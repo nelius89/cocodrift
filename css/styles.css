@@ -63,7 +63,7 @@ ul { list-style: none; }
 .view--home {
   background: var(--blue);
   color: var(--beige);
-  padding: 48px 24px 32px;
+  padding: 60px 36px 36px;
   justify-content: space-between;
 }
 
@@ -71,38 +71,62 @@ ul { list-style: none; }
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
 }
 
-/* Logo placeholder */
-.logo-placeholder {
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--beige);
-  opacity: 0.7;
-  border: 1px solid rgba(249, 246, 239, 0.3);
-  padding: 8px 16px;
-  border-radius: 4px;
+/* ── Animación de portada (logo + ilustración) ── */
+.home-anim {
+  position: relative;
+  width: 100%;
+  max-width: 260px;
+  margin: 0 auto;
 }
 
-/* Illustration placeholders */
-.illus-placeholder {
-  background: rgba(249, 246, 239, 0.12);
-  border: 2px dashed rgba(249, 246, 239, 0.3);
-  border-radius: var(--radius-card);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: rgba(249, 246, 239, 0.4);
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+/* El primer frame establece la altura del contenedor */
+.home-anim__frame--1 {
+  display: block;
+  width: 100%;
+  height: auto;
+  visibility: hidden;   /* ocupa espacio pero no se ve — los absolutas se ven encima */
 }
 
-.illus-placeholder::after {
-  content: 'ilustración';
+/* Los 3 frames, apilados */
+.home-anim__frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+}
+
+.home-anim__frame--1 {
+  position: relative; /* anula el absolute para que establezca altura */
+  visibility: visible;
+  animation: frame1 0.3s steps(1, end) infinite;
+}
+
+.home-anim__frame--2 {
+  animation: frame2 0.3s steps(1, end) infinite;
+}
+
+.home-anim__frame--3 {
+  animation: frame3 0.3s steps(1, end) infinite;
+}
+
+@keyframes frame1 {
+  0%, 33.33%  { opacity: 1; }
+  33.34%, 100%{ opacity: 0; }
+}
+
+@keyframes frame2 {
+  0%, 33.33%  { opacity: 0; }
+  33.34%, 66.66% { opacity: 1; }
+  66.67%, 100%{ opacity: 0; }
+}
+
+@keyframes frame3 {
+  0%, 66.66%  { opacity: 0; }
+  66.67%, 99.99% { opacity: 1; }
+  100%        { opacity: 0; }
 }
 
 .illus-placeholder--home {
