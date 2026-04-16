@@ -125,8 +125,7 @@ ul { list-style: none; }
 
 @keyframes frame3 {
   0%, 66.66%  { opacity: 0; }
-  66.67%, 99.99% { opacity: 1; }
-  100%        { opacity: 0; }
+  66.67%, 100% { opacity: 1; }
 }
 
 .illus-placeholder--home {
@@ -164,11 +163,11 @@ ul { list-style: none; }
   padding: 0 32px;
 }
 
-/* Grid 2 columnas — 2 spots por fila siempre */
+/* Fila de spots — flex centrado, botones de ancho fijo */
 .spots-row {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  justify-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 10px;
 }
 
@@ -179,8 +178,7 @@ ul { list-style: none; }
   justify-content: center;
   height: 48px;
   padding: 0 16px;
-  width: fit-content;
-  max-width: 100%;
+  width: 140px;
   background: transparent;
   border: 1.5px solid rgba(249, 246, 239, 0.85);
   border-radius: 100px;
@@ -201,7 +199,17 @@ ul { list-style: none; }
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 100%;
+  flex: 1;
+  min-width: 0;
+}
+
+.spot-item__abbrev {
+  font-size: 9px;
+  font-weight: 500;
+  color: rgba(249, 246, 239, 0.45);
+  letter-spacing: 0.06em;
+  margin-left: 5px;
+  flex-shrink: 0;
 }
 
 /* Botón borrar — badge encima */

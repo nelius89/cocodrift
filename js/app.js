@@ -32,6 +32,13 @@ function showView(id) {
   document.getElementById(id).classList.add('active');
 }
 
+// ── Abreviatura de ciudad ──
+function cityAbbrev(spot) {
+  if (spot.abbrev) return spot.abbrev;
+  if (!spot.city) return '';
+  return spot.city.slice(0, 3).toUpperCase();
+}
+
 // ── Home ──
 function renderSpotList() {
   const row   = document.getElementById('spots-row');
@@ -42,8 +49,9 @@ function renderSpotList() {
     const btn = document.createElement('button');
     btn.className = 'spot-item' + (deleteMode === spot.id ? ' spot-item--delete-mode' : '');
     btn.dataset.id = spot.id;
+    const abbrev = cityAbbrev(spot);
     btn.innerHTML = `
-      <span class="spot-item__name">${spot.name}</span>
+      <span class="spot-item__name">${spot.name}</span>${abbrev ? `<span class="spot-item__abbrev">${abbrev}</span>` : ''}
       ${!spot.hardcoded ? `<span class="spot-item__delete" data-delete="${spot.id}">✕</span>` : ''}
     `;
 
