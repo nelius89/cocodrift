@@ -1,0 +1,24 @@
+{
+  "name": "app-padel",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nelius89/sup-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/nelius89/sup-app/issues"
+  },
+  "homepage": "https://github.com/nelius89/sup-app#readme",
+  "devDependencies": {
+    "wrangler": "^4.83.0"
+  }
+}
