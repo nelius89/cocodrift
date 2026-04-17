@@ -253,7 +253,7 @@ ul { list-style: none; }
   position: relative;
   display: flex;
   align-items: center;
-  padding: 44px 20px 10px;
+  padding: calc(env(safe-area-inset-top, 0px) + 14px) 20px 10px;
   flex-shrink: 0;
 }
 
@@ -383,7 +383,7 @@ ul { list-style: none; }
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  padding: 4px 20px calc(12px + var(--safe-bottom));
+  padding: 14px 20px calc(12px + var(--safe-bottom));
   gap: 16px;
   min-height: 0;
 }
@@ -590,8 +590,8 @@ ul { list-style: none; }
   overflow: hidden;
 }
 
-.mblock--lg { padding: 14px 12px; }
-.mblock--sm { padding: 10px 6px; }
+.mblock--lg { padding: 9px 12px; }
+.mblock--sm { padding: 6px 6px; }
 
 .mblock__icon {
   display: flex;
