@@ -42,6 +42,18 @@
       <span class="results__spot-name" id="results-spot-name">Pont del Petroli</span>
     </header>
 
+    <!-- Navegador temporal — días + franja -->
+    <div class="time-nav" id="time-nav">
+      <div class="time-nav__days" id="time-nav-days"></div>
+      <div class="time-nav__slider-wrap">
+        <input type="range" id="franja-slider" class="franja-slider" min="0" max="6" value="1">
+      </div>
+      <div class="time-nav__franja">
+        <span class="time-nav__franja-icon" id="time-nav-icon"></span>
+        <span class="time-nav__franja-label" id="time-nav-label"></span>
+      </div>
+    </div>
+
     <div class="results__main">
 
       <!-- Capa 2: Alerta offshore -->
@@ -66,18 +78,6 @@
 
     </div><!-- /results__main -->
 
-    <!-- Barra temporal -->
-    <div class="time-bar">
-      <input
-        type="range"
-        class="time-slider"
-        id="time-slider"
-        min="0"
-        max="48"
-        value="0"
-      >
-      <div class="time-bar__label" id="time-bar-label">Hoy · Mañana</div>
-    </div>
 
   </div>
 

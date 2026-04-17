@@ -20,11 +20,31 @@ const METRICS = [
   { id: 'dir',    icon: ICONS.compass, name: 'Dirección', value: '—', label: '', phrase: '' },
 ];
 
+// ── Iconos SVG para cada franja horaria ──
+const FRANJA_ICONS = [
+  // 0 Madrugada
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/><circle cx="17" cy="5" r="1" fill="currentColor" stroke="none"/><circle cx="20" cy="9" r="0.7" fill="currentColor" stroke="none"/></svg>`,
+  // 1 Mañana
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 18a5 5 0 0 0-10 0"/><line x1="12" y1="2" x2="12" y2="9"/><line x1="4.22" y1="10.22" x2="5.64" y2="11.64"/><line x1="1" y1="18" x2="3" y2="18"/><line x1="21" y1="18" x2="23" y2="18"/><line x1="18.36" y1="11.64" x2="19.78" y2="10.22"/><line x1="23" y1="22" x2="1" y2="22"/><polyline points="8 6 12 2 16 6"/></svg>`,
+  // 2 Media mañana
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`,
+  // 3 Mediodía
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`,
+  // 4 Tarde
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>`,
+  // 5 Atardecer
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 18a5 5 0 0 0-10 0"/><line x1="12" y1="9" x2="12" y2="2"/><line x1="4.22" y1="10.22" x2="5.64" y2="11.64"/><line x1="1" y1="18" x2="3" y2="18"/><line x1="21" y1="18" x2="23" y2="18"/><line x1="18.36" y1="11.64" x2="19.78" y2="10.22"/><line x1="23" y1="22" x2="1" y2="22"/><polyline points="16 5 12 9 8 5"/></svg>`,
+  // 6 Noche
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`,
+];
+
 // ── Estado ──
-let currentSpot = null;
-let currentData = null;
-let deleteMode  = null;
-let wheel       = null;   // instancia WheelPicker
+let currentSpot   = null;
+let currentData   = null;
+let deleteMode    = null;
+let wheel         = null;   // instancia WheelPicker
+let currentDay    = 0;
+let currentFranja = 1;
 
 // ── Vistas ──
 function showView(id) {
@@ -107,9 +127,38 @@ function renderSpotList() {
   });
 }
 
+// ── Time nav ──
+function dayTabLabel(offset) {
+  if (offset === 0) return 'Hoy';
+  const d = new Date();
+  d.setDate(d.getDate() + offset);
+  return d.toLocaleDateString('es-ES', { weekday: 'short' }).replace('.', '');
+}
+
+function renderTimeNav() {
+  const daysEl = document.getElementById('time-nav-days');
+  daysEl.innerHTML = '';
+  for (let i = 0; i < FORECAST_DAYS; i++) {
+    const btn = document.createElement('button');
+    btn.className = 'time-nav__day' + (i === currentDay ? ' active' : '');
+    btn.textContent = dayTabLabel(i);
+    btn.addEventListener('click', () => {
+      currentDay = i;
+      renderTimeNav();
+      renderResults(sliderIndex(currentDay, currentFranja));
+    });
+    daysEl.appendChild(btn);
+  }
+  document.getElementById('franja-slider').value = currentFranja;
+  document.getElementById('time-nav-icon').innerHTML    = FRANJA_ICONS[currentFranja];
+  document.getElementById('time-nav-label').textContent = FRANJAS[currentFranja].label;
+}
+
 // ── Cargar datos y mostrar resultados ──
 async function loadSpot(spot) {
-  currentSpot = spot;
+  currentSpot   = spot;
+  currentDay    = 0;
+  currentFranja = getCurrentFranjaIndex();
   setActiveSpot(spot.id);
   showView('view-results');
 
@@ -119,11 +168,8 @@ async function loadSpot(spot) {
 
   try {
     currentData = await fetchSpotData(spot);
-    const sliderEl  = document.getElementById('time-slider');
-    const initIndex = getCurrentFranjaIndex();
-    sliderEl.max   = (FRANJAS.length * FORECAST_DAYS) - 1;
-    sliderEl.value = initIndex;
-    renderResults(initIndex);
+    renderTimeNav();
+    renderResults(sliderIndex(currentDay, currentFranja));
 
     // Inicializar o redimensionar el wheel una vez el DOM es visible
     requestAnimationFrame(() => {
@@ -185,9 +231,6 @@ function renderResults(sliderIndex) {
   METRICS[4].phrase = ld.phrase;
 
   if (wheel) wheel.refresh();
-
-  // Barra temporal: etiqueta
-  document.getElementById('time-bar-label').textContent = sliderLabel(sliderIndex);
 }
 
 // ── Search screen: añadir spot ──
@@ -295,9 +338,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Guardar spot nuevo
   document.getElementById('btn-save-spot').addEventListener('click', saveNewSpot);
 
-  // Slider temporal
-  document.getElementById('time-slider').addEventListener('input', (e) => {
-    renderResults(parseInt(e.target.value));
+  // Franja slider
+  document.getElementById('franja-slider').addEventListener('input', (e) => {
+    currentFranja = parseInt(e.target.value);
+    document.getElementById('time-nav-icon').innerHTML    = FRANJA_ICONS[currentFranja];
+    document.getElementById('time-nav-label').textContent = FRANJAS[currentFranja].label;
+    renderResults(sliderIndex(currentDay, currentFranja));
   });
 
   // Cerrar modo borrar tocando fuera de la lista
