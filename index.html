@@ -63,21 +63,12 @@
         <p class="diagnosis__desc" id="diagnosis-desc"></p>
       </div>
 
-      <!-- 2: Terral inline (expandible) -->
-      <div class="terral-inline hidden" id="terral-inline">
-        <button class="terral-inline__trigger" id="terral-trigger">
-          <span class="terral-inline__icon" id="terral-icon"></span>
-          <span class="terral-inline__label" id="terral-title"></span>
-          <span class="terral-inline__chevron">›</span>
-        </button>
-        <div class="terral-inline__body">
-          <div class="terral-inline__body-inner">
-            <p class="terral-inline__short" id="terral-short"></p>
-            <p class="terral-inline__full" id="terral-full"></p>
-            <p class="terral-inline__advice" id="terral-advice"></p>
-          </div>
-        </div>
-      </div>
+      <!-- 2: Terral trigger (compact) -->
+      <button class="terral-trigger hidden" id="terral-trigger">
+        <span class="terral-trigger__icon" id="terral-icon"></span>
+        <span class="terral-trigger__label" id="terral-title"></span>
+        <span class="terral-trigger__more">Ver más ›</span>
+      </button>
 
       <!-- 3: Métricas — 2 slides -->
       <div class="metrics-slides" id="metrics-slides">
@@ -185,6 +176,22 @@
     </div>
   </div>
 
+
+  <!-- Terral bottom sheet -->
+  <div class="terral-overlay" id="terral-overlay"></div>
+  <div class="terral-sheet" id="terral-sheet">
+    <div class="terral-sheet__handle"></div>
+    <div class="terral-sheet__content">
+      <div class="terral-sheet__head">
+        <span class="terral-sheet__icon" id="sheet-icon"></span>
+        <h2 class="terral-sheet__title" id="sheet-title"></h2>
+      </div>
+      <p class="terral-sheet__short" id="sheet-short"></p>
+      <p class="terral-sheet__full" id="sheet-full"></p>
+      <div class="terral-sheet__wind" id="sheet-wind"></div>
+      <p class="terral-sheet__advice" id="sheet-advice"></p>
+    </div>
+  </div>
 
   <script src="js/storage.js"></script>
   <script src="js/score.js"></script>

@@ -229,20 +229,30 @@ function renderResults(sliderIndex) {
     },
   };
   const nivelTerral = calcularRiesgoTerral(d.windKn, d.gustKn, d.windDir, d.waveH, currentSpot);
-  const terralEl = document.getElementById('terral-inline');
+  const triggerEl = document.getElementById('terral-trigger');
   if (nivelTerral === 0) {
-    terralEl.classList.add('hidden');
-    terralEl.classList.remove('expanded');
+    triggerEl.classList.add('hidden');
   } else {
-    terralEl.classList.remove('hidden');
-    terralEl.classList.remove('expanded');
-    terralEl.dataset.level = nivelTerral;
+    triggerEl.classList.remove('hidden');
+    triggerEl.dataset.level = nivelTerral;
     const ti = TERRAL_INFO[nivelTerral];
     document.getElementById('terral-icon').innerHTML    = ti.icon;
     document.getElementById('terral-title').textContent = ti.label;
-    document.getElementById('terral-short').textContent = ti.short;
-    document.getElementById('terral-full').textContent  = ti.full;
-    document.getElementById('terral-advice').textContent = ti.advice;
+    // Populate bottom sheet
+    const sheet = document.getElementById('terral-sheet');
+    sheet.dataset.level = nivelTerral;
+    document.getElementById('sheet-icon').innerHTML    = ti.icon;
+    document.getElementById('sheet-title').textContent = ti.label;
+    document.getElementById('sheet-short').textContent = ti.short;
+    document.getElementById('sheet-full').textContent  = ti.full;
+    document.getElementById('sheet-advice').textContent = ti.advice;
+    const sheetCard = degreesToCardinal(d.windDir);
+    const sheetDir  = shortDirLabel(d.windDir);
+    document.getElementById('sheet-wind').innerHTML = `
+      <span class="terral-sheet__wind-pill"><b>${d.windKn.toFixed(1)} kn</b> · viento</span>
+      <span class="terral-sheet__wind-pill"><b>${d.gustKn.toFixed(1)} kn</b> · rachas</span>
+      <span class="terral-sheet__wind-pill"><b>${sheetCard}</b> · ${sheetDir}</span>
+    `;
   }
 
   // Capa 3: Bloques visuales
@@ -281,6 +291,51 @@ function generateSummary(d) {
   const lr   = labelRacha(d.gustKn);
   const card = degreesToCardinal(d.windDir);
   return `<b>${lv.label}</b> a <b>${d.windKn.toFixed(1)} kn</b> del <b>${card}</b>, con <b>rachas ${lr.label.toLowerCase()}</b> de ${d.gustKn.toFixed(1)} kn. Ola <b>${lo.label.toLowerCase()}</b> de <b>${d.waveH.toFixed(1)} m</b> y período de <b>${d.wavePer.toFixed(0)} s</b>.`;
+}
+
+// ── Terral bottom sheet ──
+function openTerralSheet() {
+  document.getElementById('terral-overlay').classList.add('active');
+  document.getElementById('terral-sheet').classList.add('active');
+}
+
+function closeTerralSheet() {
+  const sheet = document.getElementById('terral-sheet');
+  sheet.style.transition = '';
+  sheet.style.transform = '';
+  document.getElementById('terral-overlay').classList.remove('active');
+  sheet.classList.remove('active');
+}
+
+function initTerralSheet() {
+  const sheet = document.getElementById('terral-sheet');
+  let startY = 0;
+  let dragY  = 0;
+  let dragging = false;
+
+  sheet.addEventListener('touchstart', (e) => {
+    startY   = e.touches[0].clientY;
+    dragY    = 0;
+    dragging = true;
+    sheet.style.transition = 'none';
+  }, { passive: true });
+
+  sheet.addEventListener('touchmove', (e) => {
+    if (!dragging) return;
+    dragY = Math.max(0, e.touches[0].clientY - startY);
+    sheet.style.transform = `translateY(${dragY}px)`;
+  }, { passive: true });
+
+  sheet.addEventListener('touchend', () => {
+    if (!dragging) return;
+    dragging = false;
+    sheet.style.transition = '';
+    if (dragY > 80) {
+      closeTerralSheet();
+    } else {
+      sheet.style.transform = '';
+    }
+  });
 }
 
 // ── Search screen: añadir spot ──
@@ -362,10 +417,10 @@ document.addEventListener('DOMContentLoaded', () => {
   renderSpotList();
   showView('view-home');
 
-  // Terral inline — expand/collapse
-  document.getElementById('terral-trigger').addEventListener('click', () => {
-    document.getElementById('terral-inline').classList.toggle('expanded');
-  });
+  // Terral trigger → open sheet
+  document.getElementById('terral-trigger').addEventListener('click', openTerralSheet);
+  document.getElementById('terral-overlay').addEventListener('click', closeTerralSheet);
+  initTerralSheet();
 
   // Back button
   document.getElementById('btn-back').addEventListener('click', () => {
