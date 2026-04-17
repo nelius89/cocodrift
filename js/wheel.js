@@ -15,9 +15,9 @@ class WheelPicker {
     this.n    = data.length;
 
     // Geometría del cilindro
-    this.SLOTS  = 7;           // slots DOM renderizados (-3 … +3 del centro)
-    this.HALF   = 3;
-    this.ANGLE  = 40;          // grados entre items consecutivos
+    this.SLOTS  = 3;           // slots DOM renderizados (-1 · 0 · +1 del centro)
+    this.HALF   = 1;
+    this.ANGLE  = 52;          // grados entre items — más separación con 3 visibles
     this.ITEM_H = 64;          // px — debe coincidir con CSS .drum-slot height
     this.radius = 0;           // calculado en resize()
 
