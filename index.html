@@ -58,17 +58,24 @@
 
       <!-- 1: Diagnóstico principal -->
       <div class="diagnosis">
-        <div class="illus-placeholder illus-placeholder--results" id="diagnosis-illus"></div>
+        <div class="diagnosis__illus" id="diagnosis-illus"></div>
         <h1 class="diagnosis__title" id="diagnosis-title">Cargando...</h1>
         <p class="diagnosis__desc" id="diagnosis-desc"></p>
       </div>
 
-      <!-- 2: Aviso terral (solo si nivel >= 1) -->
-      <div class="offshore-alert hidden" id="offshore-alert">
-        <span class="offshore-alert__icon" id="terral-icon"></span>
-        <div class="offshore-alert__body">
-          <span class="offshore-alert__title" id="terral-title"></span>
-          <span class="offshore-alert__desc" id="terral-desc"></span>
+      <!-- 2: Terral inline (expandible) -->
+      <div class="terral-inline hidden" id="terral-inline">
+        <button class="terral-inline__trigger" id="terral-trigger">
+          <span class="terral-inline__icon" id="terral-icon"></span>
+          <span class="terral-inline__label" id="terral-title"></span>
+          <span class="terral-inline__chevron">›</span>
+        </button>
+        <div class="terral-inline__body">
+          <div class="terral-inline__body-inner">
+            <p class="terral-inline__short" id="terral-short"></p>
+            <p class="terral-inline__full" id="terral-full"></p>
+            <p class="terral-inline__advice" id="terral-advice"></p>
+          </div>
         </div>
       </div>
 

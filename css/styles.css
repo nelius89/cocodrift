@@ -134,16 +134,7 @@ ul { list-style: none; }
   border-radius: 50%;
 }
 
-.illus-placeholder--results {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  position: relative;
-  /* sobre fondo beige: azul */
-  background: rgba(49, 79, 255, 0.08);
-  border-color: rgba(49, 79, 255, 0.2);
-  color: rgba(49, 79, 255, 0.4);
-}
+/* .illus-placeholder--results eliminado — ver .diagnosis__illus */
 
 
 /* ── Spot list ── */
@@ -262,7 +253,7 @@ ul { list-style: none; }
   position: relative;
   display: flex;
   align-items: center;
-  padding: 36px 20px 8px;
+  padding: 44px 20px 10px;
   flex-shrink: 0;
 }
 
@@ -291,10 +282,10 @@ ul { list-style: none; }
 /* ── Time nav ── */
 .time-nav {
   flex-shrink: 0;
-  padding: 0 20px 8px;
+  padding: 0 20px 14px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .time-nav__days {
@@ -392,72 +383,9 @@ ul { list-style: none; }
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  padding: 0 20px calc(8px + var(--safe-bottom));
-  gap: 14px;
+  padding: 4px 20px calc(12px + var(--safe-bottom));
+  gap: 16px;
   min-height: 0;
-}
-
-/* ── Terral alert (graduada) ── */
-.offshore-alert {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 11px 14px;
-  border-radius: 10px;
-  border: 1px solid rgba(49, 79, 255, 0.2);
-  background: rgba(49, 79, 255, 0.05);
-  flex-shrink: 0;
-  transition: background 0.2s ease, border-color 0.2s ease;
-}
-
-.offshore-alert[data-level="2"] {
-  border-color: rgba(49, 79, 255, 0.35);
-  background: rgba(49, 79, 255, 0.09);
-}
-
-.offshore-alert[data-level="3"] {
-  border-color: rgba(10, 10, 10, 0.22);
-  background: rgba(10, 10, 10, 0.04);
-}
-
-.offshore-alert__icon {
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-  color: var(--blue);
-}
-
-.offshore-alert[data-level="3"] .offshore-alert__icon {
-  color: var(--black);
-}
-
-.offshore-alert__icon svg {
-  width: 16px;
-  height: 16px;
-}
-
-.offshore-alert__body {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.offshore-alert__title {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  color: var(--blue);
-}
-
-.offshore-alert[data-level="3"] .offshore-alert__title {
-  color: var(--black);
-}
-
-.offshore-alert__desc {
-  font-size: 12px;
-  line-height: 1.5;
-  color: rgba(10, 10, 10, 0.55);
 }
 
 /* ── Diagnosis ── */
@@ -465,9 +393,22 @@ ul { list-style: none; }
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   text-align: center;
   flex-shrink: 0;
+}
+
+.diagnosis__illus {
+  height: 88px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.diagnosis__illus img {
+  height: 100%;
+  width: auto;
+  object-fit: contain;
 }
 
 .diagnosis__title {
@@ -475,8 +416,6 @@ ul { list-style: none; }
   font-weight: 600;
   color: var(--blue);
   line-height: 1.2;
-  position: relative;
-  z-index: 1;
 }
 
 .diagnosis__desc {
@@ -485,6 +424,101 @@ ul { list-style: none; }
   color: rgba(49, 79, 255, 0.6);
   max-width: 260px;
 }
+
+/* ── Terral inline (expandible) ── */
+.terral-inline {
+  flex-shrink: 0;
+}
+
+.terral-inline__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 4px 0;
+  font-family: var(--font);
+  cursor: pointer;
+}
+
+.terral-inline__icon {
+  display: flex;
+  align-items: center;
+  color: var(--blue);
+  opacity: 0.8;
+}
+
+.terral-inline__icon svg {
+  width: 13px;
+  height: 13px;
+}
+
+.terral-inline__label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--blue);
+}
+
+.terral-inline__chevron {
+  font-size: 15px;
+  color: rgba(49, 79, 255, 0.4);
+  line-height: 1;
+  transition: transform 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.terral-inline.expanded .terral-inline__chevron {
+  transform: rotate(90deg);
+}
+
+.terral-inline__body {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 0.25s ease, opacity 0.2s ease;
+}
+
+.terral-inline.expanded .terral-inline__body {
+  max-height: 220px;
+  opacity: 1;
+}
+
+.terral-inline__body-inner {
+  padding-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: center;
+}
+
+.terral-inline__short {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--blue);
+  line-height: 1.4;
+}
+
+.terral-inline__full {
+  font-size: 12px;
+  line-height: 1.65;
+  color: rgba(10, 10, 10, 0.52);
+}
+
+.terral-inline__advice {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(49, 79, 255, 0.65);
+  line-height: 1.4;
+}
+
+/* Nivel 3 — tono más severo */
+.terral-inline[data-level="3"] .terral-inline__icon  { color: rgba(10,10,10,0.65); opacity: 1; }
+.terral-inline[data-level="3"] .terral-inline__label { color: var(--black); }
+.terral-inline[data-level="3"] .terral-inline__chevron { color: rgba(10,10,10,0.3); }
+.terral-inline[data-level="3"] .terral-inline__short { color: var(--black); }
+.terral-inline[data-level="3"] .terral-inline__advice { color: rgba(10,10,10,0.5); }
 
 /* ── Metrics slides ── */
 .metrics-slides {

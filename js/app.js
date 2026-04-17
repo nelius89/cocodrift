@@ -191,38 +191,58 @@ function renderResults(sliderIndex) {
   document.getElementById('diagnosis-title').textContent    = info.titulo;
   document.getElementById('diagnosis-desc').textContent     = info.desc;
 
-  const illustMap = {
-    'perfecto': { file: 'Perfecto.png', offsetY: '-55%' },
-    'bueno':    { file: 'Bueno.png',    offsetY: '-46%' },
-  };
+  // Ilustración — limpia, sin contenedor
+  const ILLUS_MAP = { 'perfecto': 'Perfecto.png', 'bueno': 'Bueno.png' };
   const illusEl = document.getElementById('diagnosis-illus');
-  illusEl.dataset.estado = estado;
-  if (illustMap[estado]) {
-    const { file, offsetY } = illustMap[estado];
-    illusEl.innerHTML = `<img src="assets/illustrations/${file}" alt="" style="position:absolute;width:160%;height:160%;top:50%;left:50%;transform:translate(-50%,${offsetY});object-fit:contain;pointer-events:none;">`;
+  if (ILLUS_MAP[estado]) {
+    illusEl.style.display = '';
+    illusEl.innerHTML = `<img src="assets/illustrations/${ILLUS_MAP[estado]}" alt="">`;
   } else {
+    illusEl.style.display = 'none';
     illusEl.innerHTML = '';
   }
 
-  // Capa 2: Terral graduado
-  const TERRAL_SVG_WARN = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
-  const TERRAL_SVG_STOP = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>`;
+  // Terral inline
+  const TERRAL_WARN = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
+  const TERRAL_STOP = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>`;
   const TERRAL_INFO = {
-    1: { icon: TERRAL_SVG_WARN, title: 'Terral leve',      desc: 'Deriva hacia fuera baja. Puedes salir, pero sin alejarte.' },
-    2: { icon: TERRAL_SVG_WARN, title: 'Terral relevante', desc: 'Te empuja mar adentro. Mejor quedarte cerca de la orilla.' },
-    3: { icon: TERRAL_SVG_STOP, title: 'Terral fuerte',    desc: 'El viento te aleja de la orilla. Condiciones para quedarse en tierra.' },
+    1: {
+      icon:   TERRAL_WARN,
+      label:  'Terral leve',
+      short:  'Deriva hacia fuera baja.',
+      full:   'El viento sopla de tierra hacia el mar. Aunque el agua parezca tranquila, puede empujarte lentamente mar adentro.',
+      advice: 'Puedes salir, pero sin alejarte de la orilla.',
+    },
+    2: {
+      icon:   TERRAL_WARN,
+      label:  'Terral relevante',
+      short:  'Te empuja mar adentro.',
+      full:   'El viento offshore es perceptible. Te llevará progresivamente alejándote de la playa, aunque no lo notes al principio.',
+      advice: 'Mejor quedarte cerca de la orilla en todo momento.',
+    },
+    3: {
+      icon:   TERRAL_STOP,
+      label:  'Terral fuerte',
+      short:  'El viento te aleja de la orilla.',
+      full:   'Las condiciones offshore son peligrosas. El viento empuja con fuerza hacia mar abierto y recuperar la posición puede ser muy difícil.',
+      advice: 'Condiciones para quedarse en tierra hoy.',
+    },
   };
   const nivelTerral = calcularRiesgoTerral(d.windKn, d.gustKn, d.windDir, d.waveH, currentSpot);
-  const alertEl = document.getElementById('offshore-alert');
+  const terralEl = document.getElementById('terral-inline');
   if (nivelTerral === 0) {
-    alertEl.classList.add('hidden');
+    terralEl.classList.add('hidden');
+    terralEl.classList.remove('expanded');
   } else {
-    alertEl.classList.remove('hidden');
-    alertEl.dataset.level = nivelTerral;
+    terralEl.classList.remove('hidden');
+    terralEl.classList.remove('expanded');
+    terralEl.dataset.level = nivelTerral;
     const ti = TERRAL_INFO[nivelTerral];
     document.getElementById('terral-icon').innerHTML    = ti.icon;
-    document.getElementById('terral-title').textContent = ti.title;
-    document.getElementById('terral-desc').textContent  = ti.desc;
+    document.getElementById('terral-title').textContent = ti.label;
+    document.getElementById('terral-short').textContent = ti.short;
+    document.getElementById('terral-full').textContent  = ti.full;
+    document.getElementById('terral-advice').textContent = ti.advice;
   }
 
   // Capa 3: Bloques visuales
@@ -341,6 +361,11 @@ function saveNewSpot() {
 document.addEventListener('DOMContentLoaded', () => {
   renderSpotList();
   showView('view-home');
+
+  // Terral inline — expand/collapse
+  document.getElementById('terral-trigger').addEventListener('click', () => {
+    document.getElementById('terral-inline').classList.toggle('expanded');
+  });
 
   // Back button
   document.getElementById('btn-back').addEventListener('click', () => {
