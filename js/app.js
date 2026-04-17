@@ -200,9 +200,26 @@ function renderResults(sliderIndex) {
   document.getElementById('diagnosis-desc').textContent     = info.desc;
   document.getElementById('diagnosis-illus').dataset.estado = estado;
 
-  // Capa 2: Offshore
-  const offshore = esOffshore(d.windDir, currentSpot);
-  document.getElementById('offshore-alert').classList.toggle('hidden', !offshore);
+  // Capa 2: Terral graduado
+  const TERRAL_SVG_WARN = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
+  const TERRAL_SVG_STOP = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>`;
+  const TERRAL_INFO = {
+    1: { icon: TERRAL_SVG_WARN, title: 'Terral leve',      desc: 'Deriva hacia fuera baja. Puedes salir, pero sin alejarte.' },
+    2: { icon: TERRAL_SVG_WARN, title: 'Terral relevante', desc: 'Te empuja mar adentro. Mejor quedarte cerca de la orilla.' },
+    3: { icon: TERRAL_SVG_STOP, title: 'Terral fuerte',    desc: 'El viento te aleja de la orilla. Condiciones para quedarse en tierra.' },
+  };
+  const nivelTerral = calcularRiesgoTerral(d.windKn, d.gustKn, d.windDir, d.waveH, currentSpot);
+  const alertEl = document.getElementById('offshore-alert');
+  if (nivelTerral === 0) {
+    alertEl.classList.add('hidden');
+  } else {
+    alertEl.classList.remove('hidden');
+    alertEl.dataset.level = nivelTerral;
+    const ti = TERRAL_INFO[nivelTerral];
+    document.getElementById('terral-icon').innerHTML    = ti.icon;
+    document.getElementById('terral-title').textContent = ti.title;
+    document.getElementById('terral-desc').textContent  = ti.desc;
+  }
 
   // Capa 3: Actualizar METRICS y refrescar wheel
   const lv = labelViento(d.windKn);

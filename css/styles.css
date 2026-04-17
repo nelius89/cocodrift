@@ -144,19 +144,6 @@ ul { list-style: none; }
   color: rgba(49, 79, 255, 0.4);
 }
 
-.illus-placeholder--offshore {
-  width: 56px;
-  height: 56px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  background: rgba(49, 79, 255, 0.08);
-  border-color: rgba(49, 79, 255, 0.3);
-  color: transparent;
-}
-
-.illus-placeholder--offshore::after {
-  content: '';
-}
 
 /* ── Spot list ── */
 .home__spots {
@@ -413,26 +400,67 @@ ul { list-style: none; }
   min-height: 0;
 }
 
-/* ── Offshore alert ── */
+/* ── Terral alert (graduada) ── */
 .offshore-alert {
   display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  background: rgba(49, 79, 255, 0.06);
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border-radius: 10px;
   border: 1px solid rgba(49, 79, 255, 0.2);
-  border-radius: var(--radius-card);
-  padding: 16px;
+  background: rgba(49, 79, 255, 0.05);
   flex-shrink: 0;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
-.offshore-alert p {
-  font-size: 13px;
-  line-height: 1.6;
+.offshore-alert[data-level="2"] {
+  border-color: rgba(49, 79, 255, 0.35);
+  background: rgba(49, 79, 255, 0.09);
+}
+
+.offshore-alert[data-level="3"] {
+  border-color: rgba(10, 10, 10, 0.22);
+  background: rgba(10, 10, 10, 0.04);
+}
+
+.offshore-alert__icon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: var(--blue);
+}
+
+.offshore-alert[data-level="3"] .offshore-alert__icon {
   color: var(--black);
 }
 
-.offshore-alert strong {
+.offshore-alert__icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.offshore-alert__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.offshore-alert__title {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   color: var(--blue);
+}
+
+.offshore-alert[data-level="3"] .offshore-alert__title {
+  color: var(--black);
+}
+
+.offshore-alert__desc {
+  font-size: 12px;
+  line-height: 1.5;
+  color: rgba(10, 10, 10, 0.55);
 }
 
 /* ── Diagnosis ── */

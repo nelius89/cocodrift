@@ -11,9 +11,26 @@ function degreesToCardinal(deg) {
   return dirs[Math.round(deg / 22.5) % 16];
 }
 
-function esOffshore(degrees, spot) {
+// Devuelve nivel de riesgo terral: 0 (ninguno) · 1 (leve) · 2 (relevante) · 3 (desaconsejable)
+function calcularRiesgoTerral(windKn, gustKn, windDir, waveH, spot) {
   const [min, max] = spot.offshore_range;
-  return degrees >= min && degrees <= max;
+  if (windDir < min || windDir > max) return 0;
+
+  let level;
+  if (windKn < 6 && gustKn < 10) {
+    level = 1;
+  } else if (windKn > 10 || (gustKn > 16 && windKn >= 6)) {
+    level = 3;
+  } else {
+    level = 2;
+  }
+
+  // Modificador de ola: +1 si ola > 0.6 m y spot no protegido
+  if (waveH > 0.6 && !spot.protected) {
+    level = Math.min(level + 1, 3);
+  }
+
+  return level;
 }
 
 // ── Sub-scores ──
