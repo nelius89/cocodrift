@@ -94,24 +94,24 @@ function getEstado(score, weathercode) {
 
 const ESTADOS = {
   'perfecto': {
-    titulo: '¡Esto es una piscina, tío!',
-    desc: 'El mar está en calma total. Hoy sales y no gastas ni energía. Perfecto para cualquier nivel.',
+    titulo: '¡Como si estuvieras en la piscina!',
+    desc: 'El agua está tranquilísima. Súbete, relájate, flota un rato… y de chill.',
   },
   'bueno': {
-    titulo: 'Dale, que está bien.',
-    desc: 'Hay algo de movimiento pero nada que no puedas manejar. Se nota el viento, la ola te balancea un poco. Disfrútalo.',
+    titulo: 'Vamo\' a la playita!',
+    desc: 'Hay brisa ligera, olita corta, un poco de movimiento… pero nada serio. Disfruta.',
   },
   'aceptable': {
-    titulo: 'Ehh… puedes, pero ojo.',
-    desc: 'El mar está movido. Si tienes experiencia, adelante. Si estás empezando, mejor espera a mañana.',
+    titulo: 'Vale... se puede, pero cuidao!',
+    desc: 'Hay viento y el mar está movidito. Hoy toca currarse el equilibrio.',
   },
   'complicado': {
-    titulo: 'Hoy, playa pero sin tabla.',
-    desc: 'Puedes ir a la playa, tomar el sol, mojarte los pies. Pero la tabla se queda en casa. El mar no está para bromas.',
+    titulo: 'Hoy playa, pero sin tabla',
+    desc: 'Hace viento y el mar está bastante movidito. Si vas, mejor paseo y chimpún… en el agua no vas a estar a gusto.',
   },
   'no-salir': {
-    titulo: 'Ni se te ocurra.',
-    desc: 'Fuera está feo. Quédate en casa, ponte una peli y espera a que pase. En serio.',
+    titulo: 'Hoy me quedo en "causa"',
+    desc: 'Hace bastante viento y el mar está fatalístico. Mejor casita, sofá y peli.',
   }
 };
 

@@ -138,6 +138,7 @@ ul { list-style: none; }
   width: 120px;
   height: 120px;
   border-radius: 50%;
+  overflow: hidden;
   /* sobre fondo beige: azul */
   background: rgba(49, 79, 255, 0.08);
   border-color: rgba(49, 79, 255, 0.2);
