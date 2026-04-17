@@ -77,6 +77,8 @@ function getCachedData(spotId) {
   if (!entry) return null;
   const ageMinutes = (Date.now() - entry.timestamp) / 60000;
   if (ageMinutes > 60) return null; // TTL: 60 min
+  // Invalidar caché sin temperature_2m (campo añadido en v2)
+  if (!entry.forecast?.hourly?.temperature_2m) return null;
   return entry;
 }
 

@@ -128,6 +128,6 @@ function getDataForSlider(index, marine, forecast) {
     wavePer,
     cloudPct,
     weathercode,
-    tempC:       avg(h.temperature_2m),
+    tempC:       h.temperature_2m ? avg(h.temperature_2m) : 0,
   };
 }
