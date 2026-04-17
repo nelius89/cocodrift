@@ -42,6 +42,7 @@ let currentFranja = 1;
 function showView(id) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  document.body.dataset.view = id;
 }
 
 // ── Abreviatura de ciudad ──
@@ -293,6 +294,89 @@ function generateSummary(d) {
   return `<b>${lv.label}</b> a <b>${d.windKn.toFixed(1)} kn</b> del <b>${card}</b>, con <b>rachas ${lr.label.toLowerCase()}</b> de ${d.gustKn.toFixed(1)} kn. Ola <b>${lo.label.toLowerCase()}</b> de <b>${d.waveH.toFixed(1)} m</b> y período de <b>${d.wavePer.toFixed(0)} s</b>.`;
 }
 
+// ── Menú hamburguesa ──
+function openMenu() {
+  document.getElementById('menu-overlay').classList.add('active');
+  document.getElementById('menu-drawer').classList.add('active');
+  document.getElementById('btn-menu').style.visibility = 'hidden';
+}
+
+function closeMenu() {
+  document.getElementById('menu-overlay').classList.remove('active');
+  document.getElementById('menu-drawer').classList.remove('active');
+  document.getElementById('btn-menu').style.visibility = '';
+}
+
+// ── About sheet ──
+function openAboutSheet() {
+  closeMenu();
+  document.getElementById('about-overlay').classList.add('active');
+  document.getElementById('about-sheet').classList.add('active');
+}
+
+function closeAboutSheet() {
+  const sheet = document.getElementById('about-sheet');
+  sheet.style.transform = '';
+  sheet.style.transition = '';
+  document.getElementById('about-overlay').classList.remove('active');
+  sheet.classList.remove('active');
+}
+
+function initAboutSheet() {
+  const sheet = document.getElementById('about-sheet');
+  let startY = 0, dragY = 0, dragging = false;
+  sheet.addEventListener('touchstart', (e) => {
+    startY = e.touches[0].clientY; dragY = 0; dragging = true;
+    sheet.style.transition = 'none';
+  }, { passive: true });
+  sheet.addEventListener('touchmove', (e) => {
+    if (!dragging) return;
+    dragY = Math.max(0, e.touches[0].clientY - startY);
+    sheet.style.transform = `translateY(${dragY}px)`;
+  }, { passive: true });
+  sheet.addEventListener('touchend', () => {
+    if (!dragging) return;
+    dragging = false;
+    sheet.style.transition = '';
+    if (dragY > 80) closeAboutSheet(); else sheet.style.transform = '';
+  });
+}
+
+// ── Suggestions sheet ──
+function openSuggestionsSheet() {
+  closeMenu();
+  document.getElementById('suggestions-overlay').classList.add('active');
+  document.getElementById('suggestions-sheet').classList.add('active');
+}
+
+function closeSuggestionsSheet() {
+  const sheet = document.getElementById('suggestions-sheet');
+  sheet.style.transform = '';
+  sheet.style.transition = '';
+  document.getElementById('suggestions-overlay').classList.remove('active');
+  sheet.classList.remove('active');
+}
+
+function initSuggestionsSheet() {
+  const sheet = document.getElementById('suggestions-sheet');
+  let startY = 0, dragY = 0, dragging = false;
+  sheet.addEventListener('touchstart', (e) => {
+    startY = e.touches[0].clientY; dragY = 0; dragging = true;
+    sheet.style.transition = 'none';
+  }, { passive: true });
+  sheet.addEventListener('touchmove', (e) => {
+    if (!dragging) return;
+    dragY = Math.max(0, e.touches[0].clientY - startY);
+    sheet.style.transform = `translateY(${dragY}px)`;
+  }, { passive: true });
+  sheet.addEventListener('touchend', () => {
+    if (!dragging) return;
+    dragging = false;
+    sheet.style.transition = '';
+    if (dragY > 80) closeSuggestionsSheet(); else sheet.style.transform = '';
+  });
+}
+
 // ── Terral bottom sheet ──
 function openTerralSheet() {
   document.getElementById('terral-overlay').classList.add('active');
@@ -416,6 +500,22 @@ function saveNewSpot() {
 document.addEventListener('DOMContentLoaded', () => {
   renderSpotList();
   showView('view-home');
+
+  // Service Worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  }
+
+  // Menú hamburguesa
+  document.getElementById('btn-menu').addEventListener('click', openMenu);
+  document.getElementById('menu-close').addEventListener('click', closeMenu);
+  document.getElementById('menu-overlay').addEventListener('click', closeMenu);
+  document.getElementById('menu-about').addEventListener('click', openAboutSheet);
+  document.getElementById('menu-feedback').addEventListener('click', openSuggestionsSheet);
+  document.getElementById('about-overlay').addEventListener('click', closeAboutSheet);
+  document.getElementById('suggestions-overlay').addEventListener('click', closeSuggestionsSheet);
+  initAboutSheet();
+  initSuggestionsSheet();
 
   // Terral trigger → open sheet
   document.getElementById('terral-trigger').addEventListener('click', openTerralSheet);

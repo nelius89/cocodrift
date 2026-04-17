@@ -8,6 +8,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#314fff">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Coco">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
 </head>
 <body>
 
@@ -176,6 +182,82 @@
     </div>
   </div>
 
+
+  <!-- Hamburger button — fixed, siempre visible -->
+  <button class="btn-menu" id="btn-menu" aria-label="Menú">
+    <span class="btn-menu__bar"></span>
+    <span class="btn-menu__bar"></span>
+    <span class="btn-menu__bar"></span>
+  </button>
+
+  <!-- Menu drawer overlay -->
+  <div class="menu-overlay" id="menu-overlay"></div>
+
+  <!-- Menu drawer -->
+  <div class="menu-drawer" id="menu-drawer" role="dialog" aria-label="Menú">
+    <div class="menu-drawer__header">
+      <span class="menu-drawer__brand">Coco</span>
+      <button class="menu-drawer__close" id="menu-close" aria-label="Cerrar menú">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <nav class="menu-drawer__nav">
+      <button class="menu-nav-item" id="menu-about">
+        <span class="menu-nav-item__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8" stroke-width="2.4"/></svg>
+        </span>
+        <span class="menu-nav-item__label">Acerca de Coco</span>
+        <span class="menu-nav-item__arrow">›</span>
+      </button>
+      <button class="menu-nav-item" id="menu-feedback">
+        <span class="menu-nav-item__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </span>
+        <span class="menu-nav-item__label">Sugerencias</span>
+        <span class="menu-nav-item__arrow">›</span>
+      </button>
+    </nav>
+    <div class="menu-drawer__footer">
+      <span>Coco</span>
+      <span class="menu-drawer__version">v1.0</span>
+    </div>
+  </div>
+
+  <!-- About bottom sheet -->
+  <div class="about-overlay" id="about-overlay"></div>
+  <div class="about-sheet" id="about-sheet">
+    <div class="about-sheet__handle"></div>
+    <div class="about-sheet__content">
+      <div class="about-sheet__head">
+        <h2 class="about-sheet__title">Coco</h2>
+        <p class="about-sheet__tagline">¿Salgo al agua hoy?</p>
+      </div>
+      <p class="about-sheet__desc">Coco interpreta los datos del mar y te dice si puedes salir al agua. Sin tecnicismos ni tablas de datos — solo la respuesta que necesitas.</p>
+      <div class="about-sheet__disclaimer">
+        <p>⚠ Los datos son orientativos. Las condiciones reales pueden diferir de la previsión. Evalúa siempre in situ antes de entrar al agua. Coco no se responsabiliza de accidentes o daños derivados del uso de esta app.</p>
+      </div>
+      <div class="about-sheet__credits">
+        <p>Datos meteorológicos: <a href="https://open-meteo.com" target="_blank">Open-Meteo.com</a> (CC BY 4.0)</p>
+        <p>Ubicaciones: © <a href="https://www.openstreetmap.org" target="_blank">OpenStreetMap</a></p>
+      </div>
+      <div class="about-sheet__links">
+        <a href="/privacy" target="_blank">Política de privacidad</a>
+        <a href="/terms" target="_blank">Términos de uso</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Suggestions bottom sheet -->
+  <div class="suggestions-overlay" id="suggestions-overlay"></div>
+  <div class="suggestions-sheet" id="suggestions-sheet">
+    <div class="suggestions-sheet__handle"></div>
+    <div class="suggestions-sheet__content">
+      <h2 class="suggestions-sheet__title">Sugerencias</h2>
+      <p class="suggestions-sheet__desc">¿Algo que mejorar? ¿Un error? ¿Una playa que debería estar?</p>
+      <p class="suggestions-sheet__desc">Escríbenos — leemos todos los mensajes.</p>
+      <a class="suggestions-sheet__cta" href="mailto:hola@cocoapp.com">hola@cocoapp.com</a>
+    </div>
+  </div>
 
   <!-- Terral bottom sheet -->
   <div class="terral-overlay" id="terral-overlay"></div>
