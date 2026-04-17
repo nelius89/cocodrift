@@ -343,8 +343,16 @@ function initAboutSheet() {
 }
 
 // ── Suggestions sheet ──
+const SUGGESTIONS_WORKER = 'https://coco-suggestions.manel89.workers.dev';
+
 function openSuggestionsSheet() {
   closeMenu();
+  // Reset form state on open
+  document.getElementById('suggestions-form').classList.remove('hidden');
+  document.getElementById('suggestions-success').classList.add('hidden');
+  document.getElementById('suggestions-textarea').value = '';
+  document.getElementById('suggestions-count').textContent = '0';
+  document.getElementById('suggestions-send').disabled = false;
   document.getElementById('suggestions-overlay').classList.add('active');
   document.getElementById('suggestions-sheet').classList.add('active');
 }
@@ -359,6 +367,8 @@ function closeSuggestionsSheet() {
 
 function initSuggestionsSheet() {
   const sheet = document.getElementById('suggestions-sheet');
+
+  // Swipe to close
   let startY = 0, dragY = 0, dragging = false;
   sheet.addEventListener('touchstart', (e) => {
     startY = e.touches[0].clientY; dragY = 0; dragging = true;
@@ -374,6 +384,43 @@ function initSuggestionsSheet() {
     dragging = false;
     sheet.style.transition = '';
     if (dragY > 80) closeSuggestionsSheet(); else sheet.style.transform = '';
+  });
+
+  // Character counter
+  const textarea = document.getElementById('suggestions-textarea');
+  const counter  = document.getElementById('suggestions-count');
+  textarea.addEventListener('input', () => {
+    counter.textContent = textarea.value.length;
+  });
+
+  // Send button
+  document.getElementById('suggestions-send').addEventListener('click', async () => {
+    const message = textarea.value.trim();
+    if (!message) return;
+
+    const btn = document.getElementById('suggestions-send');
+    btn.disabled = true;
+    btn.textContent = 'Enviando…';
+
+    try {
+      const res = await fetch(SUGGESTIONS_WORKER, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message }),
+      });
+      if (res.ok) {
+        document.getElementById('suggestions-form').classList.add('hidden');
+        document.getElementById('suggestions-success').classList.remove('hidden');
+      } else {
+        btn.disabled = false;
+        btn.textContent = 'Enviar';
+        alert('Algo ha fallado. Inténtalo de nuevo.');
+      }
+    } catch {
+      btn.disabled = false;
+      btn.textContent = 'Enviar';
+      alert('Sin conexión. Inténtalo de nuevo.');
+    }
   });
 }
 

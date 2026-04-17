@@ -253,9 +253,15 @@
     <div class="suggestions-sheet__handle"></div>
     <div class="suggestions-sheet__content">
       <h2 class="suggestions-sheet__title">Sugerencias</h2>
-      <p class="suggestions-sheet__desc">¿Algo que mejorar? ¿Un error? ¿Una playa que debería estar?</p>
-      <p class="suggestions-sheet__desc">Escríbenos — leemos todos los mensajes.</p>
-      <a class="suggestions-sheet__cta" href="mailto:hola@cocoapp.com">hola@cocoapp.com</a>
+      <p class="suggestions-sheet__desc">¿Algo que mejorar? ¿Un error? ¿Una playa que falta? Escríbelo — leemos todos los mensajes.</p>
+      <div class="suggestions-form" id="suggestions-form">
+        <textarea class="suggestions-textarea" id="suggestions-textarea" placeholder="Escribe tu sugerencia…" maxlength="1000" rows="4"></textarea>
+        <div class="suggestions-counter"><span id="suggestions-count">0</span>/1000</div>
+        <button class="suggestions-send" id="suggestions-send">Enviar</button>
+      </div>
+      <div class="suggestions-success hidden" id="suggestions-success">
+        <p class="suggestions-success__msg">Gracias. Lo hemos recibido.</p>
+      </div>
     </div>
   </div>
 
