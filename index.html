@@ -83,36 +83,39 @@
 
 
   <!-- ─────────────────────────────────────────
-       OVERLAY: Añadir playa
+       SEARCH SCREEN: Añadir playa
   ───────────────────────────────────────── -->
-  <div id="overlay-add-spot" class="overlay hidden">
-    <div class="overlay__panel">
-      <div class="overlay__header">
-        <span>Buscar playa</span>
-        <button class="btn-close-overlay" id="btn-close-overlay">✕</button>
-      </div>
+  <div id="search-screen" class="search-screen">
+    <div class="search-screen__inner">
 
-      <input
-        type="text"
-        class="search-input"
-        id="search-input"
-        placeholder="Valencia, Tarragona..."
-        autocomplete="off"
-      >
+      <button class="search-back" id="search-back">←</button>
 
-      <ul class="search-results" id="search-results">
-        <!-- Renderizado por JS -->
-      </ul>
+      <p class="search-prompt">¿Dónde quieres ir?</p>
 
-      <div class="add-spot-confirm hidden" id="add-spot-confirm">
+      <div class="search-field-wrap">
         <input
           type="text"
-          class="search-input"
+          id="search-input"
+          class="search-field"
+          placeholder="Escribe una playa..."
+          autocomplete="off"
+          autocorrect="off"
+          spellcheck="false"
+        >
+      </div>
+
+      <ul id="search-results" class="search-results"></ul>
+
+      <div id="search-confirm" class="search-confirm hidden">
+        <input
+          type="text"
           id="spot-name-input"
+          class="search-field search-field--sm"
           placeholder="Nombre para este spot"
         >
-        <button class="btn-save-spot" id="btn-save-spot">Guardar</button>
+        <button id="btn-save-spot" class="search-save-btn">Guardar</button>
       </div>
+
     </div>
   </div>
 

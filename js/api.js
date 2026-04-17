@@ -24,15 +24,33 @@ async function fetchSpotData(spot) {
   return { marine, forecast };
 }
 
-// ── Geocoding para buscar spots ──
+// ── Geocoding — Nominatim (OpenStreetMap) ──
+// Devuelve playas, bahías y cualquier lugar geográfico, no solo ciudades
 async function searchSpots(query) {
   if (!query || query.length < 2) return [];
-  const res = await fetch(
-    `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=8&language=es`
-  );
-  if (!res.ok) return [];
-  const data = await res.json();
-  return data.results || [];
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=8&addressdetails=1&accept-language=es`,
+      { headers: { 'User-Agent': 'SUP App (sup-app.pages.dev)' } }
+    );
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.map(r => {
+      const addr = r.address || {};
+      const name = addr.beach || addr.bay || r.display_name.split(',')[0].trim();
+      const city = addr.city || addr.town || addr.village || addr.municipality || addr.county || '';
+      const country = addr.country || '';
+      return {
+        name,
+        location: [city, country].filter(Boolean).join(', '),
+        city,
+        latitude:  parseFloat(r.lat),
+        longitude: parseFloat(r.lon),
+      };
+    });
+  } catch {
+    return [];
+  }
 }
 
 // ── Franjas horarias ──

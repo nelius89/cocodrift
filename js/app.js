@@ -89,7 +89,7 @@ function renderSpotList() {
       addBtn.className = 'btn-add-spot';
       addBtn.id = 'btn-add-spot';
       addBtn.textContent = '+';
-      addBtn.addEventListener('click', openOverlay);
+      addBtn.addEventListener('click', openSearch);
       spotRow.appendChild(addBtn);
     }
 
@@ -190,38 +190,50 @@ function renderResults(sliderIndex) {
   document.getElementById('time-bar-label').textContent = sliderLabel(sliderIndex);
 }
 
-// ── Overlay: añadir spot ──
+// ── Search screen: añadir spot ──
 let selectedGeoResult = null;
 
-function openOverlay() {
-  document.getElementById('overlay-add-spot').classList.remove('hidden');
+function openSearch() {
+  const addBtn = document.getElementById('btn-add-spot');
+  if (!addBtn) return;
+  const rect = addBtn.getBoundingClientRect();
+  const screen = document.getElementById('search-screen');
+  screen.style.setProperty('--ox', (rect.left + rect.width  / 2) + 'px');
+  screen.style.setProperty('--oy', (rect.top  + rect.height / 2) + 'px');
+  screen.classList.add('active');
   document.getElementById('search-input').focus();
 }
 
-function closeOverlay() {
-  document.getElementById('overlay-add-spot').classList.add('hidden');
-  document.getElementById('search-input').value   = '';
-  document.getElementById('search-results').innerHTML = '';
-  document.getElementById('add-spot-confirm').classList.add('hidden');
-  document.getElementById('spot-name-input').value = '';
-  selectedGeoResult = null;
+function closeSearch() {
+  document.getElementById('search-screen').classList.remove('active');
+  setTimeout(() => {
+    document.getElementById('search-input').value      = '';
+    document.getElementById('search-results').innerHTML = '';
+    document.getElementById('search-confirm').classList.add('hidden');
+    document.getElementById('spot-name-input').value  = '';
+    selectedGeoResult = null;
+  }, 350);
 }
 
 async function handleSearch(query) {
   const list = document.getElementById('search-results');
-  list.innerHTML = '<li style="padding:14px 16px;opacity:0.4;font-size:13px">Buscando...</li>';
+  list.innerHTML = '<li class="search-status">Buscando...</li>';
   const results = await searchSpots(query);
 
   list.innerHTML = '';
   if (!results.length) {
-    list.innerHTML = '<li style="padding:14px 16px;opacity:0.4;font-size:13px">Sin resultados</li>';
+    list.innerHTML = '<li class="search-status">Sin resultados</li>';
     return;
   }
 
-  results.forEach(r => {
+  results.forEach((r, i) => {
     const li = document.createElement('li');
     li.className = 'search-result-item';
-    li.innerHTML = `${r.name}<span class="search-result-item__country">${r.country || ''}</span>`;
+    li.style.setProperty('--idx', i);
+    li.innerHTML = `
+      <span class="search-result-item__name">${r.name}</span>
+      <span class="search-result-item__location">${r.location}</span>
+    `;
     li.addEventListener('click', () => selectGeoResult(r));
     list.appendChild(li);
   });
@@ -230,8 +242,9 @@ async function handleSearch(query) {
 function selectGeoResult(result) {
   selectedGeoResult = result;
   document.getElementById('search-results').innerHTML = '';
+  document.getElementById('search-input').value = result.name;
   document.getElementById('spot-name-input').value = result.name;
-  document.getElementById('add-spot-confirm').classList.remove('hidden');
+  document.getElementById('search-confirm').classList.remove('hidden');
 }
 
 function saveNewSpot() {
@@ -240,14 +253,14 @@ function saveNewSpot() {
   const newSpot = {
     id: `user-${Date.now()}`,
     name,
-    city: selectedGeoResult.admin1 || selectedGeoResult.country || '',
+    city: selectedGeoResult.city || '',
     lat: selectedGeoResult.latitude,
     lon: selectedGeoResult.longitude,
     hardcoded: false,
-    offshore_range: [225, 315] // default — misma costa
+    offshore_range: [225, 315]
   };
   addUserSpot(newSpot);
-  closeOverlay();
+  closeSearch();
   renderSpotList();
 }
 
@@ -262,19 +275,16 @@ document.addEventListener('DOMContentLoaded', () => {
     renderSpotList();
   });
 
-  // Abrir overlay
-  document.getElementById('btn-close-overlay').addEventListener('click', closeOverlay);
-
-  // Cerrar overlay tocando fuera
-  document.getElementById('overlay-add-spot').addEventListener('click', (e) => {
-    if (e.target === e.currentTarget) closeOverlay();
-  });
+  // Search screen — cerrar
+  document.getElementById('search-back').addEventListener('click', closeSearch);
 
   // Búsqueda con debounce
   let searchTimer;
   document.getElementById('search-input').addEventListener('input', (e) => {
     clearTimeout(searchTimer);
     const q = e.target.value.trim();
+    document.getElementById('search-confirm').classList.add('hidden');
+    selectedGeoResult = null;
     if (q.length < 2) {
       document.getElementById('search-results').innerHTML = '';
       return;
@@ -292,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Cerrar modo borrar tocando fuera de la lista
   document.addEventListener('click', (e) => {
-    if (deleteMode && !e.target.closest('.spot-list')) {
+    if (deleteMode && !e.target.closest('.spots-row')) {
       deleteMode = null;
       renderSpotList();
     }
