@@ -93,11 +93,11 @@ function getEstado(score, weathercode) {
 }
 
 const ESTADOS = {
-  'perfecto':   { titulo: 'Hoy es perfecto para salir',    desc: '' },
-  'bueno':      { titulo: 'Puedes salir sin problema',      desc: '' },
-  'aceptable':  { titulo: 'Puedes salir, pero ojo',         desc: '' },
-  'complicado': { titulo: 'Mejor no meterse hoy',           desc: '' },
-  'no-salir':   { titulo: 'Hoy no salgas',                  desc: '' },
+  'perfecto':   { titulo: 'Hoy es de los buenos',              subtitulo: 'Yo no me lo perdería' },
+  'bueno':      { titulo: 'Hoy se puede salir',                subtitulo: 'Si te apetece, se está a gusto' },
+  'aceptable':  { titulo: 'Hoy, depende...',                   subtitulo: 'Solo si estás acostumbrado' },
+  'complicado': { titulo: 'Mejor otro día',                    subtitulo: 'Hoy lo dejaría' },
+  'no-salir':   { titulo: 'Hoy mejor quedarse en casa',        subtitulo: 'No está el agua para nadie' },
 };
 
 // ── Resumen corto para la pantalla principal (2-3 frases) ──

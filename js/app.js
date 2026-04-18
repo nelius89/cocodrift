@@ -175,8 +175,10 @@ async function loadSpot(spot) {
   showView('view-results');
 
   document.getElementById('results-spot-name').textContent = spot.name;
-  document.getElementById('diagnosis-title').textContent   = 'Cargando...';
-  document.getElementById('diagnosis-summary').textContent = '';
+  document.getElementById('diagnosis-title').textContent    = 'Cargando...';
+  document.getElementById('diagnosis-subtitle').textContent = '';
+  document.getElementById('diagnosis-sea').textContent      = '';
+  document.getElementById('diagnosis-wind').textContent     = '';
 
   try {
     currentData = await fetchSpotData(spot);
@@ -184,8 +186,10 @@ async function loadSpot(spot) {
     renderResults(sliderIndex(currentDay, currentFranja));
 
   } catch (err) {
-    document.getElementById('diagnosis-title').textContent   = 'Sin conexión';
-    document.getElementById('diagnosis-summary').textContent = 'No se han podido cargar los datos. Comprueba tu conexión.';
+    document.getElementById('diagnosis-title').textContent    = 'Sin conexión';
+    document.getElementById('diagnosis-subtitle').textContent = 'No se han podido cargar los datos. Comprueba tu conexión.';
+    document.getElementById('diagnosis-sea').textContent      = '';
+    document.getElementById('diagnosis-wind').textContent     = '';
   }
 }
 
@@ -209,8 +213,9 @@ function renderResults(sliderIdx) {
   document.getElementById('results-weather-icon').innerHTML    = getWeatherIcon(d.weathercode);
   document.getElementById('results-weather-temp').textContent  = `${Math.round(d.tempC)}°`;
 
-  // Título de decisión
-  document.getElementById('diagnosis-title').textContent = info.titulo;
+  // Título de decisión + subtítulo de personalidad
+  document.getElementById('diagnosis-title').textContent    = info.titulo;
+  document.getElementById('diagnosis-subtitle').textContent = info.subtitulo;
 
   // Ilustración
   const ILLUS_MAP = { 'perfecto': 'Perfecto.png', 'bueno': 'Bueno.png' };
@@ -226,9 +231,6 @@ function renderResults(sliderIdx) {
   // Terral
   const nivelTerral = calcularRiesgoTerral(d.windKn, d.gustKn, d.windDir, d.waveH, currentSpot);
 
-  // Resumen corto (sin mencionar dirección si hay terral — ya tiene su alerta)
-  document.getElementById('diagnosis-summary').textContent = buildSummary(d, estado);
-
   // Terral pill en pantalla principal
   const pillEl = document.getElementById('terral-pill');
   if (nivelTerral === 0) {
@@ -238,8 +240,10 @@ function renderResults(sliderIdx) {
     document.getElementById('terral-pill-label').textContent = TERRAL_INFO[nivelTerral].pillLabel;
   }
 
-  // Bloques interpretativos en el sheet
+  // Bloques interpretativos en el sheet y en la pantalla principal
   const blocks = buildBlocks(d, estado);
+  document.getElementById('diagnosis-sea').textContent  = blocks.seaTitle;
+  document.getElementById('diagnosis-wind').textContent = blocks.windTitle;
   document.getElementById('explain-wind-icon').innerHTML   = ICONS.wind;
   document.getElementById('explain-wind-title').textContent = blocks.windTitle;
   document.getElementById('explain-wind-desc').textContent  = blocks.windDesc;

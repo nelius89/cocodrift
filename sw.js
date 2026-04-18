@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE_NAME = 'coco-v5';
+const CACHE_NAME = 'coco-v6';
 const STATIC_ASSETS = [
   '/',
   '/css/styles.css',
