@@ -34,7 +34,7 @@ const FRANJA_ICONS = [
 let currentSpot   = null;
 let currentData   = null;
 let deleteMode    = null;
-let swiper        = null;   // instancia SlideSwiper
+let swiper        = null;   // unused — carrusel eliminado
 let currentDay    = 0;
 let currentFranja = 1;
 
@@ -164,15 +164,6 @@ async function loadSpot(spot) {
     renderTimeNav();
     renderResults(sliderIndex(currentDay, currentFranja));
 
-    // Inicializar swiper una vez; reset al slide 1 en cada carga
-    if (!swiper) {
-      swiper = new SlideSwiper(
-        document.getElementById('metrics-track'),
-        document.getElementById('metrics-dots')
-      );
-    } else {
-      swiper.reset();
-    }
   } catch (err) {
     document.getElementById('diagnosis-title').textContent = 'Sin conexión';
     document.getElementById('diagnosis-desc').textContent  = 'No se han podido cargar los datos. Comprueba tu conexión.';
@@ -184,15 +175,17 @@ function renderResults(sliderIndex) {
   const { marine, forecast } = currentData;
   const d = getDataForSlider(sliderIndex, marine, forecast);
 
-  // Capa 1: Score y estado
+  // Score y estado
   const score  = calcularScore(d.windKn, d.waveH, d.gustKn, d.wavePer, d.cloudPct);
   const estado = getEstado(score, d.weathercode);
   const info   = ESTADOS[estado];
 
-  document.getElementById('diagnosis-title').textContent    = info.titulo;
-  document.getElementById('diagnosis-desc').textContent     = info.desc;
+  document.getElementById('diagnosis-title').textContent = info.titulo;
+  const descEl = document.getElementById('diagnosis-desc');
+  descEl.textContent = info.desc;
+  descEl.style.display = info.desc ? '' : 'none';
 
-  // Ilustración — limpia, sin contenedor
+  // Ilustración
   const ILLUS_MAP = { 'perfecto': 'Perfecto.png', 'bueno': 'Bueno.png' };
   const illusEl = document.getElementById('diagnosis-illus');
   if (ILLUS_MAP[estado]) {
@@ -203,49 +196,34 @@ function renderResults(sliderIndex) {
     illusEl.innerHTML = '';
   }
 
+  // Párrafo inteligente
+  document.getElementById('diagnosis-paragraph').textContent = buildParagraph(d, estado);
+
   // Terral inline
   const TERRAL_WARN = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
   const TERRAL_STOP = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>`;
   const TERRAL_INFO = {
-    1: {
-      icon:   TERRAL_WARN,
-      label:  'Terral leve',
-      short:  'Deriva hacia fuera baja.',
-      full:   'El viento sopla de tierra hacia el mar. Aunque el agua parezca tranquila, puede empujarte lentamente mar adentro.',
-      advice: 'Puedes salir, pero sin alejarte de la orilla.',
-    },
-    2: {
-      icon:   TERRAL_WARN,
-      label:  'Terral relevante',
-      short:  'Te empuja mar adentro.',
-      full:   'El viento offshore es perceptible. Te llevará progresivamente alejándote de la playa, aunque no lo notes al principio.',
-      advice: 'Mejor quedarte cerca de la orilla en todo momento.',
-    },
-    3: {
-      icon:   TERRAL_STOP,
-      label:  'Terral fuerte',
-      short:  'El viento te aleja de la orilla.',
-      full:   'Las condiciones offshore son peligrosas. El viento empuja con fuerza hacia mar abierto y recuperar la posición puede ser muy difícil.',
-      advice: 'Condiciones para quedarse en tierra hoy.',
-    },
+    1: { icon: TERRAL_WARN, label: 'Terral leve',    short: 'Deriva hacia fuera baja.',          full: 'El viento sopla de tierra hacia el mar. Aunque el agua parezca tranquila, puede empujarte lentamente mar adentro.',                                                        advice: 'Puedes salir, pero sin alejarte de la orilla.' },
+    2: { icon: TERRAL_WARN, label: 'Terral relevante', short: 'Te empuja mar adentro.',          full: 'El viento offshore es perceptible. Te llevará progresivamente alejándote de la playa, aunque no lo notes al principio.',                                                   advice: 'Mejor quedarte cerca de la orilla en todo momento.' },
+    3: { icon: TERRAL_STOP, label: 'Terral fuerte',  short: 'El viento te aleja de la orilla.',  full: 'Las condiciones offshore son peligrosas. El viento empuja con fuerza hacia mar abierto y recuperar la posición puede ser muy difícil.',                                    advice: 'Condiciones para quedarse en tierra hoy.' },
   };
+
   const nivelTerral = calcularRiesgoTerral(d.windKn, d.gustKn, d.windDir, d.waveH, currentSpot);
-  const triggerEl = document.getElementById('terral-trigger');
+  const terralEl = document.getElementById('terral-inline');
   if (nivelTerral === 0) {
-    triggerEl.classList.add('hidden');
+    terralEl.style.display = 'none';
   } else {
-    triggerEl.classList.remove('hidden');
-    triggerEl.dataset.level = nivelTerral;
+    terralEl.style.display = 'flex';
     const ti = TERRAL_INFO[nivelTerral];
-    document.getElementById('terral-icon').innerHTML    = ti.icon;
-    document.getElementById('terral-title').textContent = ti.label;
-    // Populate bottom sheet
+    document.getElementById('terral-icon').innerHTML = ti.icon;
+    document.getElementById('terral-short').textContent = ti.short;
+    // Bottom sheet
     const sheet = document.getElementById('terral-sheet');
     sheet.dataset.level = nivelTerral;
-    document.getElementById('sheet-icon').innerHTML    = ti.icon;
-    document.getElementById('sheet-title').textContent = ti.label;
-    document.getElementById('sheet-short').textContent = ti.short;
-    document.getElementById('sheet-full').textContent  = ti.full;
+    document.getElementById('sheet-icon').innerHTML     = ti.icon;
+    document.getElementById('sheet-title').textContent  = ti.label;
+    document.getElementById('sheet-short').textContent  = ti.short;
+    document.getElementById('sheet-full').textContent   = ti.full;
     document.getElementById('sheet-advice').textContent = ti.advice;
     const sheetCard = degreesToCardinal(d.windDir);
     const sheetDir  = shortDirLabel(d.windDir);
@@ -256,28 +234,18 @@ function renderResults(sliderIndex) {
     `;
   }
 
-  // Capa 3: Bloques visuales
-  const lv = labelViento(d.windKn);
-  const lo = labelOla(d.waveH);
-  const lr = labelRacha(d.gustKn);
-  const lp = labelPeriodo(d.wavePer);
+  // Métricas grid
   const card = degreesToCardinal(d.windDir);
-
-  function setBlock(suffix, iconSvg, value, label) {
-    document.getElementById(`m-${suffix}-icon`).innerHTML  = iconSvg;
+  function setMetric(suffix, iconSvg, value) {
+    document.getElementById(`m-${suffix}-icon`).innerHTML    = iconSvg;
     document.getElementById(`m-${suffix}-value`).textContent = value;
-    document.getElementById(`m-${suffix}-label`).textContent = label;
   }
-
-  setBlock('temp',   ICONS.thermometer, `${Math.round(d.tempC)}°`,        labelTemp(d.tempC));
-  setBlock('wind',   ICONS.wind,        `${d.windKn.toFixed(1)} kn`,      lv.label);
-  setBlock('wave',   ICONS.wave,        `${d.waveH.toFixed(1)} m`,        lo.label);
-  setBlock('gusts',  ICONS.zap,         `${d.gustKn.toFixed(1)} kn`,      lr.label);
-  setBlock('period', ICONS.timer,       `${d.wavePer.toFixed(0)} s`,       lp.label);
-  setBlock('dir',    ICONS.compass,     card,                              shortDirLabel(d.windDir));
-
-  // Capa 4: Resumen de texto
-  document.getElementById('metrics-summary').innerHTML = generateSummary(d);
+  setMetric('temp',   ICONS.thermometer, `${Math.round(d.tempC)}°`);
+  setMetric('wind',   ICONS.wind,        `${d.windKn.toFixed(1)} kn`);
+  setMetric('wave',   ICONS.wave,        `${d.waveH.toFixed(1)} m`);
+  setMetric('gusts',  ICONS.zap,         `${d.gustKn.toFixed(1)} kn`);
+  setMetric('period', ICONS.timer,       `${d.wavePer.toFixed(0)} s`);
+  setMetric('dir',    ICONS.compass,     card);
 }
 
 function shortDirLabel(degrees) {
@@ -286,13 +254,6 @@ function shortDirLabel(degrees) {
   return 'Lateral';
 }
 
-function generateSummary(d) {
-  const lv   = labelViento(d.windKn);
-  const lo   = labelOla(d.waveH);
-  const lr   = labelRacha(d.gustKn);
-  const card = degreesToCardinal(d.windDir);
-  return `<b>${lv.label}</b> a <b>${d.windKn.toFixed(1)} kn</b> del <b>${card}</b>, con <b>rachas ${lr.label.toLowerCase()}</b> de ${d.gustKn.toFixed(1)} kn. Ola <b>${lo.label.toLowerCase()}</b> de <b>${d.waveH.toFixed(1)} m</b> y período de <b>${d.wavePer.toFixed(0)} s</b>.`;
-}
 
 // ── Menú hamburguesa ──
 function openMenu() {

@@ -62,82 +62,56 @@
 
     <div class="results__main">
 
-      <!-- 1: Diagnóstico principal -->
+      <!-- Bloque 2: Diagnóstico + párrafo + terral -->
       <div class="diagnosis">
         <div class="diagnosis__illus" id="diagnosis-illus"></div>
+        <p class="diagnosis__pretitle">Estado del mar</p>
         <h1 class="diagnosis__title" id="diagnosis-title">Cargando...</h1>
         <p class="diagnosis__desc" id="diagnosis-desc"></p>
+        <p class="diagnosis__paragraph" id="diagnosis-paragraph"></p>
+        <div class="terral-inline" id="terral-inline">
+          <span class="terral-inline__icon" id="terral-icon"></span>
+          <div class="terral-inline__body">
+            <span class="terral-inline__name">Viento terral</span>
+            <span class="terral-inline__short" id="terral-short"></span>
+          </div>
+          <button class="terral-inline__btn" id="terral-trigger">Ver por qué</button>
+        </div>
       </div>
 
-      <!-- 2: Terral trigger (compact) -->
-      <button class="terral-trigger hidden" id="terral-trigger">
-        <span class="terral-trigger__icon" id="terral-icon"></span>
-        <span class="terral-trigger__label" id="terral-title"></span>
-        <span class="terral-trigger__more">Ver más ›</span>
-      </button>
-
-      <!-- 3: Métricas — 2 slides -->
-      <div class="metrics-slides" id="metrics-slides">
-
-        <div class="metrics-track" id="metrics-track">
-
-          <!-- Slide 1: Visual -->
-          <div class="metrics-slide metrics-slide--visual">
-            <div class="mrow mrow--top">
-              <div class="mblock mblock--lg">
-                <span class="mblock__icon" id="m-temp-icon"></span>
-                <span class="mblock__name">Temp</span>
-                <span class="mblock__value" id="m-temp-value">—</span>
-                <span class="mblock__label" id="m-temp-label"></span>
-              </div>
-              <div class="mblock mblock--lg">
-                <span class="mblock__icon" id="m-wind-icon"></span>
-                <span class="mblock__name">Viento</span>
-                <span class="mblock__value" id="m-wind-value">—</span>
-                <span class="mblock__label" id="m-wind-label"></span>
-              </div>
-            </div>
-            <div class="mrow mrow--bot">
-              <div class="mblock mblock--sm">
-                <span class="mblock__icon" id="m-wave-icon"></span>
-                <span class="mblock__name">Ola</span>
-                <span class="mblock__value" id="m-wave-value">—</span>
-                <span class="mblock__label" id="m-wave-label"></span>
-              </div>
-              <div class="mblock mblock--sm">
-                <span class="mblock__icon" id="m-gusts-icon"></span>
-                <span class="mblock__name">Rachas</span>
-                <span class="mblock__value" id="m-gusts-value">—</span>
-                <span class="mblock__label" id="m-gusts-label"></span>
-              </div>
-              <div class="mblock mblock--sm">
-                <span class="mblock__icon" id="m-period-icon"></span>
-                <span class="mblock__name">Período</span>
-                <span class="mblock__value" id="m-period-value">—</span>
-                <span class="mblock__label" id="m-period-label"></span>
-              </div>
-              <div class="mblock mblock--sm">
-                <span class="mblock__icon" id="m-dir-icon"></span>
-                <span class="mblock__name">Dirección</span>
-                <span class="mblock__value" id="m-dir-value">—</span>
-                <span class="mblock__label" id="m-dir-label"></span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Slide 2: Texto -->
-          <div class="metrics-slide metrics-slide--text">
-            <p class="metrics-summary" id="metrics-summary"></p>
-          </div>
-
-        </div><!-- /metrics-track -->
-
-        <div class="metrics-dots" id="metrics-dots">
-          <span class="mdot"></span>
-          <span class="mdot"></span>
+      <!-- Bloque 3: Métricas grid 2×3 -->
+      <div class="metrics-grid">
+        <div class="mgrid__cell">
+          <span class="mgrid__icon" id="m-temp-icon"></span>
+          <span class="mgrid__value" id="m-temp-value">—</span>
+          <span class="mgrid__label">Temp</span>
         </div>
-
-      </div><!-- /metrics-slides -->
+        <div class="mgrid__cell">
+          <span class="mgrid__icon" id="m-wind-icon"></span>
+          <span class="mgrid__value" id="m-wind-value">—</span>
+          <span class="mgrid__label">Viento</span>
+        </div>
+        <div class="mgrid__cell">
+          <span class="mgrid__icon" id="m-wave-icon"></span>
+          <span class="mgrid__value" id="m-wave-value">—</span>
+          <span class="mgrid__label">Ola</span>
+        </div>
+        <div class="mgrid__cell">
+          <span class="mgrid__icon" id="m-gusts-icon"></span>
+          <span class="mgrid__value" id="m-gusts-value">—</span>
+          <span class="mgrid__label">Rachas</span>
+        </div>
+        <div class="mgrid__cell">
+          <span class="mgrid__icon" id="m-period-icon"></span>
+          <span class="mgrid__value" id="m-period-value">—</span>
+          <span class="mgrid__label">Período</span>
+        </div>
+        <div class="mgrid__cell">
+          <span class="mgrid__icon" id="m-dir-icon"></span>
+          <span class="mgrid__value" id="m-dir-value">—</span>
+          <span class="mgrid__label">Dirección</span>
+        </div>
+      </div>
 
     </div><!-- /results__main -->
 
