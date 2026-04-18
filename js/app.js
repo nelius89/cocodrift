@@ -2,6 +2,25 @@
 // APP — Lógica principal y navegación
 // ─────────────────────────────────────────
 
+// ── Iconos de tiempo (según weathercode WMO) ──
+const WEATHER_ICONS = {
+  sun:      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`,
+  cloudSun: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="M20 12h2"/><path d="m19.07 4.93-1.41 1.41"/><path d="M15.947 12.65a4 4 0 0 0-5.925-4.128"/><path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6z"/></svg>`,
+  cloud:    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9z"/></svg>`,
+  rain:     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M16 14v6"/><path d="M8 14v6"/><path d="M12 16v6"/></svg>`,
+  storm:    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9z"/><polyline points="13 11 9 17 15 17 11 23"/></svg>`,
+  fog:      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="M20 12h2"/><path d="M3 9h2"/><path d="M12 2a7 7 0 0 1 7 7"/><path d="M4.26 11.81A9 9 0 0 0 12 20h7"/><path d="M3 15h18"/><path d="M3 19h18"/></svg>`,
+};
+
+function getWeatherIcon(code) {
+  if (code === 0)              return WEATHER_ICONS.sun;
+  if (code <= 3)               return WEATHER_ICONS.cloudSun;
+  if (code <= 48)              return WEATHER_ICONS.fog;
+  if (code <= 67 || code <= 82) return WEATHER_ICONS.rain;
+  if (code >= 95)              return WEATHER_ICONS.storm;
+  return WEATHER_ICONS.cloud;
+}
+
 // ── Iconos SVG (Lucide) ──
 const ICONS = {
   wind:        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/></svg>`,
@@ -170,20 +189,28 @@ async function loadSpot(spot) {
   }
 }
 
-function renderResults(sliderIndex) {
+const TERRAL_INFO = {
+  1: { label: 'Terral leve',      pillLabel: 'TERRAL LEVE',      title: 'AVISO VIENTO TERRAL', desc: 'El viento sopla de tierra hacia el mar. Aunque el agua parezca tranquila, puede empujarte lentamente fuera.', advice: 'Puedes salir, pero no te alejes de la orilla.' },
+  2: { label: 'Terral relevante', pillLabel: 'TERRAL RELEVANTE', title: 'AVISO VIENTO TERRAL', desc: 'El viento te llevará progresivamente alejándote de la playa, aunque al principio no lo notes.', advice: 'Quédate cerca de la orilla en todo momento.' },
+  3: { label: 'Terral fuerte',    pillLabel: 'TERRAL FUERTE',    title: 'VIENTO TERRAL FUERTE', desc: 'Las condiciones offshore son peligrosas. El viento empuja con fuerza hacia mar abierto y recuperar la posición puede ser muy difícil.', advice: 'Hoy es mejor quedarse en tierra.' },
+};
+
+function renderResults(sliderIdx) {
   if (!currentData) return;
   const { marine, forecast } = currentData;
-  const d = getDataForSlider(sliderIndex, marine, forecast);
+  const d = getDataForSlider(sliderIdx, marine, forecast);
 
   // Score y estado
   const score  = calcularScore(d.windKn, d.waveH, d.gustKn, d.wavePer, d.cloudPct);
   const estado = getEstado(score, d.weathercode);
   const info   = ESTADOS[estado];
 
+  // Tiempo en el header
+  document.getElementById('results-weather-icon').innerHTML    = getWeatherIcon(d.weathercode);
+  document.getElementById('results-weather-temp').textContent  = `${Math.round(d.tempC)}°`;
+
+  // Título de decisión
   document.getElementById('diagnosis-title').textContent = info.titulo;
-  const descEl = document.getElementById('diagnosis-desc');
-  descEl.textContent = info.desc;
-  descEl.style.display = info.desc ? '' : 'none';
 
   // Ilustración
   const ILLUS_MAP = { 'perfecto': 'Perfecto.png', 'bueno': 'Bueno.png' };
@@ -196,56 +223,56 @@ function renderResults(sliderIndex) {
     illusEl.innerHTML = '';
   }
 
-  // Párrafo inteligente
-  document.getElementById('diagnosis-paragraph').textContent = buildParagraph(d, estado);
-
-  // Terral inline
-  const TERRAL_WARN = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
-  const TERRAL_STOP = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>`;
-  const TERRAL_INFO = {
-    1: { icon: TERRAL_WARN, label: 'Terral leve',    short: 'Deriva hacia fuera baja.',          full: 'El viento sopla de tierra hacia el mar. Aunque el agua parezca tranquila, puede empujarte lentamente mar adentro.',                                                        advice: 'Puedes salir, pero sin alejarte de la orilla.' },
-    2: { icon: TERRAL_WARN, label: 'Terral relevante', short: 'Te empuja mar adentro.',          full: 'El viento offshore es perceptible. Te llevará progresivamente alejándote de la playa, aunque no lo notes al principio.',                                                   advice: 'Mejor quedarte cerca de la orilla en todo momento.' },
-    3: { icon: TERRAL_STOP, label: 'Terral fuerte',  short: 'El viento te aleja de la orilla.',  full: 'Las condiciones offshore son peligrosas. El viento empuja con fuerza hacia mar abierto y recuperar la posición puede ser muy difícil.',                                    advice: 'Condiciones para quedarse en tierra hoy.' },
-  };
-
+  // Terral
   const nivelTerral = calcularRiesgoTerral(d.windKn, d.gustKn, d.windDir, d.waveH, currentSpot);
-  const terralEl = document.getElementById('terral-inline');
+
+  // Resumen corto (sin mencionar dirección si hay terral — ya tiene su alerta)
+  document.getElementById('diagnosis-summary').textContent = buildSummary(d, estado);
+
+  // Terral pill en pantalla principal
+  const pillEl = document.getElementById('terral-pill');
   if (nivelTerral === 0) {
-    terralEl.style.display = 'none';
+    pillEl.classList.add('hidden');
   } else {
-    terralEl.style.display = 'flex';
-    const ti = TERRAL_INFO[nivelTerral];
-    document.getElementById('terral-icon').innerHTML = ti.icon;
-    document.getElementById('terral-short').textContent = ti.short;
-    // Bottom sheet
-    const sheet = document.getElementById('terral-sheet');
-    sheet.dataset.level = nivelTerral;
-    document.getElementById('sheet-icon').innerHTML     = ti.icon;
-    document.getElementById('sheet-title').textContent  = ti.label;
-    document.getElementById('sheet-short').textContent  = ti.short;
-    document.getElementById('sheet-full').textContent   = ti.full;
-    document.getElementById('sheet-advice').textContent = ti.advice;
-    const sheetCard = degreesToCardinal(d.windDir);
-    const sheetDir  = shortDirLabel(d.windDir);
-    document.getElementById('sheet-wind').innerHTML = `
-      <span class="terral-sheet__wind-pill"><b>${d.windKn.toFixed(1)} kn</b> · viento</span>
-      <span class="terral-sheet__wind-pill"><b>${d.gustKn.toFixed(1)} kn</b> · rachas</span>
-      <span class="terral-sheet__wind-pill"><b>${sheetCard}</b> · ${sheetDir}</span>
-    `;
+    pillEl.classList.remove('hidden');
+    document.getElementById('terral-pill-label').textContent = TERRAL_INFO[nivelTerral].pillLabel;
   }
 
-  // Métricas grid
+  // Bloques interpretativos en el sheet
+  const blocks = buildBlocks(d, estado);
+  document.getElementById('explain-wind-icon').innerHTML   = ICONS.wind;
+  document.getElementById('explain-wind-title').textContent = blocks.windTitle;
+  document.getElementById('explain-wind-desc').textContent  = blocks.windDesc;
+  document.getElementById('explain-sea-icon').innerHTML    = ICONS.wave;
+  document.getElementById('explain-sea-title').textContent  = blocks.seaTitle;
+  document.getElementById('explain-sea-desc').textContent   = blocks.seaDesc;
+  document.getElementById('explain-closing').textContent    = blocks.closing;
+
+  // Bloque terral en el sheet
+  const explainTerral = document.getElementById('explain-terral');
+  if (nivelTerral === 0) {
+    explainTerral.classList.add('hidden');
+  } else {
+    explainTerral.classList.remove('hidden');
+    const ti = TERRAL_INFO[nivelTerral];
+    document.getElementById('explain-terral-title').textContent = ti.title;
+    document.getElementById('explain-terral-desc').textContent  = ti.desc;
+    document.getElementById('explain-terral-advice').textContent = ti.advice;
+  }
+
+  // Métricas con sublabels
   const card = degreesToCardinal(d.windDir);
-  function setMetric(suffix, iconSvg, value) {
+  function setMetric(suffix, iconSvg, value, sub) {
     document.getElementById(`m-${suffix}-icon`).innerHTML    = iconSvg;
     document.getElementById(`m-${suffix}-value`).textContent = value;
+    const subEl = document.getElementById(`m-${suffix}-sub`);
+    if (subEl) subEl.textContent = sub;
   }
-  setMetric('temp',   ICONS.thermometer, `${Math.round(d.tempC)}°`);
-  setMetric('wind',   ICONS.wind,        `${d.windKn.toFixed(1)} kn`);
-  setMetric('wave',   ICONS.wave,        `${d.waveH.toFixed(1)} m`);
-  setMetric('gusts',  ICONS.zap,         `${d.gustKn.toFixed(1)} kn`);
-  setMetric('period', ICONS.timer,       `${d.wavePer.toFixed(0)} s`);
-  setMetric('dir',    ICONS.compass,     card);
+  setMetric('wind',   ICONS.wind,    `${d.windKn.toFixed(1)} kn`,  labelViento(d.windKn).label);
+  setMetric('wave',   ICONS.wave,    `${d.waveH.toFixed(1)} m`,    labelOla(d.waveH).label);
+  setMetric('gusts',  ICONS.zap,     `${d.gustKn.toFixed(1)} kn`,  labelRacha(d.gustKn).label);
+  setMetric('period', ICONS.timer,   `${d.wavePer.toFixed(0)} s`,  labelPeriodo(d.wavePer).label);
+  setMetric('dir',    ICONS.compass, card,                          shortDirLabel(d.windDir));
 }
 
 function shortDirLabel(degrees) {
@@ -385,47 +412,55 @@ function initSuggestionsSheet() {
   });
 }
 
-// ── Terral bottom sheet ──
-function openTerralSheet() {
-  document.getElementById('terral-overlay').classList.add('active');
-  document.getElementById('terral-sheet').classList.add('active');
+// ── Explain sheet ──
+function openExplainSheet() {
+  document.getElementById('explain-overlay').classList.add('active');
+  document.getElementById('explain-sheet').classList.add('expanded');
 }
 
-function closeTerralSheet() {
-  const sheet = document.getElementById('terral-sheet');
+function closeExplainSheet() {
+  const sheet = document.getElementById('explain-sheet');
   sheet.style.transition = '';
-  sheet.style.transform = '';
-  document.getElementById('terral-overlay').classList.remove('active');
-  sheet.classList.remove('active');
+  sheet.style.transform  = '';
+  document.getElementById('explain-overlay').classList.remove('active');
+  sheet.classList.remove('expanded');
 }
 
-function initTerralSheet() {
-  const sheet = document.getElementById('terral-sheet');
-  let startY = 0;
-  let dragY  = 0;
-  let dragging = false;
+function initExplainSheet() {
+  const sheet = document.getElementById('explain-sheet');
+  let startY = 0, dragY = 0, dragging = false;
+  let isExpanded = false;
 
   sheet.addEventListener('touchstart', (e) => {
     startY   = e.touches[0].clientY;
     dragY    = 0;
     dragging = true;
+    isExpanded = sheet.classList.contains('expanded');
     sheet.style.transition = 'none';
   }, { passive: true });
 
   sheet.addEventListener('touchmove', (e) => {
     if (!dragging) return;
-    dragY = Math.max(0, e.touches[0].clientY - startY);
-    sheet.style.transform = `translateY(${dragY}px)`;
+    const delta = e.touches[0].clientY - startY;
+    if (isExpanded) {
+      // Arrastrando hacia abajo desde expandido
+      dragY = Math.max(0, delta);
+    } else {
+      // Arrastrando hacia arriba desde colapsado
+      dragY = Math.min(0, delta);
+    }
+    if (dragY !== 0) sheet.style.transform = `translateY(${dragY}px)`;
   }, { passive: true });
 
   sheet.addEventListener('touchend', () => {
     if (!dragging) return;
     dragging = false;
     sheet.style.transition = '';
-    if (dragY > 80) {
-      closeTerralSheet();
-    } else {
-      sheet.style.transform = '';
+    sheet.style.transform  = '';
+    if (isExpanded && dragY > 60) {
+      closeExplainSheet();
+    } else if (!isExpanded && dragY < -40) {
+      openExplainSheet();
     }
   });
 }
@@ -525,10 +560,13 @@ document.addEventListener('DOMContentLoaded', () => {
   initAboutSheet();
   initSuggestionsSheet();
 
-  // Terral trigger → open sheet
-  document.getElementById('terral-trigger').addEventListener('click', openTerralSheet);
-  document.getElementById('terral-overlay').addEventListener('click', closeTerralSheet);
-  initTerralSheet();
+  // Terral pill → abrir explain sheet
+  document.getElementById('terral-pill').addEventListener('click', openExplainSheet);
+  // Handle del sheet → expandir
+  document.getElementById('explain-handle').addEventListener('click', openExplainSheet);
+  // Overlay → cerrar
+  document.getElementById('explain-overlay').addEventListener('click', closeExplainSheet);
+  initExplainSheet();
 
   // Back button
   document.getElementById('btn-back').addEventListener('click', () => {

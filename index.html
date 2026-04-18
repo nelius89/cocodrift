@@ -46,6 +46,10 @@
     <header class="results__header">
       <button class="btn-back" id="btn-back">←</button>
       <span class="results__spot-name" id="results-spot-name">Pont del Petroli</span>
+      <div class="results__weather">
+        <span class="results__weather-icon" id="results-weather-icon"></span>
+        <span class="results__weather-temp" id="results-weather-temp"></span>
+      </div>
     </header>
 
     <!-- Navegador temporal — días + franja -->
@@ -62,55 +66,19 @@
 
     <div class="results__main">
 
-      <!-- Bloque 2: Diagnóstico + párrafo + terral -->
+      <!-- Diagnóstico principal -->
       <div class="diagnosis">
+        <!-- Terral pill — visible solo si hay terral, abre el sheet -->
+        <button class="terral-pill hidden" id="terral-pill">
+          <span class="terral-pill__icon">!</span>
+          <span class="terral-pill__label" id="terral-pill-label">TERRAL LEVE</span>
+          <span class="terral-pill__more">Ver más ›</span>
+        </button>
+
         <div class="diagnosis__illus" id="diagnosis-illus"></div>
         <p class="diagnosis__pretitle">Estado del mar</p>
         <h1 class="diagnosis__title" id="diagnosis-title">Cargando...</h1>
-        <p class="diagnosis__desc" id="diagnosis-desc"></p>
-        <p class="diagnosis__paragraph" id="diagnosis-paragraph"></p>
-        <div class="terral-inline" id="terral-inline">
-          <span class="terral-inline__icon" id="terral-icon"></span>
-          <div class="terral-inline__body">
-            <span class="terral-inline__name">Viento terral</span>
-            <span class="terral-inline__short" id="terral-short"></span>
-          </div>
-          <button class="terral-inline__btn" id="terral-trigger">Ver por qué</button>
-        </div>
-      </div>
-
-      <!-- Bloque 3: Métricas grid 2×3 -->
-      <div class="metrics-grid">
-        <div class="mgrid__cell">
-          <span class="mgrid__icon" id="m-temp-icon"></span>
-          <span class="mgrid__value" id="m-temp-value">—</span>
-          <span class="mgrid__label">Temp</span>
-        </div>
-        <div class="mgrid__cell">
-          <span class="mgrid__icon" id="m-wind-icon"></span>
-          <span class="mgrid__value" id="m-wind-value">—</span>
-          <span class="mgrid__label">Viento</span>
-        </div>
-        <div class="mgrid__cell">
-          <span class="mgrid__icon" id="m-wave-icon"></span>
-          <span class="mgrid__value" id="m-wave-value">—</span>
-          <span class="mgrid__label">Ola</span>
-        </div>
-        <div class="mgrid__cell">
-          <span class="mgrid__icon" id="m-gusts-icon"></span>
-          <span class="mgrid__value" id="m-gusts-value">—</span>
-          <span class="mgrid__label">Rachas</span>
-        </div>
-        <div class="mgrid__cell">
-          <span class="mgrid__icon" id="m-period-icon"></span>
-          <span class="mgrid__value" id="m-period-value">—</span>
-          <span class="mgrid__label">Período</span>
-        </div>
-        <div class="mgrid__cell">
-          <span class="mgrid__icon" id="m-dir-icon"></span>
-          <span class="mgrid__value" id="m-dir-value">—</span>
-          <span class="mgrid__label">Dirección</span>
-        </div>
+        <p class="diagnosis__summary" id="diagnosis-summary"></p>
       </div>
 
     </div><!-- /results__main -->
@@ -239,19 +207,83 @@
     </div>
   </div>
 
-  <!-- Terral bottom sheet -->
-  <div class="terral-overlay" id="terral-overlay"></div>
-  <div class="terral-sheet" id="terral-sheet">
-    <div class="terral-sheet__handle"></div>
-    <div class="terral-sheet__content">
-      <div class="terral-sheet__head">
-        <span class="terral-sheet__icon" id="sheet-icon"></span>
-        <h2 class="terral-sheet__title" id="sheet-title"></h2>
+  <!-- Explain bottom sheet — siempre visible en peek (métricas), expandible (explicación) -->
+  <div class="explain-overlay" id="explain-overlay"></div>
+  <div class="explain-sheet" id="explain-sheet">
+    <div class="explain-sheet__handle" id="explain-handle"></div>
+
+    <!-- Estado colapsado: datos técnicos -->
+    <div class="explain-sheet__peek">
+      <div class="metrics-grid">
+        <div class="mgrid__cell">
+          <span class="mgrid__icon" id="m-wind-icon"></span>
+          <span class="mgrid__label">Viento</span>
+          <span class="mgrid__value" id="m-wind-value">—</span>
+          <span class="mgrid__sub" id="m-wind-sub"></span>
+        </div>
+        <div class="mgrid__cell">
+          <span class="mgrid__icon" id="m-wave-icon"></span>
+          <span class="mgrid__label">Ola</span>
+          <span class="mgrid__value" id="m-wave-value">—</span>
+          <span class="mgrid__sub" id="m-wave-sub"></span>
+        </div>
+        <div class="mgrid__cell">
+          <span class="mgrid__icon" id="m-gusts-icon"></span>
+          <span class="mgrid__label">Rachas</span>
+          <span class="mgrid__value" id="m-gusts-value">—</span>
+          <span class="mgrid__sub" id="m-gusts-sub"></span>
+        </div>
+        <div class="mgrid__cell">
+          <span class="mgrid__icon" id="m-period-icon"></span>
+          <span class="mgrid__label">Período</span>
+          <span class="mgrid__value" id="m-period-value">—</span>
+          <span class="mgrid__sub" id="m-period-sub"></span>
+        </div>
+        <div class="mgrid__cell">
+          <span class="mgrid__icon" id="m-dir-icon"></span>
+          <span class="mgrid__label">Dirección</span>
+          <span class="mgrid__value" id="m-dir-value">—</span>
+          <span class="mgrid__sub" id="m-dir-sub"></span>
+        </div>
       </div>
-      <p class="terral-sheet__short" id="sheet-short"></p>
-      <p class="terral-sheet__full" id="sheet-full"></p>
-      <div class="terral-sheet__wind" id="sheet-wind"></div>
-      <p class="terral-sheet__advice" id="sheet-advice"></p>
+    </div>
+
+    <!-- Estado expandido: explicación interpretativa -->
+    <div class="explain-sheet__body" id="explain-body">
+
+      <!-- Bloque terral (condicional) -->
+      <div class="explain-terral hidden" id="explain-terral">
+        <div class="explain-terral__icon-wrap">
+          <span class="explain-terral__bang">!</span>
+        </div>
+        <div class="explain-terral__text">
+          <strong class="explain-terral__title" id="explain-terral-title">AVISO VIENTO TERRAL</strong>
+          <p class="explain-terral__desc" id="explain-terral-desc"></p>
+          <p class="explain-terral__advice" id="explain-terral-advice"></p>
+        </div>
+      </div>
+
+      <!-- Bloque viento (intensidad + rachas unificados) -->
+      <div class="explain-block">
+        <span class="explain-block__icon" id="explain-wind-icon"></span>
+        <div class="explain-block__text">
+          <strong class="explain-block__title" id="explain-wind-title"></strong>
+          <p class="explain-block__desc" id="explain-wind-desc"></p>
+        </div>
+      </div>
+
+      <!-- Bloque mar (ola + período unificados) -->
+      <div class="explain-block">
+        <span class="explain-block__icon" id="explain-sea-icon"></span>
+        <div class="explain-block__text">
+          <strong class="explain-block__title" id="explain-sea-title"></strong>
+          <p class="explain-block__desc" id="explain-sea-desc"></p>
+        </div>
+      </div>
+
+      <!-- Cierre -->
+      <p class="explain-closing" id="explain-closing"></p>
+
     </div>
   </div>
 

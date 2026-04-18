@@ -279,6 +279,26 @@ ul { list-style: none; }
   pointer-events: none;
 }
 
+.results__weather {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  position: relative;
+  z-index: 1;
+}
+.results__weather-icon {
+  display: flex;
+  align-items: center;
+  color: rgba(10, 10, 10, 0.45);
+}
+.results__weather-icon svg { width: 16px; height: 16px; }
+.results__weather-temp {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(10, 10, 10, 0.55);
+}
+
 /* ── Time nav ── */
 .time-nav {
   flex-shrink: 0;
@@ -385,6 +405,8 @@ ul { list-style: none; }
   flex-direction: column;
   padding: 8px 20px 0;
   min-height: 0;
+  /* Espacio para el sheet peekable que se superpone al fondo */
+  padding-bottom: 150px;
 }
 
 /* ── Diagnosis ── */
@@ -428,97 +450,82 @@ ul { list-style: none; }
   line-height: 1.15;
 }
 
-.diagnosis__desc {
-  font-size: 12px;
-  line-height: 1.5;
-  color: rgba(49, 79, 255, 0.55);
-}
-
-.diagnosis__paragraph {
+.diagnosis__summary {
   font-size: 13px;
-  line-height: 1.75;
-  color: rgba(10, 10, 10, 0.58);
-  max-width: 300px;
-  text-align: left;
-  margin-top: 4px;
+  line-height: 1.65;
+  color: rgba(49, 79, 255, 0.55);
+  max-width: 280px;
+  text-align: center;
+  margin-top: 2px;
 }
 
-/* ── Terral inline ── */
-.terral-inline {
+/* ── Terral pill — notificación compacta en pantalla principal ── */
+.terral-pill {
   display: none;
   align-items: center;
   gap: 10px;
-  width: 100%;
-  background: rgba(49, 79, 255, 0.05);
-  border: 1px solid rgba(49, 79, 255, 0.12);
-  border-radius: 12px;
-  padding: 10px 12px;
-  margin-top: 4px;
-  text-align: left;
+  background: var(--black);
+  border-radius: 100px;
+  padding: 8px 14px 8px 8px;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+  border: none;
+  margin-bottom: 4px;
 }
 
-.terral-inline__icon {
+.terral-pill:not(.hidden) { display: flex; }
+.terral-pill:active { opacity: 0.75; }
+
+.terral-pill__icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
   display: flex;
   align-items: center;
-  color: var(--blue);
+  justify-content: center;
   flex-shrink: 0;
-}
-.terral-inline__icon svg { width: 16px; height: 16px; }
-
-.terral-inline__body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  line-height: 1;
 }
 
-.terral-inline__name {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--blue);
-}
-
-.terral-inline__short {
+.terral-pill__label {
   font-size: 11px;
-  color: rgba(49, 79, 255, 0.65);
-  line-height: 1.4;
-}
-
-.terral-inline__btn {
-  font-family: var(--font);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  font-weight: 700;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: var(--blue);
-  background: none;
-  border: none;
-  cursor: pointer;
-  white-space: nowrap;
-  padding: 0;
-  flex-shrink: 0;
-  opacity: 0.6;
+  color: #fff;
+  flex: 1;
 }
 
-/* ── Terral bottom sheet ── */
-.terral-overlay {
+.terral-pill__more {
+  font-size: 10px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.45);
+  white-space: nowrap;
+}
+
+/* ── Explain sheet — siempre peekable, expandible ── */
+.explain-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.18);
+  background: rgba(0, 0, 0, 0.22);
   z-index: 300;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.25s ease;
 }
 
-.terral-overlay.active {
+.explain-overlay.active {
   opacity: 1;
   pointer-events: auto;
 }
 
-.terral-sheet {
+.explain-sheet {
+  --peek: 140px; /* handle + métricas */
   position: fixed;
   bottom: 0;
   left: 0;
@@ -526,112 +533,181 @@ ul { list-style: none; }
   z-index: 301;
   background: var(--beige);
   border-radius: 20px 20px 0 0;
-  transform: translateY(100%);
-  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  padding-bottom: calc(28px + var(--safe-bottom));
+  transform: translateY(calc(100% - var(--peek)));
+  transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  max-height: 90vh;
+  overflow: hidden;
+  box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.07);
 }
 
-.terral-sheet.active {
+.explain-sheet.expanded {
   transform: translateY(0);
+  overflow-y: auto;
 }
 
-.terral-sheet__handle {
+/* Handle con animación bounce para invitar a subir */
+.explain-sheet__handle {
   width: 36px;
   height: 4px;
   background: rgba(10, 10, 10, 0.12);
   border-radius: 2px;
   margin: 12px auto 0;
+  cursor: pointer;
+  animation: handleBounce 2.4s ease-in-out infinite;
 }
 
-.terral-sheet__content {
-  padding: 20px 24px 0;
+.explain-sheet.expanded .explain-sheet__handle {
+  animation: none;
+}
+
+@keyframes handleBounce {
+  0%, 100% { transform: translateY(0); }
+  40%       { transform: translateY(-4px); }
+  60%       { transform: translateY(-2px); }
+}
+
+/* Métricas en estado colapsado */
+.explain-sheet__peek {
+  padding: 0 0 calc(8px + var(--safe-bottom));
+}
+
+.explain-sheet.expanded .explain-sheet__peek {
+  display: none;
+}
+
+/* Cuerpo de explicación en estado expandido */
+.explain-sheet__body {
+  display: none;
+  flex-direction: column;
+  gap: 0;
+  padding: 8px 20px calc(32px + var(--safe-bottom));
+}
+
+.explain-sheet.expanded .explain-sheet__body {
+  display: flex;
+}
+
+/* Bloque terral en el sheet */
+.explain-terral {
+  background: var(--black);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.explain-terral__icon-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.explain-terral__bang {
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1;
+}
+
+.explain-terral__text {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-}
-
-.terral-sheet__head {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-}
-
-.terral-sheet__icon {
-  display: flex;
-  align-items: center;
-  color: var(--blue);
-}
-
-.terral-sheet__icon svg { width: 18px; height: 18px; }
-
-.terral-sheet__title {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--blue);
-  line-height: 1.2;
-}
-
-.terral-sheet__short {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--blue);
-  line-height: 1.4;
-}
-
-.terral-sheet__full {
-  font-size: 13px;
-  line-height: 1.65;
-  color: rgba(10, 10, 10, 0.55);
-}
-
-.terral-sheet__wind {
-  display: flex;
-  flex-wrap: wrap;
   gap: 6px;
 }
 
-.terral-sheet__wind-pill {
-  background: rgba(49, 79, 255, 0.06);
-  border: 1px solid rgba(49, 79, 255, 0.12);
-  border-radius: 100px;
-  padding: 5px 12px;
+.explain-terral__title {
   font-size: 11px;
-  font-weight: 500;
-  color: var(--blue);
-  white-space: nowrap;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  line-height: 1.2;
 }
 
-.terral-sheet__wind-pill b { font-weight: 700; }
+.explain-terral__desc {
+  font-size: 13px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.72);
+}
 
-.terral-sheet__advice {
+.explain-terral__advice {
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+/* Bloques de contenido (viento + mar) */
+.explain-block {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(10, 10, 10, 0.06);
+}
+
+.explain-block:last-of-type {
+  border-bottom: none;
+}
+
+.explain-block__icon {
+  display: flex;
+  align-items: center;
   color: var(--blue);
-  line-height: 1.5;
-  padding: 12px 16px;
-  background: rgba(49, 79, 255, 0.05);
-  border-radius: 12px;
-  border: 1px solid rgba(49, 79, 255, 0.1);
-}
-
-/* Nivel 3 — tono más severo */
-.terral-sheet[data-level="3"] .terral-sheet__icon,
-.terral-sheet[data-level="3"] .terral-sheet__title { color: var(--black); }
-.terral-sheet[data-level="3"] .terral-sheet__short { color: var(--black); }
-.terral-sheet[data-level="3"] .terral-sheet__advice {
-  color: rgba(10,10,10,0.6);
-  background: rgba(10,10,10,0.04);
-  border-color: rgba(10,10,10,0.1);
-}
-
-/* ── Metrics grid 2×3 ── */
-.metrics-grid {
+  opacity: 0.5;
   flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.explain-block__icon svg { width: 18px; height: 18px; }
+
+.explain-block__text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.explain-block__title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--blue);
+  line-height: 1.3;
+}
+
+.explain-block__desc {
+  font-size: 13px;
+  line-height: 1.55;
+  color: rgba(10, 10, 10, 0.45);
+}
+
+/* Cierre */
+.explain-closing {
+  font-size: 13px;
+  line-height: 1.55;
+  color: rgba(49, 79, 255, 0.55);
+  text-align: center;
+  padding: 16px 8px 4px;
+  border: 1px solid rgba(49, 79, 255, 0.15);
+  border-radius: 12px;
+  margin-top: 8px;
+}
+
+/* ── Metrics grid 5×1 ── */
+.metrics-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(5, 1fr);
   border-top: 1px solid rgba(10, 10, 10, 0.07);
   padding-top: 4px;
-  padding-bottom: calc(12px + var(--safe-bottom));
 }
 
 .mgrid__cell {
@@ -639,17 +715,25 @@ ul { list-style: none; }
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
-  padding: 10px 8px;
+  gap: 2px;
+  padding: 10px 6px;
   text-align: center;
 }
 
 .mgrid__icon {
   display: flex;
   align-items: center;
-  color: rgba(10, 10, 10, 0.22);
+  color: rgba(10, 10, 10, 0.2);
 }
 .mgrid__icon svg { width: 13px; height: 13px; }
+
+.mgrid__label {
+  font-size: 8px;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: rgba(10, 10, 10, 0.25);
+}
 
 .mgrid__value {
   font-size: 15px;
@@ -659,12 +743,12 @@ ul { list-style: none; }
   line-height: 1;
 }
 
-.mgrid__label {
-  font-size: 9px;
+.mgrid__sub {
+  font-size: 8px;
   font-weight: 500;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: rgba(10, 10, 10, 0.28);
+  color: rgba(10, 10, 10, 0.3);
+  line-height: 1.2;
+  letter-spacing: 0.01em;
 }
 
 /* ─────────────────────────────────────────
