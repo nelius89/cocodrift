@@ -177,9 +177,7 @@ async function loadSpot(spot) {
   document.getElementById('results-spot-name').textContent = spot.name;
   document.getElementById('diagnosis-title').textContent    = 'Cargando...';
   document.getElementById('diagnosis-subtitle').textContent = '';
-  document.getElementById('diagnosis-wind').textContent     = '';
-  document.getElementById('diagnosis-sea').textContent      = '';
-  document.getElementById('terral-card').classList.add('hidden');
+  document.getElementById('terral-pill').classList.add('hidden');
 
   try {
     currentData = await fetchSpotData(spot);
@@ -227,24 +225,23 @@ function renderResults(sliderIdx) {
     illusEl.innerHTML = '';
   }
 
-  // Bloques cortos viento + mar (pantalla principal)
-  const main = buildMainBlocks(d);
-  document.getElementById('diagnosis-wind-icon').innerHTML  = ICONS.wind;
-  document.getElementById('diagnosis-wind').textContent     = main.windShort;
-  document.getElementById('diagnosis-sea-icon').innerHTML   = ICONS.wave;
-  document.getElementById('diagnosis-sea').textContent      = main.seaShort;
+  // Bloques viento + mar en pantalla principal (título bold + desc gris)
+  const blocks = buildBlocks(d, estado);
+  document.getElementById('diagnosis-wind-icon').innerHTML    = ICONS.wind;
+  document.getElementById('diagnosis-wind-title').textContent = blocks.windTitle;
+  document.getElementById('diagnosis-wind-desc').textContent  = blocks.windDesc;
+  document.getElementById('diagnosis-sea-icon').innerHTML     = ICONS.wave;
+  document.getElementById('diagnosis-sea-title').textContent  = blocks.seaTitle;
+  document.getElementById('diagnosis-sea-desc').textContent   = blocks.seaDesc;
 
-  // Terral — card en Bloque 2
+  // Terral pill en pantalla principal
   const nivelTerral = calcularRiesgoTerral(d.windKn, d.gustKn, d.windDir, d.waveH, currentSpot);
-  const terralCard  = document.getElementById('terral-card');
+  const pillEl = document.getElementById('terral-pill');
   if (nivelTerral === 0) {
-    terralCard.classList.add('hidden');
+    pillEl.classList.add('hidden');
   } else {
-    terralCard.classList.remove('hidden');
-    const ti = TERRAL_INFO[nivelTerral];
-    document.getElementById('terral-card-title').textContent  = ti.title;
-    document.getElementById('terral-card-desc').textContent   = ti.desc;
-    document.getElementById('terral-card-advice').textContent = ti.advice;
+    pillEl.classList.remove('hidden');
+    document.getElementById('terral-pill-label').textContent = TERRAL_INFO[nivelTerral].pillLabel;
   }
 
   // Terral en el sheet técnico
@@ -571,6 +568,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initAboutSheet();
   initSuggestionsSheet();
 
+  // Terral pill → expandir sheet (el terral está primero en el sheet)
+  document.getElementById('terral-pill').addEventListener('click', openExplainSheet);
   // Handle del sheet → expandir
   document.getElementById('explain-handle').addEventListener('click', openExplainSheet);
   initExplainSheet();

@@ -68,34 +68,38 @@
 
     <div class="results__main">
 
-      <!-- Aviso terral — card expandible, visible solo si hay terral -->
-      <div class="terral-card hidden" id="terral-card">
-        <div class="terral-card__icon-wrap">
-          <span class="terral-card__bang">!</span>
-        </div>
-        <div class="terral-card__text">
-          <strong class="terral-card__title" id="terral-card-title">AVISO VIENTO TERRAL</strong>
-          <p class="terral-card__desc" id="terral-card-desc"></p>
-          <p class="terral-card__advice" id="terral-card-advice"></p>
-        </div>
-      </div>
-
       <!-- Diagnóstico principal -->
       <div class="diagnosis">
+
+        <!-- Terral pill — visible solo si hay terral -->
+        <button class="terral-pill hidden" id="terral-pill">
+          <span class="terral-pill__icon">!</span>
+          <span class="terral-pill__label" id="terral-pill-label">TERRAL LEVE</span>
+          <span class="terral-pill__more">Ver más ›</span>
+        </button>
+
         <div class="diagnosis__illus" id="diagnosis-illus"></div>
         <p class="diagnosis__pretitle">Estado del mar</p>
         <h1 class="diagnosis__title" id="diagnosis-title">Cargando...</h1>
         <p class="diagnosis__subtitle" id="diagnosis-subtitle"></p>
+
         <div class="diagnosis__blocks">
           <div class="diagnosis__block-row">
             <span class="diagnosis__block-icon" id="diagnosis-wind-icon"></span>
-            <span class="diagnosis__block-text" id="diagnosis-wind"></span>
+            <div class="diagnosis__block-body">
+              <strong class="diagnosis__block-title" id="diagnosis-wind-title"></strong>
+              <span class="diagnosis__block-desc" id="diagnosis-wind-desc"></span>
+            </div>
           </div>
           <div class="diagnosis__block-row">
             <span class="diagnosis__block-icon" id="diagnosis-sea-icon"></span>
-            <span class="diagnosis__block-text" id="diagnosis-sea"></span>
+            <div class="diagnosis__block-body">
+              <strong class="diagnosis__block-title" id="diagnosis-sea-title"></strong>
+              <span class="diagnosis__block-desc" id="diagnosis-sea-desc"></span>
+            </div>
           </div>
         </div>
+
       </div>
 
     </div><!-- /results__main -->
@@ -229,7 +233,7 @@
     <!-- Handle — siempre visible, invita a desplegar -->
     <div class="explain-sheet__handle" id="explain-handle">
       <div class="explain-sheet__handle-bar"></div>
-      <span class="explain-sheet__handle-label">Información técnica completa</span>
+      <span class="explain-sheet__handle-label">Desplegar información técnica completa</span>
     </div>
 
     <!-- Contenido técnico — visible solo al expandir -->
