@@ -1,0 +1,6 @@
+# Cloudflare Pages — HTTP headers
+
+# El service worker nunca debe cachearse en CDN
+# Si se cachea, el navegador no detecta actualizaciones
+/sw.js
+  Cache-Control: no-cache, no-store, must-revalidate
