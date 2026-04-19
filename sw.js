@@ -1,29 +1,17 @@
 'use strict';
 
-const CACHE_NAME = 'coco-v16';
-const STATIC_ASSETS = [
-  '/',
-  '/css/styles.css',
-  '/js/app.js',
-  '/js/score.js',
-  '/js/api.js',
-  '/js/storage.js',
-  '/js/wheel.js',
-  '/assets/illustrations/cocodrift-home.png',
-  '/assets/illustrations/Perfecto.png',
-  '/assets/illustrations/Bueno.png',
-  '/assets/icons/icon-192.png',
-  '/assets/icons/icon-512.png',
-  '/assets/icons/apple-touch-icon.png',
+const CACHE_NAME = 'coco-shell';
+
+const EXTERNAL = [
+  'open-meteo.com',
+  'nominatim.openstreetmap.org',
+  'fonts.googleapis.com',
+  'fonts.gstatic.com',
+  'cloudflareinsights.com',
 ];
 
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(STATIC_ASSETS))
-      .then(() => self.skipWaiting())
-  );
-});
+// Activar inmediatamente y limpiar cachés viejas
+self.addEventListener('install', () => self.skipWaiting());
 
 self.addEventListener('activate', event => {
   event.waitUntil(
@@ -35,19 +23,21 @@ self.addEventListener('activate', event => {
   );
 });
 
+// Network-first: siempre intenta red, caché solo como fallback offline
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
-  // No interceptar APIs externas ni fuentes
-  if (
-    url.hostname.includes('open-meteo.com') ||
-    url.hostname.includes('nominatim.openstreetmap.org') ||
-    url.hostname.includes('fonts.googleapis.com') ||
-    url.hostname.includes('fonts.gstatic.com')
-  ) return;
+  // Dejar pasar APIs externas y fuentes sin interceptar
+  if (EXTERNAL.some(h => url.hostname.includes(h))) return;
 
   event.respondWith(
-    caches.match(event.request)
-      .then(cached => cached || fetch(event.request))
+    fetch(event.request)
+      .then(response => {
+        // Actualizar caché con la respuesta fresca
+        const clone = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+        return response;
+      })
+      .catch(() => caches.match(event.request))
   );
 });
