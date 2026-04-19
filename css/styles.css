@@ -631,7 +631,10 @@ body.sheet-expanded .results__weather-icon { color: rgba(255, 255, 255, 0.7); }
 
 body.sheet-expanded .btn-back { color: rgba(255, 255, 255, 0.8); }
 
-body.sheet-expanded .btn-menu { color: rgba(255, 255, 255, 0.8); }
+body.sheet-expanded .btn-menu {
+  opacity: 0;
+  pointer-events: none;
+}
 
 body.sheet-expanded .explain-sheet__handle-label { color: rgba(10, 10, 10, 0.2); }
 

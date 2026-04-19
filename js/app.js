@@ -434,10 +434,15 @@ function initExplainSheet() {
   const handle = document.getElementById('explain-handle');
   const body   = document.getElementById('explain-body');
   const view   = document.querySelector('.view--results');
-  const PEEK   = 68;
-  const BEIGE  = [249, 246, 239];
-  const BLUE   = [49, 79, 255];
-  let startY = 0, dragY = 0, dragging = false, isExpanded = false, sheetH = 0;
+  const PEEK           = 68;
+  const DRAG_THRESHOLD = 8;    // px antes de considerar que es drag, no tap
+  const SNAP_OPEN      = -40;  // px hacia arriba para hacer snap open
+  const SNAP_CLOSE     =  60;  // px hacia abajo para hacer snap close
+  const BEIGE = [249, 246, 239];
+  const BLUE  = [49, 79, 255];
+
+  let startY = 0, dragY = 0;
+  let dragging = false, maybeTap = false, isExpanded = false, sheetH = 0;
   let bodyTouchStartY = 0;
 
   function lerpColor(t) {
@@ -448,63 +453,98 @@ function initExplainSheet() {
     return `rgb(${r},${g},${b})`;
   }
 
-  function startDrag(clientY, expanded) {
-    sheetH = sheet.getBoundingClientRect().height;
-    startY = clientY; dragY = 0; dragging = true; isExpanded = expanded;
-    sheet.style.transition = 'none';
-    view.style.transition  = 'none';
-  }
-
-  function moveDrag(clientY) {
-    if (!dragging) return;
-    const delta = clientY - startY;
-    const maxTravel = sheetH - PEEK;
-    dragY = isExpanded ? Math.max(0, delta) : Math.min(0, delta);
-    if (dragY !== 0) {
-      sheet.style.transform = `translateY(${dragY}px)`;
-      const progress = isExpanded
-        ? 1 - dragY / maxTravel
-        : Math.abs(dragY) / maxTravel;
-      view.style.background = lerpColor(progress);
-    }
-  }
-
-  function endDrag() {
-    if (!dragging) return;
-    dragging = false;
+  // Llama al soltar: aplica transición y decide estado final
+  function snapOrRestore() {
     sheet.style.transition = '';
     sheet.style.transform  = '';
     view.style.transition  = '';
     view.style.background  = '';
-    if (isExpanded && dragY > 60)  closeExplainSheet();
-    else if (!isExpanded && dragY < -40) openExplainSheet();
+    if (isExpanded && dragY > SNAP_CLOSE)       closeExplainSheet();
+    else if (!isExpanded && dragY < SNAP_OPEN)  openExplainSheet();
+    // si no llega al umbral, el CSS restaura la posición automáticamente
   }
 
-  // Handle: drag para abrir y cerrar
+  // ── Handle: tap para toggle + drag para control manual ──
   handle.addEventListener('touchstart', (e) => {
-    startDrag(e.touches[0].clientY, sheet.classList.contains('expanded'));
+    sheetH     = sheet.getBoundingClientRect().height;
+    startY     = e.touches[0].clientY;
+    dragY      = 0;
+    dragging   = false;
+    maybeTap   = true;
+    isExpanded = sheet.classList.contains('expanded');
   }, { passive: true });
-  handle.addEventListener('touchmove',  (e) => moveDrag(e.touches[0].clientY), { passive: true });
-  handle.addEventListener('touchend',   endDrag);
 
-  // Body: solo cierra si scrollTop === 0 y el dedo va hacia abajo
+  handle.addEventListener('touchmove', (e) => {
+    const delta = e.touches[0].clientY - startY;
+
+    if (!dragging) {
+      if (Math.abs(delta) < DRAG_THRESHOLD) return; // espera confirmación de drag
+      // Confirmar dirección válida: no arrastrar hacia arriba en colapsado
+      if (!isExpanded && delta > 0) { maybeTap = false; return; }
+      // Es drag real: iniciar
+      dragging = true;
+      maybeTap = false;
+      sheet.style.transition = 'none';
+      view.style.transition  = 'none';
+    }
+
+    const maxTravel = sheetH - PEEK;
+    dragY = isExpanded ? Math.max(0, delta) : Math.min(0, delta);
+    sheet.style.transform = `translateY(${dragY}px)`;
+    const progress = isExpanded
+      ? 1 - dragY / maxTravel
+      : Math.abs(dragY) / maxTravel;
+    view.style.background = lerpColor(progress);
+  }, { passive: true });
+
+  handle.addEventListener('touchend', () => {
+    if (dragging) {
+      dragging = false;
+      snapOrRestore();
+    } else if (maybeTap) {
+      maybeTap = false;
+      if (isExpanded) closeExplainSheet();
+      else            openExplainSheet();
+    }
+  });
+
+  // ── Body: cierra solo cuando scrollTop === 0 y arrastre hacia abajo ──
   body.addEventListener('touchstart', (e) => {
     bodyTouchStartY = e.touches[0].clientY;
   }, { passive: true });
+
   body.addEventListener('touchmove', (e) => {
     if (!sheet.classList.contains('expanded')) return;
     const delta = e.touches[0].clientY - bodyTouchStartY;
+
     if (!dragging) {
-      if (body.scrollTop === 0 && delta > 10) {
-        startDrag(bodyTouchStartY, true);
+      if (body.scrollTop === 0 && delta > DRAG_THRESHOLD) {
+        // Iniciar drag de cierre desde el body
+        sheetH     = sheet.getBoundingClientRect().height;
+        startY     = bodyTouchStartY;
+        dragY      = 0;
+        dragging   = true;
+        maybeTap   = false;
+        isExpanded = true;
+        sheet.style.transition = 'none';
+        view.style.transition  = 'none';
       } else {
         return;
       }
     }
     e.preventDefault();
-    moveDrag(e.touches[0].clientY);
+    const maxTravel = sheetH - PEEK;
+    dragY = Math.max(0, e.touches[0].clientY - startY);
+    sheet.style.transform = `translateY(${dragY}px)`;
+    view.style.background = lerpColor(1 - dragY / maxTravel);
   }, { passive: false });
-  body.addEventListener('touchend', endDrag);
+
+  body.addEventListener('touchend', () => {
+    if (dragging) {
+      dragging = false;
+      snapOrRestore();
+    }
+  });
 }
 
 // ── Franja label con horas ──
@@ -611,8 +651,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Terral pill → expandir sheet (el terral está primero en el sheet)
   document.getElementById('terral-pill').addEventListener('click', openExplainSheet);
-  // Handle del sheet → expandir
-  document.getElementById('explain-handle').addEventListener('click', openExplainSheet);
+  // Handle: tap/drag gestionado por initExplainSheet
   initExplainSheet();
 
   // Back button — doble función: cierra el sheet si está abierto, sino vuelve a home
