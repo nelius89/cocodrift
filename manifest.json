@@ -1,7 +1,7 @@
 {
-  "name": "Coco",
-  "short_name": "Coco",
-  "description": "¿Salgo al agua hoy? Coco interpreta los datos del mar para que tú no tengas que hacerlo.",
+  "name": "Cocodrift",
+  "short_name": "Cocodrift",
+  "description": "¿Salgo al agua hoy? Cocodrift interpreta los datos del mar para que tú no tengas que hacerlo.",
   "start_url": "/",
   "id": "/",
   "scope": "/",

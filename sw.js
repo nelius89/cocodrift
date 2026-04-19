@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE_NAME = 'coco-v9';
+const CACHE_NAME = 'coco-v10';
 const STATIC_ASSETS = [
   '/',
   '/css/styles.css',
@@ -15,6 +15,8 @@ const STATIC_ASSETS = [
   '/assets/illustrations/Perfecto.png',
   '/assets/illustrations/Bueno.png',
   '/assets/icons/icon-192.png',
+  '/assets/icons/icon-512.png',
+  '/assets/icons/apple-touch-icon.png',
 ];
 
 self.addEventListener('install', event => {

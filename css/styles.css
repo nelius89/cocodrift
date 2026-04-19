@@ -512,6 +512,8 @@ ul { list-style: none; }
   display: flex;
   flex-direction: column;
   gap: 3px;
+  flex: 1;
+  text-align: left;
 }
 
 .diagnosis__block-title {
@@ -519,6 +521,7 @@ ul { list-style: none; }
   font-weight: 700;
   color: var(--blue);
   line-height: 1.35;
+  text-align: left;
 }
 
 .diagnosis__block-desc {
@@ -526,6 +529,7 @@ ul { list-style: none; }
   font-weight: 400;
   color: rgba(10, 10, 10, 0.4);
   line-height: 1.45;
+  text-align: left;
 }
 
 /* ── Terral pill — compacta, abre el sheet con info terral ── */
