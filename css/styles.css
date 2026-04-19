@@ -218,17 +218,17 @@ ul { list-style: none; }
 .results__header {
   display: flex;
   align-items: center;
-  padding: calc(env(safe-area-inset-top, 0px) + 14px) 20px 10px;
+  padding: calc(env(safe-area-inset-top, 0px) + 20px) 20px 16px;
   flex-shrink: 0;
+  background: var(--blue);
 }
 
 .btn-back {
   font-size: 20px;
-  color: var(--blue);
+  color: var(--white);
   padding: 4px;
   line-height: 1;
   flex-shrink: 0;
-  transition: color 0.35s ease;
 }
 
 /* Centro del header: nombre + clima juntos */
@@ -245,12 +245,11 @@ ul { list-style: none; }
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.06em;
-  color: var(--blue);
+  color: var(--white);
   text-transform: uppercase;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  transition: color 0.35s ease;
 }
 
 .results__weather {
@@ -262,21 +261,19 @@ ul { list-style: none; }
 .results__weather-icon {
   display: flex;
   align-items: center;
-  color: rgba(10, 10, 10, 0.45);
-  transition: color 0.35s ease;
+  color: rgba(255, 255, 255, 0.7);
 }
 .results__weather-icon svg { width: 16px; height: 16px; }
 .results__weather-temp {
   font-size: 13px;
   font-weight: 500;
-  color: rgba(10, 10, 10, 0.55);
-  transition: color 0.35s ease;
+  color: rgba(255, 255, 255, 0.75);
 }
 
 /* ── Time nav ── */
 .time-nav {
   flex-shrink: 0;
-  padding: 0 20px 14px;
+  padding: 20px 20px 14px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -992,7 +989,7 @@ ul { list-style: none; }
 ───────────────────────────────────────── */
 .btn-menu {
   position: fixed;
-  top: calc(env(safe-area-inset-top, 0px) + 14px);
+  top: calc(env(safe-area-inset-top, 0px) + 20px);
   right: 20px;
   z-index: 150;
   width: 36px;
@@ -1021,7 +1018,7 @@ ul { list-style: none; }
 
 /* Color según vista activa */
 body[data-view="view-home"]    .btn-menu { color: var(--beige); }
-body[data-view="view-results"] .btn-menu { color: var(--blue); }
+body[data-view="view-results"] .btn-menu { color: var(--white); }
 
 /* ─────────────────────────────────────────
    MENU DRAWER
