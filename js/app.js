@@ -253,18 +253,6 @@ function renderResults(sliderIdx) {
     document.getElementById('terral-modal-advice').textContent = ti.advice;
   }
 
-  // Terral en el acordeón técnico
-  const explainTerral = document.getElementById('explain-terral');
-  if (nivelTerral === 0) {
-    explainTerral.classList.add('hidden');
-  } else {
-    explainTerral.classList.remove('hidden');
-    const ti = TERRAL_INFO[nivelTerral];
-    document.getElementById('explain-terral-title').textContent  = ti.title;
-    document.getElementById('explain-terral-desc').textContent   = ti.desc;
-    document.getElementById('explain-terral-advice').textContent = ti.advice;
-  }
-
   // Bloque 3 — info técnica (tech rows)
   const tech = buildTechBlocks(d, estado);
 
