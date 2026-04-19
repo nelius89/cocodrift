@@ -567,8 +567,6 @@ ul { list-style: none; }
 
 .explain-sheet.expanded {
   transform: translateY(0);
-  overflow-y: auto;
-  overscroll-behavior: contain;
 }
 
 /* Handle: barra + label "Información técnica completa" */
@@ -612,11 +610,17 @@ ul { list-style: none; }
   60%       { transform: translateY(-2px); }
 }
 
-/* Cuerpo técnico — siempre renderizado, visible al expandir por overflow del sheet */
+/* Cuerpo técnico — siempre renderizado, clipeado por overflow del sheet */
 .explain-sheet__body {
   display: flex;
   flex-direction: column;
   padding: 4px 20px calc(40px + var(--safe-bottom));
+  overflow-y: hidden;
+}
+
+.explain-sheet.expanded .explain-sheet__body {
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 /* ── Estado expandido: fondo azul en la vista ── */
