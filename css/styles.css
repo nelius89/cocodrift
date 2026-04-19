@@ -252,22 +252,25 @@ ul { list-style: none; }
   text-overflow: ellipsis;
 }
 
-.results__weather {
+.diagnosis__ambient {
   display: flex;
   align-items: center;
-  gap: 4px;
-  flex-shrink: 0;
+  justify-content: center;
+  gap: 7px;
+  margin: 12px 0 20px;
 }
-.results__weather-icon {
+.diagnosis__ambient-icon {
   display: flex;
   align-items: center;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--blue);
+  opacity: 0.75;
 }
-.results__weather-icon svg { width: 16px; height: 16px; }
-.results__weather-temp {
-  font-size: 13px;
+.diagnosis__ambient-icon svg { width: 20px; height: 20px; }
+.diagnosis__ambient-temp {
+  font-size: 20px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.75);
+  letter-spacing: -0.01em;
+  color: var(--dark);
 }
 
 /* ── Time nav ── */

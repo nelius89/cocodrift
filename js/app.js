@@ -210,9 +210,9 @@ function renderResults(sliderIdx) {
   const estado = getEstado(score, d.weathercode);
   const info   = ESTADOS[estado];
 
-  // Header: icono tiempo + temperatura
-  document.getElementById('results-weather-icon').innerHTML   = getWeatherIcon(d.weathercode);
-  document.getElementById('results-weather-temp').textContent = `${Math.round(d.tempC)}°`;
+  // Contexto ambiental: icono tiempo + temperatura (bloque diagnóstico)
+  document.getElementById('diagnosis-ambient-icon').innerHTML   = getWeatherIcon(d.weathercode);
+  document.getElementById('diagnosis-ambient-temp').textContent = `${Math.round(d.tempC)}°`;
 
   // Bloque 2 — decisión principal
   document.getElementById('diagnosis-title').textContent    = info.titulo;
