@@ -398,12 +398,26 @@ ul { list-style: none; }
   height: 15px;
 }
 
-.time-nav__franja-label {
+.time-nav__franja-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.time-nav__franja-name {
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.05em;
   color: rgba(10, 10, 10, 0.45);
   text-transform: uppercase;
+}
+
+.time-nav__franja-hours {
+  font-size: 10px;
+  font-weight: 400;
+  color: rgba(10, 10, 10, 0.3);
+  letter-spacing: 0.03em;
 }
 
 /* ── Main ── */
@@ -472,9 +486,10 @@ ul { list-style: none; }
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-top: 18px;
+  margin-top: 28px;
   width: 100%;
   max-width: 300px;
+  text-align: left;
 }
 
 .diagnosis__block-row {

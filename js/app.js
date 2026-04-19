@@ -162,8 +162,10 @@ function renderTimeNav() {
     daysEl.appendChild(btn);
   }
   document.getElementById('franja-slider').value = currentFranja;
-  document.getElementById('time-nav-icon').innerHTML    = FRANJA_ICONS[currentFranja];
-  document.getElementById('time-nav-label').textContent = franjaLabel(currentFranja);
+  const f = FRANJAS[currentFranja];
+  document.getElementById('time-nav-icon').innerHTML     = FRANJA_ICONS[currentFranja];
+  document.getElementById('time-nav-name').textContent   = f.label;
+  document.getElementById('time-nav-hours').textContent  = `${f.hours[0]}h–${f.hours[f.hours.length - 1]}h`;
 }
 
 // ── Cargar datos y mostrar resultados ──
@@ -607,8 +609,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // Franja slider
   document.getElementById('franja-slider').addEventListener('input', (e) => {
     currentFranja = parseInt(e.target.value);
+    const f = FRANJAS[currentFranja];
     document.getElementById('time-nav-icon').innerHTML    = FRANJA_ICONS[currentFranja];
-    document.getElementById('time-nav-label').textContent = franjaLabel(currentFranja);
+    document.getElementById('time-nav-name').textContent  = f.label;
+    document.getElementById('time-nav-hours').textContent = `${f.hours[0]}h–${f.hours[f.hours.length - 1]}h`;
     renderResults(sliderIndex(currentDay, currentFranja));
   });
 
