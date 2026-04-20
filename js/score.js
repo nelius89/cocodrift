@@ -43,47 +43,121 @@ function calcularVariabilidad(windKn, gustKn) {
   return Math.max(0, gustKn - windKn);
 }
 
+// ── Copy de avisos ──
+// Cada aviso tiene: label visible, categoría de gravedad y texto explicativo.
+//
+// Categorías:
+//   narrativa        → se absorbe en buildBlocks(), no genera bloque propio
+//   a-tener-en-cuenta → bloque discreto, informativo
+//   cuidado          → bloque medio, afecta la experiencia
+//   alerta           → bloque prominente, implica riesgo real
+//
+// Tabla tipo/nivel → categoría:
+//   rachas:      1=narrativa · 2=a-tener-en-cuenta · 3=alerta
+//   variabilidad:1=narrativa · 2=a-tener-en-cuenta · 3=cuidado
+//   mar:         1=narrativa · 2=a-tener-en-cuenta · 3=cuidado
+//   terral:      1=a-tener-en-cuenta · 2=cuidado · 3=alerta
+const AVISOS_COPY = {
+  rachas: {
+    1: {
+      label: 'Alguna racha notable',
+      categoria: 'narrativa',
+      copy: null, // absorbido en buildBlocks
+    },
+    2: {
+      label: 'Rachas fuertes',
+      categoria: 'a-tener-en-cuenta',
+      copy: 'Las rachas son más fuertes que el viento base. Pueden pillarte descolocado — mantén una postura baja y estable.',
+    },
+    3: {
+      label: 'Rachas muy fuertes',
+      categoria: 'alerta',
+      copy: 'Las rachas son peligrosas aunque el viento parezca tranquilo. Una racha puede empujarte lejos de la orilla o tirarte al agua.',
+    },
+  },
+  variabilidad: {
+    1: {
+      label: 'Viento algo variable',
+      categoria: 'narrativa',
+      copy: null,
+    },
+    2: {
+      label: 'Viento inestable',
+      categoria: 'a-tener-en-cuenta',
+      copy: 'El viento cambia de intensidad con frecuencia. No es fuerte, pero no es constante — estate atento.',
+    },
+    3: {
+      label: 'Viento muy inestable',
+      categoria: 'cuidado',
+      copy: 'El viento base es suave, pero los cambios son bruscos y frecuentes. Puede descolocarte cuando menos te lo esperas.',
+    },
+  },
+  mar: {
+    1: {
+      label: 'Mar algo nervioso',
+      categoria: 'narrativa',
+      copy: null,
+    },
+    2: {
+      label: 'Mar incómodo',
+      categoria: 'a-tener-en-cuenta',
+      copy: 'Las olas son cortas y poco organizadas. El equilibrio va a costar más de lo que el tamaño sugiere.',
+    },
+    3: {
+      label: 'Mar muy incómodo',
+      categoria: 'cuidado',
+      copy: 'El mar está muy nervioso. Las olas son pequeñas pero caóticas — mantenerse de pie exige concentración constante.',
+    },
+  },
+  terral: {
+    1: {
+      label: 'Terral leve',
+      categoria: 'a-tener-en-cuenta',
+      copy: 'El viento viene de tierra. Hoy es suave, pero te empuja hacia el mar. No te alejes demasiado de la orilla.',
+    },
+    2: {
+      label: 'Terral relevante',
+      categoria: 'cuidado',
+      copy: 'El viento de tierra empuja hacia mar abierto. Quédate cerca de la orilla en todo momento. Si tienes dudas, mejor no salir hoy.',
+    },
+    3: {
+      label: 'Terral fuerte',
+      categoria: 'alerta',
+      copy: 'El viento de tierra empuja fuerte hacia mar abierto. El agua puede parecer tranquila desde la orilla — no lo es. Hoy es mejor quedarse en tierra.',
+    },
+  },
+};
+
 // ── Avisos ──
-// Devuelve array de { tipo, nivel, label }
-// Los avisos describen la experiencia, no el fenómeno.
+// Devuelve array de { tipo, nivel, label, categoria, copy }
+// Los de categoría 'narrativa' se absorben en buildBlocks(), no se renderizan como bloque.
 function getWarnings(d, terralLevel) {
   const variabilidad = calcularVariabilidad(d.windKn, d.gustKn);
   const warnings = [];
 
   // Rachas
-  if (d.gustKn > 22) {
-    warnings.push({ tipo: 'rachas', nivel: 3, label: 'Rachas muy fuertes' });
-  } else if (d.gustKn > 16) {
-    warnings.push({ tipo: 'rachas', nivel: 2, label: 'Rachas fuertes' });
-  } else if (d.gustKn > 12) {
-    warnings.push({ tipo: 'rachas', nivel: 1, label: 'Alguna racha notable' });
+  const nivelRachas = d.gustKn > 22 ? 3 : d.gustKn > 16 ? 2 : d.gustKn > 12 ? 1 : 0;
+  if (nivelRachas > 0) {
+    warnings.push({ tipo: 'rachas', nivel: nivelRachas, ...AVISOS_COPY.rachas[nivelRachas] });
   }
 
   // Variabilidad
-  if (variabilidad > 10) {
-    warnings.push({ tipo: 'variabilidad', nivel: 3, label: 'Viento muy inestable' });
-  } else if (variabilidad > 6) {
-    warnings.push({ tipo: 'variabilidad', nivel: 2, label: 'Viento inestable' });
-  } else if (variabilidad > 4) {
-    warnings.push({ tipo: 'variabilidad', nivel: 1, label: 'Viento algo variable' });
+  const nivelVar = variabilidad > 10 ? 3 : variabilidad > 6 ? 2 : variabilidad > 4 ? 1 : 0;
+  if (nivelVar > 0) {
+    warnings.push({ tipo: 'variabilidad', nivel: nivelVar, ...AVISOS_COPY.variabilidad[nivelVar] });
   }
 
   // Mar incómodo (período + ola combinados)
-  if (d.wavePer < 3 && d.waveH > 0.5) {
-    warnings.push({ tipo: 'mar', nivel: 3, label: 'Mar muy incómodo' });
-  } else if (d.wavePer < 4 && d.waveH > 0.5) {
-    warnings.push({ tipo: 'mar', nivel: 2, label: 'Mar incómodo' });
-  } else if (d.wavePer < 5 && d.waveH > 0.5) {
-    warnings.push({ tipo: 'mar', nivel: 1, label: 'Mar algo nervioso' });
+  const nivelMar = (d.wavePer < 3 && d.waveH > 0.5) ? 3
+                 : (d.wavePer < 4 && d.waveH > 0.5) ? 2
+                 : (d.wavePer < 5 && d.waveH > 0.5) ? 1 : 0;
+  if (nivelMar > 0) {
+    warnings.push({ tipo: 'mar', nivel: nivelMar, ...AVISOS_COPY.mar[nivelMar] });
   }
 
-  // Terral (calculado por calcularRiesgoTerral)
-  if (terralLevel === 3) {
-    warnings.push({ tipo: 'terral', nivel: 3, label: 'Terral fuerte' });
-  } else if (terralLevel === 2) {
-    warnings.push({ tipo: 'terral', nivel: 2, label: 'Terral relevante' });
-  } else if (terralLevel === 1) {
-    warnings.push({ tipo: 'terral', nivel: 1, label: 'Terral leve' });
+  // Terral
+  if (terralLevel > 0) {
+    warnings.push({ tipo: 'terral', nivel: terralLevel, ...AVISOS_COPY.terral[terralLevel] });
   }
 
   return warnings;
@@ -146,28 +220,57 @@ function aplicarAcumulacion(estado, warnings) {
   return estado;
 }
 
+// ── Pastilla de alerta consolidada (solo para estado no-recomendable) ──
+// Cuando el estado es no-recomendable, todos los avisos se fusionan en un
+// único párrafo explicativo. El título ya dice todo — esto añade el porqué.
+function buildAlertaConsolidada(d, weathercode, warnings) {
+  if (weathercode >= 95) {
+    return 'Hay tormenta. No es seguro estar en el agua hoy bajo ningún concepto.';
+  }
+  const terralW = warnings.find(w => w.tipo === 'terral');
+  if (terralW?.nivel === 3) {
+    return 'El viento de tierra empuja con fuerza hacia mar abierto. El agua puede parecer tranquila desde la orilla — no lo es. Independientemente del resto de condiciones, hoy es mejor quedarse en tierra.';
+  }
+  if (d.windKn > 20) {
+    return `El viento sopla a ${d.windKn.toFixed(0)} nudos. A esa velocidad, remar contra él es imposible — si te alejas, no podrás volver por tu propio pie.`;
+  }
+  if (d.gustKn > 28) {
+    return `Las rachas alcanzan ${d.gustKn.toFixed(0)} nudos. Una racha puede tirarte al agua o alejarte de la orilla antes de que puedas reaccionar.`;
+  }
+  if (d.waveH > 1.5) {
+    return `Las olas superan ${d.waveH.toFixed(1)} metros. El riesgo de caer y no poder volver a la orilla es muy alto.`;
+  }
+  // Acumulación de condiciones
+  return 'La combinación de condiciones de hoy hace que no sea seguro salir. Viento, rachas y mar están al límite al mismo tiempo.';
+}
+
 // ── Diagnóstico principal ──
-// Punto de entrada único. Devuelve { estado, terralLevel, warnings }.
+// Punto de entrada único. Devuelve { estado, warnings, alertaConsolidada }.
+// alertaConsolidada solo tiene valor cuando estado === 'no-recomendable'.
 function diagnosticar(d, spot, weathercode) {
-  const terralLevel = calcularRiesgoTerral(d.windKn, d.gustKn, d.windDir, d.waveH, spot);
-  const warnings    = getWarnings(d, terralLevel);
-  const estadoBase  = calcEstadoBase(d, weathercode, terralLevel);
-  const estado      = aplicarAcumulacion(estadoBase, warnings);
-  return { estado, terralLevel, warnings };
+  const terralLevel       = calcularRiesgoTerral(d.windKn, d.gustKn, d.windDir, d.waveH, spot);
+  const warnings          = getWarnings(d, terralLevel);
+  const estadoBase        = calcEstadoBase(d, weathercode, terralLevel);
+  const estado            = aplicarAcumulacion(estadoBase, warnings);
+  const alertaConsolidada = estado === 'no-recomendable'
+    ? buildAlertaConsolidada(d, weathercode, warnings)
+    : null;
+  return { estado, warnings, alertaConsolidada };
 }
 
 // ── Textos de estado ──
 const ESTADOS = {
-  'piscina':         { titulo: 'El mar está de piscina',      subtitulo: 'Condiciones ideales. Sal sin dudar.' },
-  'muy-agradable':   { titulo: 'Va a estar muy bien',         subtitulo: 'Cómodo y agradable. Un buen día.' },
-  'se-puede-salir':  { titulo: 'Hoy se puede salir',          subtitulo: 'Con algo de práctica, sin problema.' },
-  'exigente':        { titulo: 'Condiciones exigentes',       subtitulo: 'El agua hoy pone a prueba.' },
-  'no-recomendable': { titulo: 'Mejor esperar otro día',      subtitulo: 'Las condiciones no acompañan hoy.' },
+  'piscina':         { titulo: 'El mar está de piscina',   subtitulo: 'Condiciones ideales. Sal sin dudar.' },
+  'muy-agradable':   { titulo: 'Va a estar muy bien',      subtitulo: 'Cómodo y agradable. Un buen día.' },
+  'se-puede-salir':  { titulo: 'Hoy se puede salir',       subtitulo: 'Con algo de práctica, sin problema.' },
+  'exigente':        { titulo: 'Condiciones exigentes',    subtitulo: 'El agua hoy pone a prueba.' },
+  'no-recomendable': { titulo: 'Mejor esperar otro día',   subtitulo: 'Las condiciones no acompañan hoy.' },
 };
 
 // ── Bloques narrativos (pantalla principal) ──
 // windTitle + windDesc: describe el viento como experiencia
 // seaTitle + seaDesc: describe el mar como experiencia
+// Los avisos de categoría 'narrativa' (nivel 1) quedan absorbidos en este copy.
 function buildBlocks(d, estado) {
   const variabilidad = calcularVariabilidad(d.windKn, d.gustKn);
 
@@ -242,11 +345,51 @@ function buildBlocks(d, estado) {
   return { windTitle, windDesc, seaTitle, seaDesc, closing: cierres[estado] };
 }
 
+// ── Para quién es ──
+// Texto generativo: describe quién puede manejar las condiciones concretas de hoy.
+// No describe el perfil en abstracto — describe el día específico.
+function getUserFit(estado, warnings) {
+  const terralW = warnings.find(w => w.tipo === 'terral');
+  const rachasW = warnings.find(w => w.tipo === 'rachas');
+  const varW    = warnings.find(w => w.tipo === 'variabilidad');
+
+  switch (estado) {
+    case 'piscina':
+      return 'Hoy el agua es para cualquiera. Principiante o experto: sin esfuerzo, sin sorpresas.';
+
+    case 'muy-agradable':
+      if (terralW) {
+        return 'Cómodo para cualquier nivel. Solo ten en cuenta el terral — quédate cerca de la orilla por si acaso.';
+      }
+      return 'Cómodo para cualquier nivel. Un buen día para estrenar o para salir sin pensar.';
+
+    case 'se-puede-salir':
+      if (varW?.nivel === 3 || rachasW?.nivel >= 2) {
+        return 'El mar está tranquilo, pero el viento no se porta igual todo el rato. Cómodo para alguien con práctica; un principiante puede sorprenderse con las rachas.';
+      }
+      if (terralW) {
+        return 'Con algo de práctica, sin problema. Ten en cuenta el terral — si el viento cambia, volver puede costar más de lo esperado.';
+      }
+      return 'Con algo de práctica, sin problema. Un principiante puede salir si va con calma y cerca de la orilla.';
+
+    case 'exigente':
+      if (terralW) {
+        return 'Solo para remadores con experiencia que saben leer el viento. El terral añade un riesgo que no se ve en la superficie.';
+      }
+      return 'Hoy no es para principiantes. El viento y el mar juntos exigen técnica y experiencia. Si sabes lo que haces, adelante.';
+
+    case 'no-recomendable':
+      return 'Hoy no es para nadie. Las condiciones superan lo que cualquier nivel puede manejar con seguridad.';
+
+    default:
+      return '';
+  }
+}
+
 // ── Info técnica expandible (3 párrafos por métrica) ──
 function buildTechBlocks(d, estado) {
   const variabilidad = calcularVariabilidad(d.windKn, d.gustKn);
 
-  // Viento
   let windP1, windP2, windP3;
   if (d.windKn <= 6) {
     windP1 = 'El viento es muy suave. Apenas lo notarás al remar.';
@@ -270,7 +413,6 @@ function buildTechBlocks(d, estado) {
     windP3 = 'Por encima de 20 nudos (Beaufort 5) no es seguro salir en tabla.';
   }
 
-  // Rachas — con contexto de variabilidad
   let gustP1, gustP2, gustP3;
   if (variabilidad < 4) {
     gustP1 = 'Las rachas son muy leves. El viento es estable y constante.';
@@ -290,7 +432,6 @@ function buildTechBlocks(d, estado) {
     gustP3 = 'Diferencia muy alta entre base y rachas. No es seguro sin mucha experiencia.';
   }
 
-  // Ola
   let seaP1, seaP2, seaP3;
   if (d.waveH <= 0.3) {
     seaP1 = 'Las olas son muy pequeñas. El mar está casi plano.';
@@ -314,7 +455,6 @@ function buildTechBlocks(d, estado) {
     seaP3 = 'Por encima de 1.5 m el mar no es apto para actividades recreativas.';
   }
 
-  // Período
   let perP1, perP2, perP3;
   if (d.wavePer >= 7) {
     perP1 = 'Las olas tienen un ritmo largo y ordenado.';
