@@ -180,7 +180,6 @@ async function loadSpot(spot) {
   document.getElementById('diagnosis-title').textContent    = 'Cargando...';
   document.getElementById('diagnosis-subtitle').textContent = '';
   document.getElementById('diagnosis-closing').textContent  = '';
-  document.getElementById('terral-pill').classList.add('hidden');
   document.getElementById('alerta-consolidada').classList.add('hidden');
   document.getElementById('warnings-section').classList.add('hidden');
   document.getElementById('warnings-body').classList.remove('open');
@@ -199,19 +198,13 @@ async function loadSpot(spot) {
   }
 }
 
-const TERRAL_INFO = {
-  1: { label: 'Terral leve',      pillLabel: 'TERRAL LEVE',      title: 'AVISO VIENTO TERRAL', desc: 'El viento sopla de tierra hacia el mar. Aunque el agua parezca tranquila, puede empujarte lentamente fuera.', advice: 'Puedes salir, pero no te alejes de la orilla.' },
-  2: { label: 'Terral relevante', pillLabel: 'TERRAL RELEVANTE', title: 'AVISO VIENTO TERRAL', desc: 'El viento te llevará progresivamente alejándote de la playa, aunque al principio no lo notes.', advice: 'Quédate cerca de la orilla en todo momento.' },
-  3: { label: 'Terral fuerte',    pillLabel: 'TERRAL FUERTE',    title: 'VIENTO TERRAL FUERTE', desc: 'Las condiciones offshore son peligrosas. El viento empuja con fuerza hacia mar abierto y recuperar la posición puede ser muy difícil.', advice: 'Hoy es mejor quedarse en tierra.' },
-};
-
 function renderResults(sliderIdx) {
   if (!currentData) return;
   const { marine, forecast } = currentData;
   const d = getDataForSlider(sliderIdx, marine, forecast);
 
   // Diagnóstico
-  const { estado, terralLevel: _terral, warnings } = diagnosticar(d, currentSpot, d.weathercode);
+  const { estado, warnings, alertaConsolidada } = diagnosticar(d, currentSpot, d.weathercode);
   const info = ESTADOS[estado];
 
   // Contexto ambiental: icono tiempo + temperatura (bloque diagnóstico)
@@ -241,21 +234,6 @@ function renderResults(sliderIdx) {
   document.getElementById('diagnosis-sea-icon').innerHTML     = ICONS.wave;
   document.getElementById('diagnosis-sea-title').textContent  = blocks.seaTitle;
   document.getElementById('diagnosis-sea-desc').textContent   = blocks.seaDesc;
-
-  // Terral pill en pantalla principal
-  const nivelTerral = warnings.find(w => w.tipo === 'terral')?.nivel ?? 0;
-  const pillEl = document.getElementById('terral-pill');
-  if (nivelTerral === 0) {
-    pillEl.classList.add('hidden');
-  } else {
-    const ti = TERRAL_INFO[nivelTerral];
-    pillEl.classList.remove('hidden');
-    document.getElementById('terral-pill-label').textContent = ti.pillLabel;
-    // Rellenar modal
-    document.getElementById('terral-modal-title').textContent  = ti.title;
-    document.getElementById('terral-modal-desc').textContent   = ti.desc;
-    document.getElementById('terral-modal-advice').textContent = ti.advice;
-  }
 
   // Bloque 3 — info técnica (tech rows)
   const tech = buildTechBlocks(d, estado);
@@ -484,17 +462,6 @@ function initTechToggle() {
   });
 }
 
-// ── Terral popup ──
-function openTerralPopup() {
-  document.getElementById('terral-overlay').classList.remove('hidden');
-  document.getElementById('terral-modal').classList.remove('hidden');
-}
-
-function closeTerralPopup() {
-  document.getElementById('terral-overlay').classList.add('hidden');
-  document.getElementById('terral-modal').classList.add('hidden');
-}
-
 // ── Franja label con horas ──
 function franjaLabel(franjaIndex) {
   const f = FRANJAS[franjaIndex];
@@ -597,10 +564,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initAboutSheet();
   initSuggestionsSheet();
 
-  // Terral pill → popup
-  document.getElementById('terral-pill').addEventListener('click', openTerralPopup);
-  document.getElementById('terral-overlay').addEventListener('click', closeTerralPopup);
-  document.getElementById('terral-modal-close').addEventListener('click', closeTerralPopup);
   initWarningsToggle();
   initTechToggle();
 
