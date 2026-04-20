@@ -241,7 +241,7 @@ function buildAlertaConsolidada(d, weathercode, warnings) {
     return `Las olas superan ${d.waveH.toFixed(1)} metros. El riesgo de caer y no poder volver a la orilla es muy alto.`;
   }
   // Acumulación de condiciones
-  return 'La combinación de condiciones de hoy hace que no sea seguro salir. Viento, rachas y mar están al límite al mismo tiempo.';
+  return 'La combinación de rachas y mar supera lo que se puede manejar con seguridad. Mejor esperar a mejores condiciones.';
 }
 
 // ── Diagnóstico principal ──
@@ -259,12 +259,14 @@ function diagnosticar(d, spot, weathercode) {
 }
 
 // ── Textos de estado ──
+// Subtítulos responden directamente "¿es para mí?" — sin referencias temporales.
+// [PENDIENTE: token temporal para título/subtítulo cuando se consulta otro día/franja]
 const ESTADOS = {
-  'piscina':         { titulo: 'El mar está de piscina',   subtitulo: 'Condiciones ideales. Sal sin dudar.' },
-  'muy-agradable':   { titulo: 'Va a estar muy bien',      subtitulo: 'Cómodo y agradable. Un buen día.' },
-  'se-puede-salir':  { titulo: 'Hoy se puede salir',       subtitulo: 'Con algo de práctica, sin problema.' },
-  'exigente':        { titulo: 'Condiciones exigentes',    subtitulo: 'El agua hoy pone a prueba.' },
-  'no-recomendable': { titulo: 'Mejor esperar otro día',   subtitulo: 'Las condiciones no acompañan hoy.' },
+  'piscina':         { titulo: 'El mar está de piscina',   subtitulo: 'Para cualquiera. No hay excusa para no salir.' },
+  'muy-agradable':   { titulo: 'Va a estar muy bien',      subtitulo: 'Cualquiera puede salir a gusto.' },
+  'se-puede-salir':  { titulo: 'Se puede salir',           subtitulo: 'Si has salido alguna vez, no vas a tener problema.' },
+  'exigente':        { titulo: 'Condiciones exigentes',    subtitulo: 'Es para quienes ya saben lo que hacen.' },
+  'no-recomendable': { titulo: 'Mejor esperar',            subtitulo: 'No es para nadie, independientemente del nivel.' },
 };
 
 // ── Bloques narrativos (pantalla principal) ──
@@ -334,12 +336,16 @@ function buildBlocks(d, estado) {
     seaDesc  = 'No es seguro salir en tabla hoy.';
   }
 
+  // Frases de cierre: ángulo diferente al subtítulo del bocadillo.
+  // El subtítulo habla del usuario. El cierre habla de las condiciones concretas.
+  // Sin referencias temporales — atemporales por diseño.
+  // [PENDIENTE: revisar si el cierre va aquí o en bloque propio tras los avisos]
   const cierres = {
-    'piscina':         'Un día ideal. Sin esfuerzo, sin sorpresas.',
-    'muy-agradable':   'Un buen día para salir. Las condiciones acompañan.',
-    'se-puede-salir':  'Puedes salir, pero con más atención de lo habitual.',
-    'exigente':        'No es un buen día para la tabla. Mejor esperar en tierra.',
-    'no-recomendable': 'Hoy es mejor quedarse en tierra.',
+    'piscina':         'Aprovéchalo — estos días no abundan.',
+    'muy-agradable':   'Las condiciones acompañan. Vale la pena salir.',
+    'se-puede-salir':  'El mar no va a sorprenderte. El viento, a ratos sí.',
+    'exigente':        'Si tienes dudas, ya tienes la respuesta.',
+    'no-recomendable': 'No merece la pena forzarlo.',
   };
 
   return { windTitle, windDesc, seaTitle, seaDesc, closing: cierres[estado] };

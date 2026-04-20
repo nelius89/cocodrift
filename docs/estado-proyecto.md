@@ -52,6 +52,16 @@ Sin login. Sin historial. Funciona offline (Service Worker).
   - `docs/sistema-diagnostico.md` — sistema completo con reglas, copy y UX
   - `docs/estado-proyecto.md` — este archivo
 
+### Decisiones de copy cerradas en esta sesión
+
+- Subtítulos del bocadillo reescritos: responden "¿es para mí?" de forma directa
+- Frases de cierre atemporales: ángulo diferente al subtítulo, sin repetir
+- Copy del Caso 6 (acumulación) corregido: sin lenguaje técnico
+- Bloque "Para quién es" disuelto: función cubierta por subtítulo + frase de cierre
+- Acordeón de avisos: nombre provisional "A saber antes de salir"
+- Código de color dentro del acordeón para diferenciar Cuidado vs. A tener en cuenta
+- Todo el copy es atemporal (sin "hoy", "otro día")
+
 ### Lo que NO está implementado todavía
 
 - **HTML/CSS para los nuevos bloques:**
@@ -63,6 +73,26 @@ Sin login. Sin historial. Funciona offline (Service Worker).
 - **`getUserFit()` no se llama desde app.js** — función escrita, sin conexión al DOM
 
 - **`alertaConsolidada` no se renderiza** — `diagnosticar()` la devuelve, app.js la ignora
+
+---
+
+## Pendiente — Token temporal
+
+El copy es atemporal, pero el usuario puede consultar condiciones de otras franjas/días.
+Hay que definir un sistema de referencia temporal dinámica:
+
+| Situación | Token |
+|---|---|
+| Franja actual, hoy | "ahora" |
+| Franja posterior, hoy | "esta tarde" / "esta noche" |
+| Día siguiente | "mañana" |
+| Días futuros | "el martes" / "el miércoles" |
+
+El token se inyecta en título y subtítulo del bocadillo donde tenga sentido.
+`getUserFit(estado, warnings, timeRef)` y `buildBlocks` recibirán `timeRef` cuando se implemente.
+El token lo genera `app.js` (o `api.js`) según `dayOffset` + índice de franja activa.
+
+**No implementar hasta decidir la lógica completa.**
 
 ---
 

@@ -301,6 +301,47 @@ BLOQUE 7 · DETALLE TÉCNICO
   3 párrafos por métrica + cierre narrativo
 ```
 
+### Textos de estado
+
+El bocadillo tiene dos funciones simultáneas:
+- **Título**: nombra el estado (mood)
+- **Subtítulo**: responde directamente "¿es para mí?" — sin rodeos
+
+| Estado | Título | Subtítulo |
+|---|---|---|
+| Piscina | El mar está de piscina | Para cualquiera. No hay excusa para no salir. |
+| Muy agradable | Va a estar muy bien | Cualquiera puede salir a gusto. |
+| Se puede salir | Se puede salir | Si has salido alguna vez, no vas a tener problema. |
+| Exigente | Condiciones exigentes | Es para quienes ya saben lo que hacen. |
+| No recomendable | Mejor esperar | No es para nadie, independientemente del nivel. |
+
+### Frase de cierre
+
+Aparece al final del bloque de narrativa (o tras los avisos). No repite el subtítulo — lo complementa desde las condiciones concretas del día. El subtítulo habla del usuario; el cierre habla de lo que va a encontrar.
+
+| Estado | Frase de cierre |
+|---|---|
+| Piscina | Aprovéchalo — estos días no abundan. |
+| Muy agradable | Las condiciones acompañan. Vale la pena salir. |
+| Se puede salir | El mar no va a sorprenderte. El viento, a ratos sí. |
+| Exigente | Si tienes dudas, ya tienes la respuesta. |
+| No recomendable | No merece la pena forzarlo. |
+
+### El bloque "Para quién es" queda disuelto
+
+No existe como bloque independiente. Su función la cubren:
+1. El subtítulo del bocadillo (respuesta inmediata, directa)
+2. La frase de cierre (reafirmación desde otro ángulo)
+
+### Acordeón de avisos — "A saber antes de salir"
+
+Nombre provisional pendiente de confirmar. Agrupa Cuidado + A tener en cuenta.
+Dentro del acordeón, el nivel de gravedad se diferencia por código de color:
+- bullet/icono naranja → Cuidado
+- bullet/icono gris/amarillo → A tener en cuenta
+
+La Alerta va siempre fuera del acordeón, en pastilla prominente.
+
 ### Jerarquía tipográfica
 
 | Elemento | Tamaño | Peso | Color | Fondo |
@@ -310,11 +351,10 @@ BLOQUE 7 · DETALLE TÉCNICO
 | Subtítulo | 15–16px | regular | gris medio | — |
 | Narrativa título | 15px | bold | negro | — |
 | Narrativa desc | 14px | regular | gris | — |
-| Alerta label | 13px | bold uppercase | color alerta | fondo alerta |
+| Frase de cierre | 14px | regular | gris medio | — |
 | Alerta copy | 14px | regular | oscuro | fondo alerta |
-| Cuidado copy | 14px | regular | oscuro | fondo cuidado |
-| A tener en cuenta | 13px | regular | gris | gris muy claro |
-| Para quién es | 14px | regular | oscuro | — |
+| Cuidado (acordeón) | 14px | regular | oscuro | — · bullet naranja |
+| A tener en cuenta | 13px | regular | gris | — · bullet gris |
 
 ---
 
