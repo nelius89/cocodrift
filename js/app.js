@@ -179,7 +179,12 @@ async function loadSpot(spot) {
   document.getElementById('results-spot-name').textContent = spot.name;
   document.getElementById('diagnosis-title').textContent    = 'Cargando...';
   document.getElementById('diagnosis-subtitle').textContent = '';
+  document.getElementById('diagnosis-closing').textContent  = '';
   document.getElementById('terral-pill').classList.add('hidden');
+  document.getElementById('alerta-consolidada').classList.add('hidden');
+  document.getElementById('warnings-section').classList.add('hidden');
+  document.getElementById('warnings-body').classList.remove('open');
+  document.getElementById('warnings-toggle').classList.remove('open');
   document.getElementById('tech-section').classList.remove('open');
   document.getElementById('tech-toggle').classList.remove('open');
 
@@ -270,6 +275,51 @@ function renderResults(sliderIdx) {
   setTechRow('period', ICONS.timer, `${d.wavePer.toFixed(0)} s`, labelPeriodo(d.wavePer).label, tech.period);
 
   document.getElementById('tech-closing').textContent = tech.closing;
+
+  // Frase de cierre + avisos
+  document.getElementById('diagnosis-closing').textContent = blocks.closing;
+  renderWarnings(warnings, alertaConsolidada, estado);
+}
+
+// ── Render avisos ──
+// Muestra pastilla consolidada (no-recomendable) o acordeón (resto de estados).
+// Avisos de categoría 'narrativa' no se muestran — ya están en los bloques de viento/mar.
+function renderWarnings(warnings, alertaConsolidada, estado) {
+  const pastillaEl = document.getElementById('alerta-consolidada');
+  const sectionEl  = document.getElementById('warnings-section');
+  const bodyEl     = document.getElementById('warnings-body');
+
+  const visibles = warnings.filter(w => w.categoria !== 'narrativa');
+
+  if (estado === 'no-recomendable' && alertaConsolidada) {
+    // Pastilla consolidada
+    pastillaEl.classList.remove('hidden');
+    document.getElementById('alerta-consolidada-text').textContent = alertaConsolidada;
+    sectionEl.classList.add('hidden');
+  } else if (visibles.length > 0) {
+    // Acordeón
+    pastillaEl.classList.add('hidden');
+    sectionEl.classList.remove('hidden');
+    document.getElementById('warnings-count').textContent = visibles.length;
+
+    // Orden: alerta → cuidado → a-tener-en-cuenta
+    const ORDER = { 'alerta': 0, 'cuidado': 1, 'a-tener-en-cuenta': 2 };
+    visibles.sort((a, b) => (ORDER[a.categoria] ?? 9) - (ORDER[b.categoria] ?? 9));
+
+    bodyEl.innerHTML = '';
+    visibles.forEach(w => {
+      const item = document.createElement('div');
+      item.className = `warning-item warning-item--${w.categoria}`;
+      item.innerHTML = `
+        <span class="warning-item__label">${w.label}</span>
+        <p class="warning-item__copy">${w.copy}</p>
+      `;
+      bodyEl.appendChild(item);
+    });
+  } else {
+    pastillaEl.classList.add('hidden');
+    sectionEl.classList.add('hidden');
+  }
 }
 
 function shortDirLabel(degrees) {
@@ -409,6 +459,16 @@ function initSuggestionsSheet() {
   });
 }
 
+// ── Warnings toggle (acordeón avisos) ──
+function initWarningsToggle() {
+  const toggle = document.getElementById('warnings-toggle');
+  const body   = document.getElementById('warnings-body');
+  toggle.addEventListener('click', () => {
+    const open = body.classList.toggle('open');
+    toggle.classList.toggle('open', open);
+  });
+}
+
 // ── Tech toggle (acordeón técnico) ──
 function initTechToggle() {
   const toggle  = document.getElementById('tech-toggle');
@@ -541,6 +601,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('terral-pill').addEventListener('click', openTerralPopup);
   document.getElementById('terral-overlay').addEventListener('click', closeTerralPopup);
   document.getElementById('terral-modal-close').addEventListener('click', closeTerralPopup);
+  initWarningsToggle();
   initTechToggle();
 
   // Back button — volver a home

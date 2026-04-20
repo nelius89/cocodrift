@@ -1366,6 +1366,183 @@ body[data-view="view-results"] .btn-menu { color: var(--white); }
 }
 
 /* ─────────────────────────────────────────
+   DIAGNOSIS — FRASE DE CIERRE
+───────────────────────────────────────── */
+.diagnosis__closing {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(10, 10, 10, 0.38);
+  text-align: center;
+  line-height: 1.5;
+  margin-top: 4px;
+  max-width: 260px;
+  font-style: italic;
+}
+
+/* ─────────────────────────────────────────
+   PASTILLA CONSOLIDADA — no-recomendable
+───────────────────────────────────────── */
+.alerta-consolidada {
+  background: var(--black);
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin-top: 16px;
+  width: 100%;
+  max-width: 300px;
+  text-align: left;
+}
+
+.alerta-consolidada p {
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.82);
+  font-family: var(--font);
+}
+
+/* ─────────────────────────────────────────
+   ACORDEÓN AVISOS — A saber antes de salir
+───────────────────────────────────────── */
+.warnings-section {
+  width: 100%;
+  max-width: 300px;
+  margin-top: 16px;
+  border: 1px solid rgba(10, 10, 10, 0.1);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.warnings-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 13px 14px;
+  background: none;
+  border: none;
+  font-family: var(--font);
+  cursor: pointer;
+  text-align: left;
+  gap: 8px;
+}
+
+.warnings-toggle__label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(10, 10, 10, 0.55);
+  flex: 1;
+}
+
+.warnings-toggle__right {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+}
+
+.warnings-toggle__count {
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(10, 10, 10, 0.3);
+  background: rgba(10, 10, 10, 0.07);
+  border-radius: 100px;
+  padding: 1px 7px;
+  line-height: 1.6;
+}
+
+.warnings-toggle__arrow {
+  font-size: 12px;
+  color: rgba(10, 10, 10, 0.3);
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+.warnings-toggle.open .warnings-toggle__arrow {
+  transform: rotate(180deg);
+}
+
+.warnings-body {
+  display: none;
+  flex-direction: column;
+  border-top: 1px solid rgba(10, 10, 10, 0.07);
+}
+
+.warnings-body.open {
+  display: flex;
+}
+
+/* Items individuales */
+.warning-item {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  border-bottom: 1px solid rgba(10, 10, 10, 0.06);
+}
+
+.warning-item:last-child {
+  border-bottom: none;
+}
+
+.warning-item__label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.warning-item__label::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.warning-item__copy {
+  font-size: 12px;
+  line-height: 1.55;
+  color: rgba(10, 10, 10, 0.55);
+  font-family: var(--font);
+}
+
+/* Colores por nivel */
+.warning-item--alerta .warning-item__label {
+  color: #c0392b;
+}
+.warning-item--alerta .warning-item__label::before {
+  background: #c0392b;
+}
+
+.warning-item--cuidado .warning-item__label {
+  color: #d4830a;
+}
+.warning-item--cuidado .warning-item__label::before {
+  background: #d4830a;
+}
+
+.warning-item--a-tener-en-cuenta .warning-item__label {
+  color: rgba(10, 10, 10, 0.45);
+}
+.warning-item--a-tener-en-cuenta .warning-item__label::before {
+  background: rgba(10, 10, 10, 0.25);
+}
+
+/* Versión en about sheet */
+.about-sheet__version {
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(49, 79, 255, 0.35);
+  letter-spacing: 0.06em;
+  margin-top: 2px;
+}
+
+/* ─────────────────────────────────────────
    UTILS
 ───────────────────────────────────────── */
 .hidden { display: none !important; }
