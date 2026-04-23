@@ -53,18 +53,16 @@ async function searchSpots(query) {
   }
 }
 
-// ── Franjas horarias ──
+// ── Franjas horarias (v2: 5 franjas) ──
 const FRANJAS = [
-  { id: 'madrugada',     label: 'Madrugada',     hours: [0, 1, 2, 3, 4, 5] },
-  { id: 'manana',        label: 'Mañana',         hours: [6, 7, 8] },
-  { id: 'media-manana',  label: 'Media mañana',   hours: [9, 10, 11] },
-  { id: 'mediodia',      label: 'Mediodía',       hours: [12, 13, 14] },
-  { id: 'tarde',         label: 'Tarde',          hours: [15, 16, 17] },
-  { id: 'atardecer',     label: 'Atardecer',      hours: [18, 19, 20] },
-  { id: 'noche',         label: 'Noche',          hours: [21, 22, 23] }
+  { id: 'madrugada', label: 'Madrugada', hours: [0, 1, 2, 3, 4, 5, 6] },
+  { id: 'amanecer',  label: 'Amanecer',  hours: [7, 8, 9] },
+  { id: 'mediodia',  label: 'Mediodía',  hours: [10, 11, 12, 13] },
+  { id: 'tarde',     label: 'Tarde',     hours: [14, 15, 16, 17, 18] },
+  { id: 'noche',     label: 'Noche',     hours: [19, 20, 21, 22, 23] }
 ];
 
-// Devuelve el índice del slider (0..48) dado día (0-6) y franja (0-6)
+// Devuelve el índice del slider (0..34) dado día (0-6) y franja (0-4)
 function sliderIndex(day, franja) {
   return day * FRANJAS.length + franja;
 }
@@ -75,7 +73,7 @@ function getCurrentFranjaIndex() {
   for (let i = 0; i < FRANJAS.length; i++) {
     if (FRANJAS[i].hours.includes(h)) return i;
   }
-  return 1; // fallback: Mañana
+  return 1; // fallback: Amanecer
 }
 
 // Etiqueta legible del slider
