@@ -258,15 +258,15 @@ function diagnosticar(d, spot, weathercode) {
   return { estado, warnings, alertaConsolidada };
 }
 
-// ── Textos de estado ──
-// Subtítulos responden directamente "¿es para mí?" — sin referencias temporales.
-// [PENDIENTE: token temporal para título/subtítulo cuando se consulta otro día/franja]
+// ── Textos de estado (v2) ──
+// titulo: respuesta directa a "¿Está para salir?"
+// subtitulo: presubtítulo fijo en pantalla de resultados
 const ESTADOS = {
-  'piscina':         { titulo: 'El mar está de piscina',   subtitulo: 'Para cualquiera. No hay excusa para no salir.' },
-  'muy-agradable':   { titulo: 'Va a estar muy bien',      subtitulo: 'Cualquiera puede salir a gusto.' },
-  'se-puede-salir':  { titulo: 'Se puede salir',           subtitulo: 'Si has salido alguna vez, no vas a tener problema.' },
-  'exigente':        { titulo: 'Condiciones exigentes',    subtitulo: 'Es para quienes ya saben lo que hacen.' },
-  'no-recomendable': { titulo: 'Mejor esperar',            subtitulo: 'No es para nadie, independientemente del nivel.' },
+  'piscina':         { titulo: 'Oh yeah, sin dudarlo',           subtitulo: '¿Está para salir?' },
+  'muy-agradable':   { titulo: 'Sí, está muy agradable',         subtitulo: '¿Está para salir?' },
+  'se-puede-salir':  { titulo: 'Sí, está movido pero manejable', subtitulo: '¿Está para salir?' },
+  'exigente':        { titulo: 'Depende, está exigente',          subtitulo: '¿Está para salir?' },
+  'no-recomendable': { titulo: 'Mejor quedarse en tierra',        subtitulo: '¿Está para salir?' },
 };
 
 // ── Bloques narrativos (pantalla principal) ──
@@ -349,6 +349,114 @@ function buildBlocks(d, estado) {
   };
 
   return { windTitle, windDesc, seaTitle, seaDesc, closing: cierres[estado] };
+}
+
+// ── Bloques narrativos v2 (pantalla principal) ──
+// Reemplaza buildBlocks() en la Results screen v2.
+// Docs: docs/sistema-mensajes.md
+//
+// Bloque 1 (encounter): depende de waveH + wavePer
+// Bloque 2 (demand):    depende de windKn
+// Bloque 3 (fit):       depende de estado + warnings críticos (alerta/cuidado)
+function buildNarrativeBlocks(d, estado, warnings) {
+
+  // ── Encounter — qué te vas a encontrar ──
+  let encounter;
+  if (d.waveH > 1.5) {
+    encounter = {
+      title: 'El mar está muy revuelto',
+      desc:  'Olas grandes, cortas y desordenadas. Todo se mueve a la vez.',
+    };
+  } else if (d.waveH > 1.0 || (d.waveH > 0.6 && d.wavePer < 4)) {
+    encounter = {
+      title: 'Mar movido y poco ordenado',
+      desc:  'Olas que no siguen un ritmo claro y viento incómodo.',
+    };
+  } else if (d.waveH > 0.6) {
+    encounter = {
+      title: 'El mar tiene movimiento real',
+      desc:  'Olas medias y viento que cambia por momentos.',
+    };
+  } else if (d.waveH > 0.3) {
+    encounter = {
+      title: 'Algo de movimiento, pero suave',
+      desc:  'Pequeñas olas y ritmo regular. Nada que sorprenda.',
+    };
+  } else {
+    encounter = {
+      title: 'El mar está como una piscina',
+      desc:  'Sin olas y sin apenas movimiento. Todo se siente estable.',
+    };
+  }
+
+  // ── Demand — qué te va a pedir ──
+  let demand;
+  if (d.windKn > 20) {
+    demand = {
+      title: 'Remar se vuelve muy difícil',
+      desc:  'El viento te frena o te arrastra, y mantener el equilibrio cuesta mucho.',
+    };
+  } else if (d.windKn > 15) {
+    demand = {
+      title: 'Mantenerse de pie exige técnica',
+      desc:  'El viento empuja y el mar no ayuda. No puedes relajarte.',
+    };
+  } else if (d.windKn > 10) {
+    demand = {
+      title: 'Necesitarás mantener el equilibrio',
+      desc:  'Las rachas pueden descolocarte y remar ya exige esfuerzo.',
+    };
+  } else if (d.windKn > 5) {
+    demand = {
+      title: 'Se rema cómodo, algo de viento',
+      desc:  'Lo notas, pero no molesta ni condiciona.',
+    };
+  } else {
+    demand = {
+      title: 'Remar está fácil y fluido',
+      desc:  'No hay resistencia ni esfuerzo extra. Puedes avanzar sin cansarte.',
+    };
+  }
+
+  // ── Fit — para quién encaja ──
+  const hasCriticalWarnings = warnings.some(
+    w => w.categoria === 'alerta' || w.categoria === 'cuidado'
+  );
+
+  let fit;
+  switch (estado) {
+    case 'piscina':
+      fit = {
+        title: 'Es un día para cualquiera',
+        desc:  'Da igual el nivel. Es perfecto incluso si es tu primera vez.',
+      };
+      break;
+    case 'muy-agradable':
+      fit = {
+        title: 'Apto para casi todos',
+        desc:  'Si has salido alguna vez, lo vas a disfrutar sin problema.',
+      };
+      break;
+    case 'se-puede-salir':
+      fit = hasCriticalWarnings
+        ? { title: 'Solo para gente con experiencia', desc: 'Si no tienes control, lo vas a pasar mal.' }
+        : { title: 'Mejor con algo de experiencia',   desc: 'Si ya controlas la tabla, es buen día. Si no, puede costar.' };
+      break;
+    case 'exigente':
+      fit = {
+        title: 'Solo para gente con experiencia',
+        desc:  'Si no tienes control, lo vas a pasar mal.',
+      };
+      break;
+    case 'no-recomendable':
+    default:
+      fit = {
+        title: 'No es un día para salir',
+        desc:  'Las condiciones no son seguras, independientemente del nivel.',
+      };
+  }
+
+  return { encounter, demand, fit };
 }
 
 // ── Para quién es ──
