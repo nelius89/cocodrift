@@ -120,6 +120,7 @@ function getDataForSlider(index, marine, forecast) {
 
   return {
     windKn:      kmhToKnots(windKmh),
+    windKmh:     Math.round(windKmh),
     gustKn:      kmhToKnots(gustKmh),
     windDir,
     waveH,

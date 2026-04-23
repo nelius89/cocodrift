@@ -155,33 +155,92 @@ function renderSpotList() {
   });
 }
 
-// ── Time nav ──
-function dayTabLabel(offset) {
+// ── Navegación temporal v2.0 ──
+
+function dayFullLabel(offset) {
   if (offset === 0) return 'Hoy';
+  if (offset === 1) return 'Mañana';
   const d = new Date();
   d.setDate(d.getDate() + offset);
-  return d.toLocaleDateString('es-ES', { weekday: 'short' }).replace('.', '');
+  return d.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
 }
 
-function renderTimeNav() {
-  const daysEl = document.getElementById('time-nav-days');
-  daysEl.innerHTML = '';
+function dayShortDate(offset) {
+  if (offset === 0) return '';
+  const d = new Date();
+  d.setDate(d.getDate() + offset);
+  return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+}
+
+// Selector de fecha — botón
+function renderDateBtn() {
+  const label = document.getElementById('results-date-label');
+  if (label) label.textContent = dayFullLabel(currentDay);
+}
+
+// Selector de fecha — dropdown (7 días)
+function renderDateDropdown() {
+  const dropdown = document.getElementById('results-date-dropdown');
+  dropdown.innerHTML = '';
   for (let i = 0; i < FORECAST_DAYS; i++) {
     const btn = document.createElement('button');
-    btn.className = 'time-nav__day' + (i === currentDay ? ' active' : '');
-    btn.textContent = dayTabLabel(i);
+    btn.className = 'results__date-option' + (i === currentDay ? ' selected' : '');
+    btn.innerHTML = `
+      <span class="results__date-option__day">${dayFullLabel(i)}</span>
+      ${i > 0 ? `<span class="results__date-option__date">${dayShortDate(i)}</span>` : ''}
+    `;
     btn.addEventListener('click', () => {
       currentDay = i;
-      renderTimeNav();
+      closeDateDropdown();
+      renderDateBtn();
       renderResults(sliderIndex(currentDay, currentFranja));
     });
-    daysEl.appendChild(btn);
+    dropdown.appendChild(btn);
   }
-  document.getElementById('franja-slider').value = currentFranja;
+}
+
+function openDateDropdown() {
+  const dropdown = document.getElementById('results-date-dropdown');
+  const btn      = document.getElementById('results-date-btn');
+  renderDateDropdown();
+  dropdown.classList.remove('hidden');
+  btn.classList.add('open');
+}
+
+function closeDateDropdown() {
+  const dropdown = document.getElementById('results-date-dropdown');
+  const btn      = document.getElementById('results-date-btn');
+  dropdown.classList.add('hidden');
+  btn.classList.remove('open');
+}
+
+// Franjas — pastillas
+function renderFranjas() {
+  const container = document.getElementById('results-franjas-pills');
+  container.innerHTML = '';
+  FRANJAS.forEach((f, i) => {
+    const pill = document.createElement('button');
+    pill.className = 'results__franja-pill' + (i === currentFranja ? ' active' : '');
+    pill.textContent = f.label;
+    pill.addEventListener('click', () => {
+      currentFranja = i;
+      renderFranjas();
+      renderResults(sliderIndex(currentDay, currentFranja));
+    });
+    container.appendChild(pill);
+  });
+  updateFranjaIndicator();
+}
+
+function updateFranjaIndicator() {
+  const indicator = document.getElementById('results-franja-indicator');
+  const hoursEl   = document.getElementById('results-franja-hours');
+  if (!indicator || !hoursEl) return;
+  // Each pill = 20% of container (5 equal pills, gaps approximated)
+  const left = currentFranja * 20 + 10;
+  indicator.style.left = `${left}%`;
   const f = FRANJAS[currentFranja];
-  document.getElementById('time-nav-icon').innerHTML     = FRANJA_ICONS[currentFranja];
-  document.getElementById('time-nav-name').textContent   = f.label;
-  document.getElementById('time-nav-hours').textContent  = `${f.hours[0]}h–${f.hours[f.hours.length - 1]}h`;
+  hoursEl.textContent = `${f.hours[0]}h – ${f.hours[f.hours.length - 1]}h`;
 }
 
 // ── Cargar datos y mostrar resultados ──
@@ -191,26 +250,31 @@ async function loadSpot(spot) {
   currentFranja = getCurrentFranjaIndex();
   setActiveSpot(spot.id);
   showView('view-results');
+  closeDateDropdown();
 
   document.getElementById('results-spot-name').textContent = spot.name;
-  document.getElementById('diagnosis-title').textContent    = 'Cargando...';
-  document.getElementById('diagnosis-subtitle').textContent = '';
-  document.getElementById('diagnosis-closing').textContent  = '';
-  document.getElementById('alerta-consolidada').classList.add('hidden');
-  document.getElementById('warnings-section').classList.add('hidden');
-  document.getElementById('warnings-body').classList.remove('open');
-  document.getElementById('warnings-toggle').classList.remove('open');
-  document.getElementById('tech-section').classList.remove('open');
-  document.getElementById('tech-toggle').classList.remove('open');
+  document.getElementById('ctx-city').textContent  = spot.city || '—';
+  document.getElementById('ctx-wind').textContent  = '—';
+  document.getElementById('ctx-temp').textContent  = '—';
+  document.getElementById('ctx-weather-icon').innerHTML = '';
+  document.getElementById('diagnosis-title').textContent = 'Cargando...';
+  document.getElementById('diagnosis-illus').innerHTML   = '';
+  document.getElementById('nb-encounter-title').textContent = '—';
+  document.getElementById('nb-encounter-desc').textContent  = '—';
+  document.getElementById('nb-demand-title').textContent    = '—';
+  document.getElementById('nb-demand-desc').textContent     = '—';
+  document.getElementById('nb-fit-title').textContent       = '—';
+  document.getElementById('nb-fit-desc').textContent        = '—';
+
+  renderDateBtn();
+  renderFranjas();
+  updateFavoriteBtn();
 
   try {
     currentData = await fetchSpotData(spot);
-    renderTimeNav();
     renderResults(sliderIndex(currentDay, currentFranja));
-
   } catch (err) {
-    document.getElementById('diagnosis-title').textContent    = 'Sin conexión';
-    document.getElementById('diagnosis-subtitle').textContent = 'No se han podido cargar los datos. Comprueba tu conexión.';
+    document.getElementById('diagnosis-title').textContent = 'Sin conexión';
   }
 }
 
@@ -220,100 +284,60 @@ function renderResults(sliderIdx) {
   const d = getDataForSlider(sliderIdx, marine, forecast);
 
   // Diagnóstico
-  const { estado, warnings, alertaConsolidada } = diagnosticar(d, currentSpot, d.weathercode);
+  const { estado, warnings } = diagnosticar(d, currentSpot, d.weathercode);
   const info = ESTADOS[estado];
 
-  // Contexto ambiental: icono tiempo + temperatura (bloque diagnóstico)
-  document.getElementById('diagnosis-ambient-icon').innerHTML   = getWeatherIcon(d.weathercode);
-  document.getElementById('diagnosis-ambient-temp').textContent = `${Math.round(d.tempC)}°`;
+  // Línea de contexto
+  document.getElementById('ctx-city').textContent            = currentSpot.city || '—';
+  document.getElementById('ctx-wind').textContent            = `${d.windKmh} km/h`;
+  document.getElementById('ctx-weather-icon').innerHTML      = getWeatherIcon(d.weathercode);
+  document.getElementById('ctx-temp').textContent            = `${Math.round(d.tempC)}°`;
 
-  // Bloque 2 — decisión principal
-  document.getElementById('diagnosis-title').textContent    = info.titulo;
-  document.getElementById('diagnosis-subtitle').textContent = info.subtitulo;
+  // Título diagnóstico
+  document.getElementById('diagnosis-title').textContent = info.titulo;
 
-  // Ilustración
-  const ILLUS_MAP = { 'piscina': 'Perfecto.svg', 'muy-agradable': 'Bueno.svg' };
-  const illusEl = document.getElementById('diagnosis-illus');
-  if (ILLUS_MAP[estado]) {
-    illusEl.style.display = '';
-    illusEl.innerHTML = `<img src="assets/illustrations/${ILLUS_MAP[estado]}" alt="">`;
-  } else {
-    illusEl.style.display = 'none';
-    illusEl.innerHTML = '';
-  }
+  // Ilustración — temporal: misma para todos los estados
+  document.getElementById('diagnosis-illus').innerHTML =
+    `<img src="assets/illustrations/Bueno.svg" alt="">`;
 
-  // Bloques viento + mar en pantalla principal (título bold + desc gris)
-  const blocks = buildBlocks(d, estado);
-  document.getElementById('diagnosis-wind-icon').innerHTML    = ICONS.wind;
-  document.getElementById('diagnosis-wind-title').textContent = blocks.windTitle;
-  document.getElementById('diagnosis-wind-desc').textContent  = blocks.windDesc;
-  document.getElementById('diagnosis-sea-icon').innerHTML     = ICONS.wave;
-  document.getElementById('diagnosis-sea-title').textContent  = blocks.seaTitle;
-  document.getElementById('diagnosis-sea-desc').textContent   = blocks.seaDesc;
-
-  // Bloque 3 — info técnica (tech rows)
-  const tech = buildTechBlocks(d, estado);
-
-  function setTechRow(prefix, iconSvg, value, sub, block) {
-    document.getElementById(`tr-${prefix}-icon`).innerHTML    = iconSvg;
-    document.getElementById(`tr-${prefix}-value`).textContent = value;
-    document.getElementById(`tr-${prefix}-sub`).textContent   = sub;
-    document.getElementById(`tr-${prefix}-p1`).textContent    = block.p1;
-    document.getElementById(`tr-${prefix}-p2`).textContent    = block.p2;
-    document.getElementById(`tr-${prefix}-p3`).textContent    = block.p3;
-  }
-
-  setTechRow('wind',   ICONS.wind,  `${d.windKn.toFixed(1)} kn`, labelViento(d.windKn).label, tech.wind);
-  setTechRow('gusts',  ICONS.zap,   `${d.gustKn.toFixed(1)} kn`, labelRacha(d.gustKn).label,  tech.gusts);
-  setTechRow('wave',   ICONS.wave,  `${d.waveH.toFixed(1)} m`,   labelOla(d.waveH).label,     tech.sea);
-  setTechRow('period', ICONS.timer, `${d.wavePer.toFixed(0)} s`, labelPeriodo(d.wavePer).label, tech.period);
-
-  document.getElementById('tech-closing').textContent = tech.closing;
-
-  // Frase de cierre + avisos
-  document.getElementById('diagnosis-closing').textContent = blocks.closing;
-  renderWarnings(warnings, alertaConsolidada, estado);
+  // Bloques narrativos
+  const nb = buildNarrativeBlocks(d, estado, warnings);
+  document.getElementById('nb-encounter-title').textContent = nb.encounter.title;
+  document.getElementById('nb-encounter-desc').textContent  = nb.encounter.desc;
+  document.getElementById('nb-demand-title').textContent    = nb.demand.title;
+  document.getElementById('nb-demand-desc').textContent     = nb.demand.desc;
+  document.getElementById('nb-fit-title').textContent       = nb.fit.title;
+  document.getElementById('nb-fit-desc').textContent        = nb.fit.desc;
 }
 
-// ── Render avisos ──
-// Muestra pastilla consolidada (no-recomendable) o acordeón (resto de estados).
-// Avisos de categoría 'narrativa' no se muestran — ya están en los bloques de viento/mar.
-function renderWarnings(warnings, alertaConsolidada, estado) {
-  const pastillaEl = document.getElementById('alerta-consolidada');
-  const sectionEl  = document.getElementById('warnings-section');
-  const bodyEl     = document.getElementById('warnings-body');
+// ── Favoritos ──
+function isSpotSaved(id) {
+  return getAllSpots().some(s => s.id === id);
+}
 
-  const visibles = warnings.filter(w => w.categoria !== 'narrativa');
+function updateFavoriteBtn() {
+  const btn = document.getElementById('btn-favorite');
+  if (!btn || !currentSpot) return;
+  const saved = isSpotSaved(currentSpot.id);
+  btn.classList.toggle('saved', saved);
+  btn.setAttribute('aria-label', saved ? 'Quitar de favoritos' : 'Guardar playa');
+}
 
-  if (estado === 'no-recomendable' && alertaConsolidada) {
-    // Pastilla consolidada
-    pastillaEl.classList.remove('hidden');
-    document.getElementById('alerta-consolidada-text').textContent = alertaConsolidada;
-    sectionEl.classList.add('hidden');
-  } else if (visibles.length > 0) {
-    // Acordeón
-    pastillaEl.classList.add('hidden');
-    sectionEl.classList.remove('hidden');
-    document.getElementById('warnings-count').textContent = visibles.length;
-
-    // Orden: alerta → cuidado → a-tener-en-cuenta
-    const ORDER = { 'alerta': 0, 'cuidado': 1, 'a-tener-en-cuenta': 2 };
-    visibles.sort((a, b) => (ORDER[a.categoria] ?? 9) - (ORDER[b.categoria] ?? 9));
-
-    bodyEl.innerHTML = '';
-    visibles.forEach(w => {
-      const item = document.createElement('div');
-      item.className = `warning-item warning-item--${w.categoria}`;
-      item.innerHTML = `
-        <span class="warning-item__label">${w.label}</span>
-        <p class="warning-item__copy">${w.copy}</p>
-      `;
-      bodyEl.appendChild(item);
-    });
+function toggleFavorite() {
+  if (!currentSpot) return;
+  if (isSpotSaved(currentSpot.id)) {
+    removeUserSpot(currentSpot.id);
+    updateFavoriteBtn();
   } else {
-    pastillaEl.classList.add('hidden');
-    sectionEl.classList.add('hidden');
+    // Si es un spot temporal, asignar id permanente antes de guardar
+    if (currentSpot.id.startsWith('view-')) {
+      currentSpot = { ...currentSpot, id: `user-${Date.now()}` };
+    }
+    addUserSpot(currentSpot);
+    setActiveSpot(currentSpot.id);
+    updateFavoriteBtn();
   }
+  renderSpotList();
 }
 
 function shortDirLabel(degrees) {
@@ -438,31 +462,6 @@ function initSuggestionsSheet() {
   });
 }
 
-// ── Warnings toggle (acordeón avisos) ──
-function initWarningsToggle() {
-  const toggle = document.getElementById('warnings-toggle');
-  const body   = document.getElementById('warnings-body');
-  toggle.addEventListener('click', () => {
-    const open = body.classList.toggle('open');
-    toggle.classList.toggle('open', open);
-  });
-}
-
-// ── Tech toggle (acordeón técnico) ──
-function initTechToggle() {
-  const toggle  = document.getElementById('tech-toggle');
-  const section = document.getElementById('tech-section');
-  toggle.addEventListener('click', () => {
-    const opening = !section.classList.contains('open');
-    section.classList.toggle('open');
-    toggle.classList.toggle('open');
-    if (opening) {
-      // Scroll suave para que el botón quede visible con el contenido justo debajo
-      setTimeout(() => toggle.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
-    }
-  });
-}
-
 // ── Franja label con horas ──
 function franjaLabel(franjaIndex) {
   const f = FRANJAS[franjaIndex];
@@ -549,13 +548,36 @@ document.addEventListener('DOMContentLoaded', () => {
   initAboutSheet();
   initSuggestionsSheet();
 
-  initWarningsToggle();
-  initTechToggle();
-
   // Back button — volver a home
   document.getElementById('btn-back').addEventListener('click', () => {
+    closeDateDropdown();
     showView('view-home');
     renderSpotList();
+  });
+
+  // Favorito
+  document.getElementById('btn-favorite').addEventListener('click', toggleFavorite);
+
+  // Selector de fecha
+  document.getElementById('results-date-btn').addEventListener('click', () => {
+    const dropdown = document.getElementById('results-date-dropdown');
+    if (dropdown.classList.contains('hidden')) {
+      openDateDropdown();
+    } else {
+      closeDateDropdown();
+    }
+  });
+
+  // Cerrar dropdown de fecha al tocar fuera
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.results__date-wrap')) {
+      closeDateDropdown();
+    }
+  });
+
+  // CTA info detallada — pendiente step 4
+  document.getElementById('btn-detail').addEventListener('click', () => {
+    // TODO step 4: showView('view-info');
   });
 
   // Search screen — cerrar
@@ -572,16 +594,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
     searchTimer = setTimeout(() => handleSearch(q), 350);
-  });
-
-  // Franja slider
-  document.getElementById('franja-slider').addEventListener('input', (e) => {
-    currentFranja = parseInt(e.target.value);
-    const f = FRANJAS[currentFranja];
-    document.getElementById('time-nav-icon').innerHTML    = FRANJA_ICONS[currentFranja];
-    document.getElementById('time-nav-name').textContent  = f.label;
-    document.getElementById('time-nav-hours').textContent = `${f.hours[0]}h–${f.hours[f.hours.length - 1]}h`;
-    renderResults(sliderIndex(currentDay, currentFranja));
   });
 
   // Cerrar modo borrar tocando fuera de la lista

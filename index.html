@@ -47,168 +47,110 @@
 
 
   <!-- ─────────────────────────────────────────
-       VIEW: RESULTS — Diagnóstico
+       VIEW: RESULTS — Diagnóstico v2.0
   ───────────────────────────────────────── -->
   <div id="view-results" class="view view--results">
 
-    <header class="results__header">
-      <button class="btn-back" id="btn-back">←</button>
-      <div class="results__center">
-        <span class="results__spot-name" id="results-spot-name">Pont del Petroli</span>
-      </div>
-    </header>
+    <!-- ── Zona azul: header + contexto + navegación ── -->
+    <div class="results__blue">
 
-    <!-- Navegador temporal — días + franja -->
-    <div class="time-nav" id="time-nav">
-      <div class="time-nav__days" id="time-nav-days"></div>
-      <div class="time-nav__slider-wrap">
-        <input type="range" id="franja-slider" class="franja-slider" min="0" max="4" value="1">
-      </div>
-      <div class="time-nav__franja">
-        <span class="time-nav__franja-icon" id="time-nav-icon"></span>
-        <div class="time-nav__franja-text">
-          <span class="time-nav__franja-name" id="time-nav-name"></span>
-          <span class="time-nav__franja-hours" id="time-nav-hours"></span>
-        </div>
-      </div>
-    </div>
-
-    <div class="results__main">
-
-      <!-- Diagnóstico principal -->
-      <div class="diagnosis">
-
-        <div class="diagnosis__bubble">
-          <h1 class="diagnosis__title" id="diagnosis-title">Cargando...</h1>
-          <p class="diagnosis__subtitle" id="diagnosis-subtitle"></p>
-        </div>
-
-        <div class="diagnosis__illus" id="diagnosis-illus"></div>
-
-        <div class="diagnosis__ambient">
-          <span class="diagnosis__ambient-icon" id="diagnosis-ambient-icon"></span>
-          <span class="diagnosis__ambient-temp" id="diagnosis-ambient-temp"></span>
-        </div>
-
-        <div class="diagnosis__blocks">
-          <div class="diagnosis__block-row">
-            <span class="diagnosis__block-icon" id="diagnosis-wind-icon"></span>
-            <div class="diagnosis__block-body">
-              <strong class="diagnosis__block-title" id="diagnosis-wind-title"></strong>
-              <span class="diagnosis__block-desc" id="diagnosis-wind-desc"></span>
-            </div>
-          </div>
-          <div class="diagnosis__block-row">
-            <span class="diagnosis__block-icon" id="diagnosis-sea-icon"></span>
-            <div class="diagnosis__block-body">
-              <strong class="diagnosis__block-title" id="diagnosis-sea-title"></strong>
-              <span class="diagnosis__block-desc" id="diagnosis-sea-desc"></span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Frase de cierre -->
-        <p class="diagnosis__closing" id="diagnosis-closing"></p>
-
-        <!-- Pastilla consolidada — solo para no-recomendable -->
-        <div class="alerta-consolidada hidden" id="alerta-consolidada">
-          <p id="alerta-consolidada-text"></p>
-        </div>
-
-        <!-- Acordeón avisos: A saber antes de salir -->
-        <div class="warnings-section hidden" id="warnings-section">
-          <button class="warnings-toggle" id="warnings-toggle">
-            <span class="warnings-toggle__label">A saber antes de salir</span>
-            <span class="warnings-toggle__right">
-              <span class="warnings-toggle__count" id="warnings-count"></span>
-              <span class="warnings-toggle__arrow">↓</span>
-            </span>
-          </button>
-          <div class="warnings-body" id="warnings-body"></div>
-        </div>
-
-        <!-- CTA acordeón técnico -->
-        <button class="tech-toggle" id="tech-toggle">
-          <span class="tech-toggle__label">Ver por qué</span>
-          <span class="tech-toggle__arrow">↓</span>
+      <header class="results__header">
+        <button class="btn-back" id="btn-back" aria-label="Volver">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
         </button>
+        <span class="results__spot-name" id="results-spot-name">—</span>
+        <button class="btn-favorite" id="btn-favorite" aria-label="Guardar playa">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </button>
+      </header>
 
+      <!-- Línea de contexto: ciudad · viento · tiempo/temp -->
+      <div class="results__context">
+        <span class="results__context-item">
+          <span class="results__context-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span>
+          <span id="ctx-city">—</span>
+        </span>
+        <span class="results__context-sep">·</span>
+        <span class="results__context-item">
+          <span class="results__context-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/></svg></span>
+          <span id="ctx-wind">—</span>
+        </span>
+        <span class="results__context-sep">·</span>
+        <span class="results__context-item">
+          <span class="results__context-icon" id="ctx-weather-icon"></span>
+          <span id="ctx-temp">—</span>
+        </span>
       </div>
 
-      <!-- Bloque técnico — acordeón -->
-      <div class="tech-section" id="tech-section">
-
-        <!-- Viento -->
-        <div class="tech-row">
-          <div class="tech-row__card">
-            <span class="tech-row__icon" id="tr-wind-icon"></span>
-            <span class="tech-row__label">VIENTO</span>
-            <span class="tech-row__value" id="tr-wind-value"></span>
-            <span class="tech-row__sub" id="tr-wind-sub"></span>
-          </div>
-          <div class="tech-row__text">
-            <p id="tr-wind-p1"></p>
-            <p id="tr-wind-p2"></p>
-            <p id="tr-wind-p3"></p>
-          </div>
-        </div>
-        <div class="tech-divider"></div>
-
-        <!-- Rachas -->
-        <div class="tech-row">
-          <div class="tech-row__card">
-            <span class="tech-row__icon" id="tr-gusts-icon"></span>
-            <span class="tech-row__label">RACHAS</span>
-            <span class="tech-row__value" id="tr-gusts-value"></span>
-            <span class="tech-row__sub" id="tr-gusts-sub"></span>
-          </div>
-          <div class="tech-row__text">
-            <p id="tr-gusts-p1"></p>
-            <p id="tr-gusts-p2"></p>
-            <p id="tr-gusts-p3"></p>
-          </div>
-        </div>
-        <div class="tech-divider"></div>
-
-        <!-- Ola -->
-        <div class="tech-row">
-          <div class="tech-row__card">
-            <span class="tech-row__icon" id="tr-wave-icon"></span>
-            <span class="tech-row__label">OLA</span>
-            <span class="tech-row__value" id="tr-wave-value"></span>
-            <span class="tech-row__sub" id="tr-wave-sub"></span>
-          </div>
-          <div class="tech-row__text">
-            <p id="tr-wave-p1"></p>
-            <p id="tr-wave-p2"></p>
-            <p id="tr-wave-p3"></p>
-          </div>
-        </div>
-        <div class="tech-divider"></div>
-
-        <!-- Período -->
-        <div class="tech-row">
-          <div class="tech-row__card">
-            <span class="tech-row__icon" id="tr-period-icon"></span>
-            <span class="tech-row__label">PERÍODO</span>
-            <span class="tech-row__value" id="tr-period-value"></span>
-            <span class="tech-row__sub" id="tr-period-sub"></span>
-          </div>
-          <div class="tech-row__text">
-            <p id="tr-period-p1"></p>
-            <p id="tr-period-p2"></p>
-            <p id="tr-period-p3"></p>
-          </div>
-        </div>
-
-        <!-- Cierre -->
-        <div class="tech-closing">
-          <p id="tech-closing"></p>
-        </div>
-
+      <!-- Selector de fecha -->
+      <div class="results__date-wrap">
+        <button class="results__date-btn" id="results-date-btn">
+          <span class="results__date-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+          <span class="results__date-label" id="results-date-label">Hoy</span>
+          <span class="results__date-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+        </button>
+        <div class="results__date-dropdown hidden" id="results-date-dropdown"></div>
       </div>
 
-    </div><!-- /results__main -->
+      <!-- Franjas horarias -->
+      <div class="results__franjas">
+        <div class="results__franjas-pills" id="results-franjas-pills"></div>
+        <div class="results__franja-indicator-wrap">
+          <div class="results__franja-indicator" id="results-franja-indicator">
+            <span id="results-franja-hours">—</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /results__blue -->
+
+    <!-- ── Zona resultado ── -->
+    <div class="results__body">
+
+      <div class="diagnosis">
+        <p class="diagnosis__pre">¿Está para salir?</p>
+        <h1 class="diagnosis__title" id="diagnosis-title">Cargando...</h1>
+        <div class="diagnosis__illus" id="diagnosis-illus"></div>
+      </div>
+
+      <!-- 3 bloques narrativos -->
+      <div class="narrative-blocks">
+        <div class="narrative-block">
+          <div class="narrative-block__icon-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/></svg>
+          </div>
+          <div class="narrative-block__body">
+            <strong class="narrative-block__title" id="nb-encounter-title">—</strong>
+            <span class="narrative-block__desc" id="nb-encounter-desc">—</span>
+          </div>
+        </div>
+        <div class="narrative-block">
+          <div class="narrative-block__icon-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <div class="narrative-block__body">
+            <strong class="narrative-block__title" id="nb-demand-title">—</strong>
+            <span class="narrative-block__desc" id="nb-demand-desc">—</span>
+          </div>
+        </div>
+        <div class="narrative-block">
+          <div class="narrative-block__icon-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div class="narrative-block__body">
+            <strong class="narrative-block__title" id="nb-fit-title">—</strong>
+            <span class="narrative-block__desc" id="nb-fit-desc">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CTA info técnica -->
+      <button class="btn-detail" id="btn-detail">
+        <span class="btn-detail__label">Info detallada</span>
+        <span class="btn-detail__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+      </button>
+
+    </div><!-- /results__body -->
 
   </div>
 
