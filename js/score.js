@@ -377,6 +377,11 @@ function buildNarrativeBlocks(d, estado, warnings) {
       title: 'El mar tiene movimiento real',
       desc:  'Olas medias y viento que cambia por momentos.',
     };
+  } else if (d.waveH > 0.3 && d.wavePer < 4) {
+    encounter = {
+      title: 'Olas pequeñas, pero desordenadas',
+      desc:  'El mar no tiene ritmo. Te va a mover más de lo que parece.',
+    };
   } else if (d.waveH > 0.3) {
     encounter = {
       title: 'Algo de movimiento, pero suave',
@@ -415,6 +420,14 @@ function buildNarrativeBlocks(d, estado, warnings) {
     demand = {
       title: 'Remar está fácil y fluido',
       desc:  'No hay resistencia ni esfuerzo extra. Puedes avanzar sin cansarte.',
+    };
+  }
+
+  // Override: cuando el mar corto es lo que exige, no el viento
+  if (d.wavePer < 4 && d.waveH > 0.3 && d.windKn <= 5) {
+    demand = {
+      title: 'Remar no cuesta, pero mantenerse estable sí',
+      desc:  'El problema no es el viento — es el equilibrio con el mar corto.',
     };
   }
 
