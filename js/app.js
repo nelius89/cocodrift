@@ -55,19 +55,27 @@ function initInstallButton() {
   // Ya instalada como PWA → botón nunca aparece
   if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) return;
 
+  // En browser: siempre visible
+  btn.classList.remove('hidden');
+
   // Capturar el prompt cuando el navegador lo ofrezca (Chrome/Edge/Android)
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     installPrompt = e;
-    btn.classList.remove('hidden');
   });
 
   btn.addEventListener('click', async () => {
-    if (!installPrompt) return;
-    installPrompt.prompt();
-    const { outcome } = await installPrompt.userChoice;
-    installPrompt = null;
-    btn.classList.add('hidden');
+    if (installPrompt) {
+      // Chrome/Edge/Android: prompt nativo
+      installPrompt.prompt();
+      const { outcome } = await installPrompt.userChoice;
+      installPrompt = null;
+      if (outcome === 'accepted') btn.classList.add('hidden');
+    } else {
+      // Safari/Firefox: no hay prompt nativo, abrir about sheet con instrucciones
+      document.getElementById('about-overlay').classList.add('active');
+      document.getElementById('about-sheet').classList.add('active');
+    }
   });
 
   // Ocultar si se instala desde otro punto (p.ej. barra del navegador)
