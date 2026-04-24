@@ -31,17 +31,15 @@ const ICONS = {
   thermometer: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>`,
 };
 
-// ── Iconos SVG para cada franja horaria (v2: 5 franjas) ──
+// ── Iconos SVG para cada franja horaria (v2.1: 4 franjas) ──
 const FRANJA_ICONS = [
-  // 0 Madrugada
-  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/><circle cx="17" cy="5" r="1" fill="currentColor" stroke="none"/><circle cx="20" cy="9" r="0.7" fill="currentColor" stroke="none"/></svg>`,
-  // 1 Amanecer
+  // 0 Amanecer — sol saliendo
   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 18a5 5 0 0 0-10 0"/><line x1="12" y1="2" x2="12" y2="9"/><line x1="4.22" y1="10.22" x2="5.64" y2="11.64"/><line x1="1" y1="18" x2="3" y2="18"/><line x1="21" y1="18" x2="23" y2="18"/><line x1="18.36" y1="11.64" x2="19.78" y2="10.22"/><line x1="23" y1="22" x2="1" y2="22"/><polyline points="8 6 12 2 16 6"/></svg>`,
-  // 2 Mediodía
+  // 1 Día — sol completo
   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`,
-  // 3 Tarde
-  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>`,
-  // 4 Noche
+  // 2 Tarde — sol bajando
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 18a5 5 0 0 0-10 0"/><line x1="12" y1="9" x2="12" y2="2"/><line x1="4.22" y1="10.22" x2="5.64" y2="11.64"/><line x1="1" y1="18" x2="3" y2="18"/><line x1="21" y1="18" x2="23" y2="18"/><line x1="18.36" y1="11.64" x2="19.78" y2="10.22"/><line x1="23" y1="22" x2="1" y2="22"/><polyline points="16 6 12 10 8 6"/></svg>`,
+  // 3 Noche — luna
   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`,
 ];
 
@@ -247,7 +245,11 @@ function dayFullLabel(offset) {
   const d = new Date();
   d.setDate(d.getDate() + offset);
   const weekday = d.toLocaleDateString('es-ES', { weekday: 'long' });
-  return weekday.charAt(0).toUpperCase() + weekday.slice(1);
+  const day     = d.getDate();
+  const month   = d.toLocaleDateString('es-ES', { month: 'long' });
+  const wCap    = weekday.charAt(0).toUpperCase() + weekday.slice(1);
+  const mCap    = month.charAt(0).toUpperCase() + month.slice(1);
+  return `${wCap} ${day}, ${mCap}`;
 }
 
 function dayShortDate(offset) {
@@ -298,14 +300,18 @@ function closeDateDropdown() {
   btn.classList.remove('open');
 }
 
-// Franjas — pastillas
+// Franjas — nueva vista: columnas con icono + nombre + horas
 function renderFranjas() {
   const container = document.getElementById('results-franjas-pills');
   container.innerHTML = '';
   FRANJAS.forEach((f, i) => {
     const pill = document.createElement('button');
     pill.className = 'results__franja-pill' + (i === currentFranja ? ' active' : '');
-    pill.textContent = f.label;
+    pill.innerHTML = `
+      <span class="results__franja-icon">${FRANJA_ICONS[i]}</span>
+      <span class="results__franja-name">${f.label}</span>
+      <span class="results__franja-hours">${f.range}</span>
+    `;
     pill.addEventListener('click', () => {
       currentFranja = i;
       renderFranjas();
@@ -313,18 +319,6 @@ function renderFranjas() {
     });
     container.appendChild(pill);
   });
-  updateFranjaIndicator();
-}
-
-function updateFranjaIndicator() {
-  const indicator = document.getElementById('results-franja-indicator');
-  const hoursEl   = document.getElementById('results-franja-hours');
-  if (!indicator || !hoursEl) return;
-  // Each pill = 20% of container (5 equal pills, gaps approximated)
-  const left = currentFranja * 20 + 10;
-  indicator.style.left = `${left}%`;
-  const f = FRANJAS[currentFranja];
-  hoursEl.textContent = `${f.hours[0]}h – ${f.hours[f.hours.length - 1]}h`;
 }
 
 // ── Cargar datos y mostrar resultados ──
@@ -337,10 +331,10 @@ async function loadSpot(spot) {
   closeDateDropdown();
 
   document.getElementById('results-spot-name').textContent = spot.name;
-  document.getElementById('ctx-city').textContent  = spot.city || '—';
-  document.getElementById('ctx-wind').textContent  = '—';
-  document.getElementById('ctx-temp').textContent  = '—';
-  document.getElementById('ctx-weather-icon').innerHTML = '';
+  document.getElementById('ctx-city').textContent         = spot.city || '—';
+  document.getElementById('ctx-temp').textContent         = '—';
+  document.getElementById('ctx-rain').textContent         = '—';
+  document.getElementById('ctx-weather-icon').innerHTML   = '';
   document.getElementById('diagnosis-title').textContent = 'Cargando...';
   document.getElementById('diagnosis-illus').innerHTML   = '';
   document.getElementById('nb-encounter-title').textContent = '—';
@@ -371,11 +365,11 @@ function renderResults(sliderIdx) {
   const { estado, warnings } = diagnosticar(d, currentSpot, d.weathercode);
   const info = ESTADOS[estado];
 
-  // Línea de contexto
-  document.getElementById('ctx-city').textContent            = currentSpot.city || '—';
-  document.getElementById('ctx-wind').textContent            = `${d.windKmh} km/h`;
-  document.getElementById('ctx-weather-icon').innerHTML      = getWeatherIcon(d.weathercode);
-  document.getElementById('ctx-temp').textContent            = `${Math.round(d.tempC)}°`;
+  // Clima
+  document.getElementById('ctx-city').textContent       = currentSpot.city || '—';
+  document.getElementById('ctx-weather-icon').innerHTML = getWeatherIcon(d.weathercode);
+  document.getElementById('ctx-temp').textContent       = `${Math.round(d.tempC)}°`;
+  document.getElementById('ctx-rain').textContent       = `${d.precipPct}%`;
 
   // Título diagnóstico
   document.getElementById('diagnosis-title').textContent = info.titulo;

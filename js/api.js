@@ -12,7 +12,7 @@ async function fetchSpotData(spot) {
 
   const [marineRes, forecastRes] = await Promise.all([
     fetch(`https://marine-api.open-meteo.com/v1/marine?${params}&hourly=wave_height,wave_direction,wave_period,swell_wave_height,wind_wave_height,wind_wave_period`),
-    fetch(`https://api.open-meteo.com/v1/forecast?${params}&hourly=wind_speed_10m,wind_gusts_10m,wind_direction_10m,weathercode,cloudcover,temperature_2m`)
+    fetch(`https://api.open-meteo.com/v1/forecast?${params}&hourly=wind_speed_10m,wind_gusts_10m,wind_direction_10m,weathercode,cloudcover,temperature_2m,precipitation_probability`)
   ]);
 
   if (!marineRes.ok || !forecastRes.ok) throw new Error('Error al obtener datos del mar');
@@ -53,13 +53,12 @@ async function searchSpots(query) {
   }
 }
 
-// ── Franjas horarias (v2: 5 franjas) ──
+// ── Franjas horarias (v2.1: 4 franjas) ──
 const FRANJAS = [
-  { id: 'madrugada', label: 'Madrugada', hours: [0, 1, 2, 3, 4, 5, 6] },
-  { id: 'amanecer',  label: 'Amanecer',  hours: [7, 8, 9] },
-  { id: 'mediodia',  label: 'Mediodía',  hours: [10, 11, 12, 13] },
-  { id: 'tarde',     label: 'Tarde',     hours: [14, 15, 16, 17, 18] },
-  { id: 'noche',     label: 'Noche',     hours: [19, 20, 21, 22, 23] }
+  { id: 'amanecer', label: 'Amanecer', hours: [6, 7, 8],                                range: '6:00 – 9:00'  },
+  { id: 'dia',      label: 'Día',      hours: [9, 10, 11, 12, 13, 14, 15, 16, 17],      range: '9:00 – 18:00' },
+  { id: 'tarde',    label: 'Tarde',    hours: [18, 19, 20],                              range: '18:00 – 21:00'},
+  { id: 'noche',    label: 'Noche',    hours: [21, 22, 23],                              range: '21:00 – 0:00' },
 ];
 
 // Devuelve el índice del slider (0..34) dado día (0-6) y franja (0-4)
@@ -70,10 +69,10 @@ function sliderIndex(day, franja) {
 // Franja activa según hora actual
 function getCurrentFranjaIndex() {
   const h = new Date().getHours();
-  for (let i = 0; i < FRANJAS.length; i++) {
-    if (FRANJAS[i].hours.includes(h)) return i;
-  }
-  return 1; // fallback: Amanecer
+  if (h >= 6  && h < 9)  return 0; // amanecer
+  if (h >= 9  && h < 18) return 1; // día
+  if (h >= 18 && h < 21) return 2; // tarde
+  return 3;                         // noche
 }
 
 // Etiqueta legible del slider
@@ -118,6 +117,10 @@ function getDataForSlider(index, marine, forecast) {
   // weathercode: usar el máximo del periodo (más pesimista)
   const weathercode = Math.max(...hourIndices.map(i => h.weathercode[i] || 0));
 
+  const precipPct = h.precipitation_probability
+    ? Math.round(Math.max(...hourIndices.map(i => h.precipitation_probability[i] || 0)))
+    : 0;
+
   return {
     windKn:      kmhToKnots(windKmh),
     windKmh:     Math.round(windKmh),
@@ -128,5 +131,6 @@ function getDataForSlider(index, marine, forecast) {
     cloudPct,
     weathercode,
     tempC:       h.temperature_2m ? avg(h.temperature_2m) : 0,
+    precipPct,
   };
 }
