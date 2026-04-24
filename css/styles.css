@@ -1540,25 +1540,29 @@ ul { list-style: none; }
 }
 
 /* ─────────────────────────────────────────
-   PAGE TRANSITION — botón negro expande
+   PAGE TRANSITION — crossfade con scale
 ───────────────────────────────────────── */
-.page-transition-overlay {
-  position: fixed;
-  inset: 0;
-  background: var(--black);
-  z-index: 300;
-  clip-path: circle(0px at var(--ox, 50%) var(--oy, 50%));
-  transition: clip-path 0.55s cubic-bezier(0.22, 1, 0.36, 1);
-  pointer-events: none;
-  opacity: 1;
-}
-
-.page-transition-overlay.expanding {
-  clip-path: circle(150vmax at var(--ox, 50%) var(--oy, 50%));
-}
-
 .view.no-transition {
   transition: none !important;
+}
+
+.view--results.leaving {
+  opacity: 0;
+  transform: scale(0.97);
+  transition: opacity 0.28s ease, transform 0.28s ease;
+  pointer-events: none;
+}
+
+.view--info.entering {
+  opacity: 0;
+  transform: scale(1.03);
+  transition: none;
+}
+
+.view--info.entering-active {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 0.32s ease, transform 0.32s ease;
 }
 
 /* ─────────────────────────────────────────

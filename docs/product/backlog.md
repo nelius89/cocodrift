@@ -40,6 +40,12 @@ _Última actualización: 2026-04-17_
 
 ---
 
+## UX / ANIMACIONES
+
+- **Transición btn-detail → info técnica (Opción D):** el propio botón negro hace `transform: scale(40)` hasta cubrir la pantalla — sin overlay separado, el botón literalmente se convierte en la página de info. Más satisfactorio que el crossfade actual (Opción B, implementada en v2.0). Requiere gestionar el z-index y el origen del transform desde la posición real del botón.
+
+---
+
 ## BACKLOG SIN PRIORIZAR
 
 - Ilustraciones adicionales (variantes de estados)

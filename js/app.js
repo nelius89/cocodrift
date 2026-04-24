@@ -866,39 +866,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // CTA info detallada — animación: botón negro se expande a pantalla completa
+  // CTA info detallada — crossfade con scale sutil
   document.getElementById('btn-detail').addEventListener('click', () => {
-    const btn     = document.getElementById('btn-detail');
-    const overlay = document.getElementById('page-transition-overlay');
-    const rect    = btn.getBoundingClientRect();
+    const viewResults = document.getElementById('view-results');
+    const viewInfo    = document.getElementById('view-info');
 
-    overlay.style.setProperty('--ox', (rect.left + rect.width  / 2) + 'px');
-    overlay.style.setProperty('--oy', (rect.top  + rect.height / 2) + 'px');
-    overlay.style.transition = 'clip-path 0.55s cubic-bezier(0.22, 1, 0.36, 1)';
-    overlay.style.opacity    = '1';
-    overlay.classList.add('expanding');
+    // Preparar view-info invisible antes de mostrarla
+    viewInfo.classList.add('entering');
+    renderInfoTech();
+    showView('view-info');
 
-    setTimeout(() => {
-      // Mostrar view-info sin animación (el overlay la cubre)
-      const viewInfo = document.getElementById('view-info');
-      viewInfo.classList.add('no-transition');
-      renderInfoTech();
-      showView('view-info');
+    // Results sale con leve scale-down
+    viewResults.classList.add('leaving');
 
-      // Fade out suave del overlay
+    // Activar entrada de view-info en el siguiente frame
+    requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          viewInfo.classList.remove('no-transition');
-          overlay.style.transition = 'opacity 0.45s ease';
-          overlay.style.opacity    = '0';
-          setTimeout(() => {
-            overlay.classList.remove('expanding');
-            overlay.style.transition = '';
-            overlay.style.opacity    = '';
-          }, 450);
-        });
+        viewInfo.classList.remove('entering');
+        viewInfo.classList.add('entering-active');
+        setTimeout(() => {
+          viewInfo.classList.remove('entering-active');
+          viewResults.classList.remove('leaving');
+        }, 320);
       });
-    }, 500);
+    });
   });
 
   // Back desde info técnica → volver a results
