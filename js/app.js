@@ -45,6 +45,38 @@ const FRANJA_ICONS = [
   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`,
 ];
 
+// ── PWA Install ──
+let installPrompt = null;
+
+function initInstallButton() {
+  const btn = document.getElementById('btn-install');
+  if (!btn) return;
+
+  // Ya instalada como PWA → botón nunca aparece
+  if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) return;
+
+  // Capturar el prompt cuando el navegador lo ofrezca (Chrome/Edge/Android)
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    installPrompt = e;
+    btn.classList.remove('hidden');
+  });
+
+  btn.addEventListener('click', async () => {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    const { outcome } = await installPrompt.userChoice;
+    installPrompt = null;
+    btn.classList.add('hidden');
+  });
+
+  // Ocultar si se instala desde otro punto (p.ej. barra del navegador)
+  window.addEventListener('appinstalled', () => {
+    installPrompt = null;
+    btn.classList.add('hidden');
+  });
+}
+
 // ── Estado ──
 let currentSpot   = null;
 let currentData   = null;
@@ -740,6 +772,7 @@ function selectGeoResult(result) {
 document.addEventListener('DOMContentLoaded', () => {
   renderSpotList();
   showView('view-home');
+  initInstallButton();
 
   // Service Worker
   if ('serviceWorker' in navigator) {
