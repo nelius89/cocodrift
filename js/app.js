@@ -101,10 +101,50 @@ function showView(id) {
 }
 
 // ── Abreviatura de ciudad ──
+const CITY_ABBREVS = {
+  // Cataluña
+  'barcelona': 'BCN', 'badalona': 'BDN', 'tarragona': 'TGN',
+  'sitges': 'STG', 'vilanova i la geltru': 'VNG', 'mataro': 'MAT',
+  'blanes': 'BLN', 'lloret de mar': 'LLM', 'roses': 'ROS',
+  'cadaques': 'CDQ', 'l\'escala': 'ESC', 'palamos': 'PLS',
+  // Comunitat Valenciana
+  'valencia': 'VLC', 'alicante': 'ALC', 'gandia': 'GND',
+  'denia': 'DEN', 'javea': 'JAV', 'calpe': 'CPE',
+  'benidorm': 'BND', 'altea': 'ALT', 'torrevieja': 'TRV',
+  // Andalucía
+  'malaga': 'MAG', 'cadiz': 'CDZ', 'huelva': 'HUE',
+  'almeria': 'ALM', 'marbella': 'MBL', 'tarifa': 'TRF',
+  'algeciras': 'ALG', 'nerja': 'NJA', 'roquetas de mar': 'RQT',
+  // País Vasco / Cantabria / Galicia
+  'san sebastian': 'SSB', 'donostia': 'SSB', 'bilbao': 'BIO',
+  'santander': 'SDR', 'castro urdiales': 'CTU', 'laredo': 'LRD',
+  'vigo': 'VGO', 'a coruna': 'COR', 'pontevedra': 'PON',
+  'baiona': 'BAI',
+  // Asturias
+  'gijon': 'GJN', 'oviedo': 'OVD', 'aviles': 'AVL',
+  // Islas Baleares
+  'palma': 'PMI', 'ibiza': 'IBZ', 'eivissa': 'IBZ',
+  'mahon': 'MAH', 'ciudadela': 'CIU', 'formentera': 'FRM',
+  // Islas Canarias
+  'las palmas': 'LPA', 'santa cruz de tenerife': 'TFN',
+  'tenerife': 'TFN', 'lanzarote': 'LZT', 'fuerteventura': 'FTV',
+  // Otras
+  'madrid': 'MAD', 'murcia': 'MRC', 'castellon': 'CST',
+};
+
 function cityAbbrev(spot) {
   if (spot.abbrev) return spot.abbrev;
   if (!spot.city) return '';
-  return spot.city.slice(0, 3).toUpperCase();
+  // Normalizar: minúsculas + sin acentos
+  const key = spot.city.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  if (CITY_ABBREVS[key]) return CITY_ABBREVS[key];
+  // Fallback: primeras 3 consonantes del nombre
+  const consonants = spot.city.toUpperCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^A-Z]/g, '')
+    .replace(/[AEIOU]/g, '');
+  return consonants.slice(0, 3) || spot.city.slice(0, 3).toUpperCase();
 }
 
 // ── Home ──
@@ -171,7 +211,7 @@ function renderSpotList() {
 
     spotRow.appendChild(btn);
 
-    // Botón búsqueda circular solo en el último spot
+    // Columna derecha: botón búsqueda en el último spot, placeholder en los demás
     if (index === spots.length - 1) {
       const searchCircle = document.createElement('button');
       searchCircle.className = 'btn-search-circle';
@@ -179,6 +219,10 @@ function renderSpotList() {
       searchCircle.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`;
       searchCircle.addEventListener('click', () => openSearch(searchCircle));
       spotRow.appendChild(searchCircle);
+    } else {
+      const spacer = document.createElement('span');
+      spacer.className = 'spot-row__spacer';
+      spotRow.appendChild(spacer);
     }
 
     container.appendChild(spotRow);
@@ -202,11 +246,11 @@ function dayFullLabel(offset) {
   if (offset === 1) return 'Mañana';
   const d = new Date();
   d.setDate(d.getDate() + offset);
-  return d.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
+  const weekday = d.toLocaleDateString('es-ES', { weekday: 'long' });
+  return weekday.charAt(0).toUpperCase() + weekday.slice(1);
 }
 
 function dayShortDate(offset) {
-  if (offset === 0) return '';
   const d = new Date();
   d.setDate(d.getDate() + offset);
   return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
@@ -227,7 +271,7 @@ function renderDateDropdown() {
     btn.className = 'results__date-option' + (i === currentDay ? ' selected' : '');
     btn.innerHTML = `
       <span class="results__date-option__day">${dayFullLabel(i)}</span>
-      ${i > 0 ? `<span class="results__date-option__date">${dayShortDate(i)}</span>` : ''}
+      <span class="results__date-option__date">${dayShortDate(i)}</span>
     `;
     btn.addEventListener('click', () => {
       currentDay = i;

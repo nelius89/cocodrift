@@ -128,7 +128,7 @@ ul { list-style: none; }
   font-weight: 500;
   color: rgba(249, 246, 239, 0.45);
   letter-spacing: 0.06em;
-  width: 28px;
+  width: 48px;
   text-align: right;
   flex-shrink: 0;
 }
@@ -299,6 +299,12 @@ ul { list-style: none; }
 .btn-search-circle:active { opacity: 0.25; }
 .btn-search-circle svg { width: 18px; height: 18px; }
 
+/* Placeholder derecho para filas sin botón de búsqueda (mantiene pill centrado) */
+.spot-row__spacer {
+  width: 48px;
+  flex-shrink: 0;
+}
+
 /* ─────────────────────────────────────────
    VIEW: RESULTS v2.0
 ───────────────────────────────────────── */
@@ -397,6 +403,8 @@ ul { list-style: none; }
 .results__date-wrap {
   position: relative;
   padding: 0 16px 12px;
+  display: flex;
+  justify-content: center;
 }
 
 .results__date-btn {
@@ -585,7 +593,8 @@ ul { list-style: none; }
 
 .diagnosis__title {
   font-size: 26px;
-  font-weight: 700;
+  font-weight: 900;
+  text-transform: uppercase;
   color: var(--blue);
   line-height: 1.15;
 }
