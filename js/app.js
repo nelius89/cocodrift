@@ -31,6 +31,15 @@ const ICONS = {
   thermometer: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>`,
 };
 
+// ── Ilustraciones por estado ──
+const ESTADO_ILLUS = {
+  'piscina':         'assets/illustrations/Resolucion/Estados/Piscina.svg',
+  'muy-agradable':   'assets/illustrations/Resolucion/Estados/Muyagradable.svg',
+  'se-puede-salir':  'assets/illustrations/Resolucion/Estados/Sepuedesalir.svg',
+  'exigente':        'assets/illustrations/Resolucion/Estados/Exigente.svg',
+  'no-recomendable': 'assets/illustrations/Resolucion/Estados/Norecomendable.svg',
+};
+
 // ── Iconos SVG para cada franja horaria (v2.1: 4 franjas) ──
 const FRANJA_ICONS = [
   // 0 Amanecer — sol saliendo
@@ -374,9 +383,9 @@ function renderResults(sliderIdx) {
   // Título diagnóstico
   document.getElementById('diagnosis-title').textContent = info.titulo;
 
-  // Ilustración — temporal: misma para todos los estados
+  // Ilustración según estado
   document.getElementById('diagnosis-illus').innerHTML =
-    `<img src="assets/illustrations/Bueno.svg" alt="">`;
+    `<img src="${ESTADO_ILLUS[estado]}" alt="">`;
 
   // Bloques narrativos
   const nb = buildNarrativeBlocks(d, estado, warnings);
