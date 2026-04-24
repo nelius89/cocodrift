@@ -866,10 +866,39 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // CTA info detallada
+  // CTA info detallada — animación: botón negro se expande a pantalla completa
   document.getElementById('btn-detail').addEventListener('click', () => {
-    renderInfoTech();
-    showView('view-info');
+    const btn     = document.getElementById('btn-detail');
+    const overlay = document.getElementById('page-transition-overlay');
+    const rect    = btn.getBoundingClientRect();
+
+    overlay.style.setProperty('--ox', (rect.left + rect.width  / 2) + 'px');
+    overlay.style.setProperty('--oy', (rect.top  + rect.height / 2) + 'px');
+    overlay.style.transition = 'clip-path 0.38s cubic-bezier(0.4, 0, 0.2, 1)';
+    overlay.style.opacity    = '1';
+    overlay.classList.add('expanding');
+
+    setTimeout(() => {
+      // Mostrar view-info sin animación (el overlay la cubre)
+      const viewInfo = document.getElementById('view-info');
+      viewInfo.classList.add('no-transition');
+      renderInfoTech();
+      showView('view-info');
+
+      // Fade out del overlay
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          viewInfo.classList.remove('no-transition');
+          overlay.style.transition = 'opacity 0.28s ease';
+          overlay.style.opacity    = '0';
+          setTimeout(() => {
+            overlay.classList.remove('expanding');
+            overlay.style.transition = '';
+            overlay.style.opacity    = '';
+          }, 280);
+        });
+      });
+    }, 360);
   });
 
   // Back desde info técnica → volver a results

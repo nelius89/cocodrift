@@ -328,7 +328,7 @@ ul { list-style: none; }
 .results__header {
   display: flex;
   align-items: center;
-  padding: calc(env(safe-area-inset-top, 0px) + 18px) 16px 12px;
+  padding: calc(env(safe-area-inset-top, 0px) + 18px) 16px 5px;
   gap: 8px;
 }
 
@@ -372,7 +372,7 @@ ul { list-style: none; }
   align-items: center;
   justify-content: center;
   gap: 7px;
-  padding: 0 16px 12px;
+  padding: 0 16px 20px;
   overflow: hidden;
 }
 
@@ -666,9 +666,10 @@ ul { list-style: none; }
 
 /* ── CTA info detallada ── */
 .btn-detail {
+  position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   background: var(--black);
   border-radius: 14px;
   padding: 14px 16px;
@@ -686,6 +687,8 @@ ul { list-style: none; }
 }
 
 .btn-detail__icon {
+  position: absolute;
+  right: 16px;
   display: flex;
   align-items: center;
   color: rgba(255, 255, 255, 0.55);
@@ -1534,6 +1537,28 @@ ul { list-style: none; }
   color: rgba(255, 255, 255, 0.22);
   text-align: center;
   padding: 4px 8px;
+}
+
+/* ─────────────────────────────────────────
+   PAGE TRANSITION — botón negro expande
+───────────────────────────────────────── */
+.page-transition-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--black);
+  z-index: 300;
+  clip-path: circle(0px at var(--ox, 50%) var(--oy, 50%));
+  transition: clip-path 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  opacity: 1;
+}
+
+.page-transition-overlay.expanding {
+  clip-path: circle(150vmax at var(--ox, 50%) var(--oy, 50%));
+}
+
+.view.no-transition {
+  transition: none !important;
 }
 
 /* ─────────────────────────────────────────
