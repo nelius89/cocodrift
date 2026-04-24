@@ -442,6 +442,31 @@ function shortDirLabel(degrees) {
 const INFO_SVG = `<svg class="tech-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8" stroke-width="2.4"/></svg>`;
 const WARN_SVG = `<svg class="tech-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17" stroke-width="2.4"/></svg>`;
 
+function buildCompassSVG(dir) {
+  const ticks = [];
+  for (let i = 0; i < 12; i++) {
+    const a = (i * 30) * Math.PI / 180;
+    const isCard = i % 3 === 0;
+    const r1 = isCard ? 31 : 33, r2 = 37;
+    ticks.push(`<line x1="${(40+r1*Math.sin(a)).toFixed(1)}" y1="${(40-r1*Math.cos(a)).toFixed(1)}" x2="${(40+r2*Math.sin(a)).toFixed(1)}" y2="${(40-r2*Math.cos(a)).toFixed(1)}" stroke="rgba(10,10,10,${isCard?'0.22':'0.12'})" stroke-width="${isCard?1.5:1}" stroke-linecap="round"/>`);
+  }
+  return `<svg class="tech-compass-svg" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="40" cy="40" r="39" fill="rgba(10,10,10,0.03)" stroke="rgba(10,10,10,0.09)" stroke-width="1"/>
+    ${ticks.join('')}
+    <text x="40" y="14" text-anchor="middle" dominant-baseline="middle" class="compass-lbl">N</text>
+    <text x="66" y="41" text-anchor="middle" dominant-baseline="middle" class="compass-lbl">E</text>
+    <text x="40" y="68" text-anchor="middle" dominant-baseline="middle" class="compass-lbl">S</text>
+    <text x="14" y="41" text-anchor="middle" dominant-baseline="middle" class="compass-lbl">O</text>
+    <g transform="rotate(${dir}, 40, 40)">
+      <line x1="40" y1="40" x2="40" y2="57" stroke="rgba(100,110,140,0.28)" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="40" y1="40" x2="40" y2="20" stroke="#314FFF" stroke-width="3" stroke-linecap="round"/>
+      <polygon points="40,13 36,22 44,22" fill="#314FFF"/>
+    </g>
+    <circle cx="40" cy="40" r="3" fill="rgba(10,10,10,0.10)"/>
+    <circle cx="40" cy="3.5" r="2.5" fill="#C84B4B" opacity="0.75"/>
+  </svg>`;
+}
+
 function stateIcon(s) { return s === 'red' ? WARN_SVG : INFO_SVG; }
 
 function windSpeedState(kn)      { return kn > 20 ? 'red' : kn > 10 ? 'orange' : 'ok'; }
@@ -496,7 +521,7 @@ function renderTechBlocks(d, warnings) {
               <div class="tech-cell__value--dir">${windCard}</div>
               <div class="tech-cell__degrees">${Math.round(d.windDir)}°</div>
             </div>
-            <div class="tech-compass"></div>
+            ${buildCompassSVG(d.windDir)}
           </div>
         </div>
         <div class="tech-cell tech-cell--${sWind}">
@@ -504,7 +529,8 @@ function renderTechBlocks(d, warnings) {
             <span class="tech-cell__label">Media</span>
             ${stateIcon(sWind)}
           </div>
-          <div class="tech-cell__value">${d.windKn.toFixed(1)} <em>kn</em></div>
+          <div class="tech-cell__value tech-cell__value--wind">${d.windKn.toFixed(1)}</div>
+          <div class="tech-cell__unit">nudos</div>
           <div class="tech-cell__sub">${d.windKmh} km/h</div>
         </div>
         <div class="tech-cell tech-cell--${sGust}">
@@ -512,7 +538,8 @@ function renderTechBlocks(d, warnings) {
             <span class="tech-cell__label">Rachas</span>
             ${stateIcon(sGust)}
           </div>
-          <div class="tech-cell__value">${d.gustKn.toFixed(1)} <em>kn</em></div>
+          <div class="tech-cell__value tech-cell__value--wind">${d.gustKn.toFixed(1)}</div>
+          <div class="tech-cell__unit">nudos</div>
           <div class="tech-cell__sub">${d.gustKmh} km/h</div>
         </div>
       </div>
@@ -522,17 +549,33 @@ function renderTechBlocks(d, warnings) {
             <span class="tech-cell__label">Variabilidad</span>
             ${stateIcon(sVar)}
           </div>
-          <div class="tech-cell__value">${variabilidad.toFixed(1)} <em>kn</em></div>
+          <div class="tech-cell__value tech-cell__value--wind">${variabilidad.toFixed(1)} <em class="tech-cell__unit-inline">nudos</em></div>
           <div class="tech-cell__sub">(rachas − media)</div>
         </div>
-        <div class="tech-cell tech-cell--${sTerral}">
-          <div class="tech-cell__top">
-            <span class="tech-cell__label">Terral</span>
-            ${stateIcon(sTerral)}
-          </div>
-          <div class="tech-cell__value ${terralLevel === 0 ? 'tech-cell__value--muted' : ''}">${terralLevel === 0 ? 'Sin terral' : 'Viento de tierra'}</div>
-          ${terralLevel > 0 ? `<div class="tech-cell__sub">${terralLabels[terralLevel]}</div>` : ''}
-        </div>
+        ${terralLevel === 0
+          ? `<div class="tech-cell tech-cell--ok">
+              <div class="tech-cell__top">
+                <span class="tech-cell__label">Terral</span>
+                ${INFO_SVG}
+              </div>
+              <div class="tech-cell__value--muted">Sin terral</div>
+            </div>`
+          : `<div class="tech-terral-alert tech-terral-alert--${sTerral}">
+              <div class="tech-terral-body">
+                <span class="tech-terral-icon">${ICONS.wind}</span>
+                <div>
+                  <div class="tech-terral-label">Terral</div>
+                  <div class="tech-terral-sub">Viento de tierra</div>
+                </div>
+              </div>
+              <div class="tech-terral-meta">
+                <div class="tech-terral-warn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17" stroke-width="2.4"/></svg>
+                </div>
+                ${INFO_SVG}
+              </div>
+            </div>`
+        }
       </div>
     </div>
 
@@ -551,14 +594,14 @@ function renderTechBlocks(d, warnings) {
         </div>
         <div class="tech-cell tech-cell--${sWavePer}">
           <div class="tech-cell__top">
-            <span class="tech-cell__label">Período</span>
+            <span class="tech-cell__label">Período medio</span>
             ${stateIcon(sWavePer)}
           </div>
           <div class="tech-cell__value">${Math.round(d.wavePer)} <em>s</em></div>
         </div>
         <div class="tech-cell">
           <div class="tech-cell__top">
-            <span class="tech-cell__label">Dir. de ola</span>
+            <span class="tech-cell__label">Dirección de ola</span>
             ${INFO_SVG}
           </div>
           <div class="tech-cell__value--dir">${waveCard}</div>

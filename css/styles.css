@@ -773,7 +773,7 @@ ul { list-style: none; }
 .tech-grid-row:last-of-type { border-bottom: none; }
 .tech-grid-row--3   { grid-template-columns: repeat(3, 1fr); }
 .tech-grid-row--2   { grid-template-columns: 1fr 1fr; }
-.tech-grid-row--dir { grid-template-columns: 1.4fr 1fr 1fr; }
+.tech-grid-row--dir { grid-template-columns: 1.7fr 1fr 1fr; }
 
 .tech-cell {
   padding: 10px 12px 10px;
@@ -834,6 +834,90 @@ ul { list-style: none; }
 .tech-cell--orange .tech-cell__value { color: #F97316; }
 .tech-cell--red    .tech-cell__value { color: #EF4444; }
 
+/* Valor viento — número sin unidad (nudos va debajo) */
+.tech-cell__value--wind {
+  font-size: 26px;
+  font-weight: 800;
+  color: rgba(10, 10, 10, 0.88);
+  line-height: 1;
+  margin-top: 2px;
+}
+.tech-cell--orange .tech-cell__value--wind { color: #F97316; }
+.tech-cell--red    .tech-cell__value--wind { color: #EF4444; }
+
+/* "nudos" en línea propia */
+.tech-cell__unit {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--blue);
+  line-height: 1.3;
+  margin-top: 1px;
+}
+.tech-cell--orange .tech-cell__unit { color: #F97316; }
+.tech-cell--red    .tech-cell__unit { color: #EF4444; }
+
+/* "nudos" inline (variabilidad) */
+.tech-cell__unit-inline {
+  font-size: 13px;
+  font-weight: 600;
+  font-style: normal;
+  color: var(--blue);
+  margin-left: 2px;
+}
+.tech-cell--orange .tech-cell__unit-inline { color: #F97316; }
+.tech-cell--red    .tech-cell__unit-inline { color: #EF4444; }
+
+/* Terral — caja de alerta */
+.tech-terral-alert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(239, 68, 68, 0.40);
+  background: rgba(239, 68, 68, 0.04);
+  margin: 4px 6px 4px 0;
+}
+.tech-terral-body {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tech-terral-icon { display: flex; color: #EF4444; }
+.tech-terral-icon svg { width: 18px; height: 18px; }
+.tech-terral-label {
+  font-size: 13px;
+  font-weight: 800;
+  color: #EF4444;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+}
+.tech-terral-sub {
+  font-size: 10px;
+  color: rgba(10, 10, 10, 0.50);
+  margin-top: 1px;
+}
+.tech-terral-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.tech-terral-warn {
+  width: 34px;
+  height: 34px;
+  border: 1.5px solid rgba(239, 68, 68, 0.45);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #EF4444;
+}
+.tech-terral-warn svg { width: 16px; height: 16px; }
+.tech-terral-alert .tech-state-icon { color: rgba(10, 10, 10, 0.25); }
+
 .tech-cell__value--muted {
   font-size: 13px;
   font-weight: 500;
@@ -868,14 +952,18 @@ ul { list-style: none; }
   margin-top: 2px;
 }
 
-/* Placeholder brújula */
-.tech-compass {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  border: 1.5px solid rgba(10, 10, 10, 0.10);
+/* Brújula SVG */
+.tech-compass-svg {
+  width: 80px;
+  height: 80px;
   flex-shrink: 0;
-  background: rgba(10, 10, 10, 0.02);
+}
+.compass-lbl {
+  font-size: 9px;
+  font-family: var(--font);
+  font-weight: 700;
+  fill: rgba(10, 10, 10, 0.45);
+  dominant-baseline: middle;
 }
 
 /* Tipo de mar */
