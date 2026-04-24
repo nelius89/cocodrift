@@ -472,7 +472,7 @@ function stateIcon(s) { return s === 'red' ? WARN_SVG : INFO_SVG; }
 function windSpeedState(kn)      { return kn > 20 ? 'red' : kn > 10 ? 'orange' : 'ok'; }
 function gustSpeedState(kn)      { return kn > 22 ? 'red' : kn > 12 ? 'orange' : 'ok'; }
 function varState(v)             { return v > 10  ? 'red' : v > 4   ? 'orange' : 'ok'; }
-function terralCellState(level)  { return level === 3 ? 'red' : level >= 1 ? 'orange' : 'ok'; }
+function terralCellState(level, windKn)  { return (level === 3 && windKn > 8) ? 'red' : level >= 1 ? 'orange' : 'ok'; }
 function waveHState(h)           { return h > 1.0 ? 'red' : h > 0.6 ? 'orange' : 'ok'; }
 function wavePeriodState(per, h) {
   if (h <= 0.2) return 'ok';
@@ -499,7 +499,7 @@ function renderTechBlocks(d, warnings) {
   const sWind   = windSpeedState(d.windKn);
   const sGust   = gustSpeedState(d.gustKn);
   const sVar    = varState(variabilidad);
-  const sTerral = terralCellState(terralLevel);
+  const sTerral = terralCellState(terralLevel, d.windKn);
   const sWaveH  = waveHState(d.waveH);
   const sWavePer = wavePeriodState(d.wavePer, d.waveH);
 
