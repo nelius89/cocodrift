@@ -708,7 +708,6 @@ function renderTechBlocks(d, warnings) {
           <div class="tech-cell__value tech-cell__value--wind">${variabilidad.toFixed(1)} <em class="tech-cell__unit-inline">nudos</em></div>
           <div class="tech-cell__sub">(rachas − media)</div>
         </div>
-        }
       </div>
     </div>
 
