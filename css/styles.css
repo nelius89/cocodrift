@@ -1133,10 +1133,26 @@ ul { list-style: none; }
 
 
 /* ─────────────────────────────────────────
-   ABOUT SHEET
+   TECH INFO BTN
+───────────────────────────────────────── */
+.tech-info-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  line-height: 0;
+}
+
+/* ─────────────────────────────────────────
+   ABOUT / SUGGESTIONS / INFO SHEET
 ───────────────────────────────────────── */
 .about-overlay,
-.suggestions-overlay {
+.suggestions-overlay,
+.info-overlay {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.18);
@@ -1147,13 +1163,15 @@ ul { list-style: none; }
 }
 
 .about-overlay.active,
-.suggestions-overlay.active {
+.suggestions-overlay.active,
+.info-overlay.active {
   opacity: 1;
   pointer-events: auto;
 }
 
 .about-sheet,
-.suggestions-sheet {
+.suggestions-sheet,
+.info-sheet {
   position: fixed;
   bottom: 0;
   left: 0;
@@ -1169,12 +1187,14 @@ ul { list-style: none; }
 }
 
 .about-sheet.active,
-.suggestions-sheet.active {
+.suggestions-sheet.active,
+.info-sheet.active {
   transform: translateY(0);
 }
 
 .about-sheet__handle,
-.suggestions-sheet__handle {
+.suggestions-sheet__handle,
+.info-sheet__handle {
   width: 36px;
   height: 4px;
   background: rgba(10, 10, 10, 0.12);
@@ -1466,6 +1486,63 @@ ul { list-style: none; }
   margin-top: 2px;
 }
 
+
+/* ─────────────────────────────────────────
+   INFO SHEET — contenido
+───────────────────────────────────────── */
+.info-sheet__content {
+  padding: 20px 24px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.info-sheet__title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--blue);
+  letter-spacing: -0.02em;
+}
+
+.info-sheet__intro {
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(10, 10, 10, 0.55);
+  margin: 0;
+}
+
+.info-sheet__rows {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(10, 10, 10, 0.08);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.info-sheet__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(10, 10, 10, 0.06);
+}
+.info-sheet__row:last-child { border-bottom: none; }
+
+.info-sheet__range {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--blue);
+  min-width: 76px;
+  flex-shrink: 0;
+  letter-spacing: 0.02em;
+}
+
+.info-sheet__label {
+  font-size: 12px;
+  color: rgba(10, 10, 10, 0.60);
+  line-height: 1.4;
+}
 
 /* ─────────────────────────────────────────
    UTILS

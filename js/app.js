@@ -467,7 +467,128 @@ function buildCompassSVG(dir) {
   </svg>`;
 }
 
-function stateIcon(s) { return s === 'red' ? WARN_SVG : INFO_SVG; }
+// ── Info copy — contenido de los popups de cada métrica ──
+const INFO_COPY = {
+  'wind-speed': {
+    title: 'Velocidad media',
+    intro: 'La intensidad del viento constante. Marca el esfuerzo al remar y lo fácil que será moverte.',
+    rows: [
+      { range: '0 – 6 kn',   label: 'Calma / apenas perceptible' },
+      { range: '6 – 10 kn',  label: 'Brisa ligera' },
+      { range: '10 – 15 kn', label: 'Viento moderado' },
+      { range: '15 – 20 kn', label: 'Viento fuerte' },
+      { range: '+20 kn',     label: 'Muy fuerte / limitante' },
+    ],
+  },
+  'wind-gusts': {
+    title: 'Rachas',
+    intro: 'Son los picos de viento que aparecen de golpe. Son los que te descolocan.',
+    rows: [
+      { range: '0 – 8 kn',   label: 'Estable' },
+      { range: '8 – 12 kn',  label: 'Alguna racha' },
+      { range: '12 – 16 kn', label: 'Rachas notables' },
+      { range: '16 – 22 kn', label: 'Rachas fuertes' },
+      { range: '+22 kn',     label: 'Rachas muy fuertes' },
+    ],
+  },
+  'wind-variability': {
+    title: 'Variabilidad',
+    intro: 'Mide cuánto cambia el viento. Cuanto más alto, menos predecible.',
+    rows: [
+      { range: '0 – 3',  label: 'Viento estable' },
+      { range: '3 – 6',  label: 'Algo variable' },
+      { range: '6 – 10', label: 'Variable' },
+      { range: '+10',    label: 'Muy variable' },
+    ],
+  },
+  'wind-direction': {
+    title: 'Dirección del viento',
+    intro: 'Indica de dónde viene el viento respecto a la playa. Cambia completamente la seguridad.',
+    rows: [
+      { range: 'Offshore', label: 'Tierra → mar. Te empuja hacia fuera (peligroso)' },
+      { range: 'Onshore',  label: 'Mar → tierra. Te empuja hacia la orilla (más seguro)' },
+      { range: 'Lateral',  label: 'Te desplaza de lado' },
+    ],
+  },
+  'wave-height': {
+    title: 'Altura de ola',
+    intro: 'El tamaño de las olas. Define cuánto se mueve el mar.',
+    rows: [
+      { range: '0 – 0.2 m',   label: 'Mar en calma' },
+      { range: '0.2 – 0.6 m', label: 'Movimiento leve' },
+      { range: '0.6 – 1.0 m', label: 'Movimiento real' },
+      { range: '1.0 – 1.5 m', label: 'Mar movido' },
+      { range: '+1.5 m',      label: 'Mar grande / complicado' },
+    ],
+  },
+  'wave-period': {
+    title: 'Período medio',
+    intro: 'El tiempo entre olas. Define si el mar es ordenado o caótico.',
+    rows: [
+      { range: '+7 s',   label: 'Olas largas y ordenadas (fácil)' },
+      { range: '5 – 7 s', label: 'Ritmo normal' },
+      { range: '4 – 5 s', label: 'Algo irregular' },
+      { range: '<4 s',   label: 'Caótico y difícil' },
+    ],
+  },
+  'wave-direction': {
+    title: 'Dirección de ola',
+    intro: 'Indica desde dónde llegan las olas. Afecta a cómo rompen y al equilibrio.',
+    rows: [
+      { range: 'De mar',    label: 'Entran hacia la playa' },
+      { range: 'Cruzadas',  label: 'Llegan de lado' },
+      { range: 'De tierra', label: 'Apenas afectan' },
+    ],
+  },
+  'swell': {
+    title: 'Mar de fondo',
+    intro: 'Olas limpias que vienen de lejos. Más fáciles de leer y predecir.',
+    rows: [
+      { range: '0 m',        label: 'No hay' },
+      { range: '0 – 0.5 m',  label: 'Débil' },
+      { range: '0.5 – 1.0 m', label: 'Presente' },
+      { range: '+1.0 m',     label: 'Predomina' },
+    ],
+  },
+  'wind-wave': {
+    title: 'Mar de viento',
+    intro: 'Olas generadas por el viento local. Más incómodas y desordenadas que el mar de fondo.',
+    rows: [
+      { range: '0 m',        label: 'No hay' },
+      { range: '0 – 0.3 m',  label: 'Leve' },
+      { range: '0.3 – 0.6 m', label: 'Presente' },
+      { range: '+0.6 m',     label: 'Predomina' },
+    ],
+  },
+  'sea-type': {
+    title: 'Tipo de mar',
+    intro: 'Resume cómo es el mar en conjunto según el origen de las olas.',
+    rows: [
+      { range: 'Solo fondo',  label: 'Limpio y ordenado' },
+      { range: 'Mar mixto',   label: 'Algo irregular' },
+      { range: 'Solo viento', label: 'Desordenado' },
+    ],
+  },
+  'terral': {
+    title: 'Terral',
+    intro: 'El viento viene de tierra y te empuja hacia el mar. El riesgo es alejarte sin poder volver fácilmente.',
+    rows: [
+      { range: 'Leve',      label: 'Suave. No te alejes demasiado de la orilla' },
+      { range: 'Relevante', label: 'Quédate cerca de la orilla en todo momento' },
+      { range: 'Fuerte',    label: 'Mejor no salir hoy' },
+    ],
+  },
+};
+
+function stateIcon(s, key) {
+  const svg = s === 'red' ? WARN_SVG : INFO_SVG;
+  if (!key) return svg;
+  return `<button class="tech-info-btn" data-info="${key}" aria-label="Más info">${svg}</button>`;
+}
+
+function infoSvg(key) {
+  return `<button class="tech-info-btn" data-info="${key}" aria-label="Más info">${INFO_SVG}</button>`;
+}
 
 function windSpeedState(kn)      { return kn > 20 ? 'red' : kn > 10 ? 'orange' : 'ok'; }
 function gustSpeedState(kn)      { return kn > 22 ? 'red' : kn > 12 ? 'orange' : 'ok'; }
@@ -518,6 +639,7 @@ function renderTechBlocks(d, warnings) {
         <div class="tech-cell">
           <div class="tech-cell__top">
             <span class="tech-cell__label">Dirección</span>
+            ${infoSvg('wind-direction')}
           </div>
           <div class="tech-cell__dir-body">
             <div>
@@ -530,7 +652,7 @@ function renderTechBlocks(d, warnings) {
         <div class="tech-cell tech-cell--${sWind}">
           <div class="tech-cell__top">
             <span class="tech-cell__label">Media</span>
-            ${stateIcon(sWind)}
+            ${stateIcon(sWind, 'wind-speed')}
           </div>
           <div class="tech-cell__value tech-cell__value--wind">${d.windKn.toFixed(1)}</div>
           <div class="tech-cell__unit">nudos</div>
@@ -539,7 +661,7 @@ function renderTechBlocks(d, warnings) {
         <div class="tech-cell tech-cell--${sGust}">
           <div class="tech-cell__top">
             <span class="tech-cell__label">Rachas</span>
-            ${stateIcon(sGust)}
+            ${stateIcon(sGust, 'wind-gusts')}
           </div>
           <div class="tech-cell__value tech-cell__value--wind">${d.gustKn.toFixed(1)}</div>
           <div class="tech-cell__unit">nudos</div>
@@ -550,7 +672,7 @@ function renderTechBlocks(d, warnings) {
         <div class="tech-cell tech-cell--${sVar}">
           <div class="tech-cell__top">
             <span class="tech-cell__label">Variabilidad</span>
-            ${stateIcon(sVar)}
+            ${stateIcon(sVar, 'wind-variability')}
           </div>
           <div class="tech-cell__value tech-cell__value--wind">${variabilidad.toFixed(1)} <em class="tech-cell__unit-inline">nudos</em></div>
           <div class="tech-cell__sub">(rachas − media)</div>
@@ -559,7 +681,7 @@ function renderTechBlocks(d, warnings) {
           ? `<div class="tech-cell tech-cell--ok">
               <div class="tech-cell__top">
                 <span class="tech-cell__label">Terral</span>
-                ${INFO_SVG}
+                ${infoSvg('terral')}
               </div>
               <div class="tech-cell__value--muted">Sin terral</div>
             </div>`
@@ -572,9 +694,9 @@ function renderTechBlocks(d, warnings) {
                 </div>
               </div>
               <div class="tech-terral-meta">
-                <div class="tech-terral-warn">
+                <button class="tech-terral-warn tech-info-btn" data-info="terral" aria-label="Más info">
                   ${terralMetaIcon}
-                </div>
+                </button>
               </div>
             </div>`
         }
@@ -590,21 +712,21 @@ function renderTechBlocks(d, warnings) {
         <div class="tech-cell tech-cell--${sWaveH}">
           <div class="tech-cell__top">
             <span class="tech-cell__label">Altura de ola</span>
-            ${stateIcon(sWaveH)}
+            ${stateIcon(sWaveH, 'wave-height')}
           </div>
           <div class="tech-cell__value">${d.waveH.toFixed(1)} <em>m</em></div>
         </div>
         <div class="tech-cell tech-cell--${sWavePer}">
           <div class="tech-cell__top">
             <span class="tech-cell__label">Período medio</span>
-            ${stateIcon(sWavePer)}
+            ${stateIcon(sWavePer, 'wave-period')}
           </div>
           <div class="tech-cell__value">${Math.round(d.wavePer)} <em>s</em></div>
         </div>
         <div class="tech-cell">
           <div class="tech-cell__top">
             <span class="tech-cell__label">Dirección de ola</span>
-            ${INFO_SVG}
+            ${infoSvg('wave-direction')}
           </div>
           <div class="tech-cell__value--dir">${waveCard}</div>
           <div class="tech-cell__degrees">${waveDeg}</div>
@@ -614,21 +736,21 @@ function renderTechBlocks(d, warnings) {
         <div class="tech-cell">
           <div class="tech-cell__top">
             <span class="tech-cell__label">Mar de fondo</span>
-            ${INFO_SVG}
+            ${infoSvg('swell')}
           </div>
           <div class="tech-cell__value">${(d.swellH || 0).toFixed(1)} <em>m</em></div>
         </div>
         <div class="tech-cell">
           <div class="tech-cell__top">
             <span class="tech-cell__label">Mar de viento</span>
-            ${INFO_SVG}
+            ${infoSvg('wind-wave')}
           </div>
           <div class="tech-cell__value">${(d.windWaveH || 0).toFixed(1)} <em>m</em></div>
         </div>
         <div class="tech-cell">
           <div class="tech-cell__top">
             <span class="tech-cell__label">Tipo de mar</span>
-            ${INFO_SVG}
+            ${infoSvg('sea-type')}
           </div>
           <div class="tech-cell__tipo">
             ${ICONS.wave}
@@ -643,6 +765,52 @@ function renderTechBlocks(d, warnings) {
       Valores medios de la franja seleccionada.
     </p>
   `;
+}
+
+// ── Info sheet ──
+function openInfoSheet(key) {
+  const data = INFO_COPY[key];
+  if (!data) return;
+
+  document.getElementById('info-sheet-title').textContent = data.title;
+  document.getElementById('info-sheet-intro').textContent = data.intro;
+  document.getElementById('info-sheet-rows').innerHTML = data.rows
+    .map(r => `<div class="info-sheet__row">
+      <span class="info-sheet__range">${r.range}</span>
+      <span class="info-sheet__label">${r.label}</span>
+    </div>`)
+    .join('');
+
+  document.getElementById('info-overlay').classList.add('active');
+  document.getElementById('info-sheet').classList.add('active');
+}
+
+function closeInfoSheet() {
+  const sheet = document.getElementById('info-sheet');
+  sheet.style.transform = '';
+  sheet.style.transition = '';
+  document.getElementById('info-overlay').classList.remove('active');
+  sheet.classList.remove('active');
+}
+
+function initInfoSheet() {
+  const sheet = document.getElementById('info-sheet');
+  let startY = 0, dragY = 0, dragging = false;
+  sheet.addEventListener('touchstart', (e) => {
+    startY = e.touches[0].clientY; dragY = 0; dragging = true;
+    sheet.style.transition = 'none';
+  }, { passive: true });
+  sheet.addEventListener('touchmove', (e) => {
+    if (!dragging) return;
+    dragY = Math.max(0, e.touches[0].clientY - startY);
+    sheet.style.transform = `translateY(${dragY}px)`;
+  }, { passive: true });
+  sheet.addEventListener('touchend', () => {
+    if (!dragging) return;
+    dragging = false;
+    sheet.style.transition = '';
+    if (dragY > 80) closeInfoSheet(); else sheet.style.transform = '';
+  });
 }
 
 // ── About sheet ──
@@ -846,6 +1014,14 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('suggestions-overlay').addEventListener('click', closeSuggestionsSheet);
   initAboutSheet();
   initSuggestionsSheet();
+  initInfoSheet();
+
+  // Info sheet — delegación en tech-blocks
+  document.getElementById('tech-blocks').addEventListener('click', (e) => {
+    const btn = e.target.closest('.tech-info-btn');
+    if (btn?.dataset.info) openInfoSheet(btn.dataset.info);
+  });
+  document.getElementById('info-overlay').addEventListener('click', closeInfoSheet);
 
   // Back button — volver a home
   document.getElementById('btn-back').addEventListener('click', () => {
