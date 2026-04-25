@@ -877,7 +877,8 @@ function initAboutSheet() {
 }
 
 // ── Suggestions sheet ──
-const SUGGESTIONS_WORKER = 'https://coco-suggestions.manel89.workers.dev';
+const SUGGESTIONS_WORKER      = 'https://coco-suggestions.manel89.workers.dev';
+const ERROR_REPORT_WORKER     = 'https://coco-error-reports.manel89.workers.dev';
 
 function openSuggestionsSheet() {
   _currentState = { view: history.state?.view, sheet: 'suggestions' };
@@ -955,6 +956,111 @@ function initSuggestionsSheet() {
     } catch {
       btn.disabled = false;
       btn.textContent = 'Enviar';
+      alert('Sin conexión. Inténtalo de nuevo.');
+    }
+  });
+}
+
+// ── Error report sheet ──
+function buildReportPayload() {
+  const dayLabel = currentDay === 0 ? 'Hoy' : currentDay === 1 ? 'Mañana' : `Día ${currentDay}`;
+  const franja   = FRANJAS[currentFranja]?.label || '—';
+  const getText  = (id) => document.getElementById(id)?.textContent?.trim() || '—';
+
+  let condiciones = `Diagnóstico: ${getText('diagnosis-title')}\nDía: ${dayLabel} · Franja: ${franja}`;
+  if (currentD) {
+    const wH   = currentD.waveH   != null ? currentD.waveH.toFixed(1)   + 'm'  : '—';
+    const wPer = currentD.wavePer != null ? currentD.wavePer.toFixed(0)  + 's'  : '—';
+    const wDir = currentD.waveDir != null ? Math.round(currentD.waveDir) + '°'  : '—';
+    const wind = currentD.windKn  != null ? currentD.windKn.toFixed(0)   + 'kn' : '—';
+    const gust = currentD.gustKn  != null ? currentD.gustKn.toFixed(0)   + 'kn' : '—';
+    const wDeg = currentD.windDir != null ? Math.round(currentD.windDir) + '°'  : '—';
+    condiciones += `\nOlas: ${wH} · Periodo: ${wPer} · Dir: ${wDir}`;
+    condiciones += `\nViento: ${wind} · Ráfagas: ${gust} · Dir: ${wDeg}`;
+  }
+
+  const mensajes = [
+    `${getText('nb-encounter-title')}: ${getText('nb-encounter-desc')}`,
+    `${getText('nb-demand-title')}: ${getText('nb-demand-desc')}`,
+    `${getText('nb-fit-title')}: ${getText('nb-fit-desc')}`,
+  ].join('\n');
+
+  return { spot: currentSpot?.name || '—', condiciones, mensajes };
+}
+
+function openErrorReportSheet() {
+  _currentState = { view: history.state?.view, sheet: 'error-report' };
+  history.pushState(_currentState, '');
+  document.getElementById('error-report-form').classList.remove('hidden');
+  document.getElementById('error-report-success').classList.add('hidden');
+  document.getElementById('error-report-textarea').value = '';
+  document.getElementById('error-report-count').textContent = '0';
+  document.getElementById('error-report-send').disabled = false;
+  document.getElementById('error-report-send').textContent = 'Enviar reporte';
+  document.getElementById('error-report-overlay').classList.add('active');
+  document.getElementById('error-report-sheet').classList.add('active');
+}
+
+function closeErrorReportSheet() {
+  if (!_historyNavigation) history.back();
+  const sheet = document.getElementById('error-report-sheet');
+  sheet.style.transform = '';
+  sheet.style.transition = '';
+  document.getElementById('error-report-overlay').classList.remove('active');
+  sheet.classList.remove('active');
+}
+
+function initErrorReportSheet() {
+  const sheet = document.getElementById('error-report-sheet');
+
+  let startY = 0, dragY = 0, dragging = false;
+  sheet.addEventListener('touchstart', (e) => {
+    startY = e.touches[0].clientY; dragY = 0; dragging = true;
+    sheet.style.transition = 'none';
+  }, { passive: true });
+  sheet.addEventListener('touchmove', (e) => {
+    if (!dragging) return;
+    dragY = Math.max(0, e.touches[0].clientY - startY);
+    sheet.style.transform = `translateY(${dragY}px)`;
+  }, { passive: true });
+  sheet.addEventListener('touchend', () => {
+    if (!dragging) return;
+    dragging = false;
+    sheet.style.transition = '';
+    if (dragY > 80) closeErrorReportSheet(); else sheet.style.transform = '';
+  });
+
+  const textarea = document.getElementById('error-report-textarea');
+  const counter  = document.getElementById('error-report-count');
+  textarea.addEventListener('input', () => {
+    counter.textContent = textarea.value.length;
+  });
+
+  document.getElementById('error-report-send').addEventListener('click', async () => {
+    const payload = buildReportPayload();
+    payload.comentario = textarea.value.trim();
+
+    const btn = document.getElementById('error-report-send');
+    btn.disabled = true;
+    btn.textContent = 'Enviando…';
+
+    try {
+      const res = await fetch(ERROR_REPORT_WORKER, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        document.getElementById('error-report-form').classList.add('hidden');
+        document.getElementById('error-report-success').classList.remove('hidden');
+      } else {
+        btn.disabled = false;
+        btn.textContent = 'Enviar reporte';
+        alert('Algo ha fallado. Inténtalo de nuevo.');
+      }
+    } catch {
+      btn.disabled = false;
+      btn.textContent = 'Enviar reporte';
       alert('Sin conexión. Inténtalo de nuevo.');
     }
   });
@@ -1047,8 +1153,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const leaving = _currentState;
     const arriving = e.state ?? { view: 'view-home' };
     if (leaving?.sheet === 'about')            closeAboutSheet();
-    else if (leaving?.sheet === 'suggestions') closeSuggestionsSheet();
-    else if (leaving?.sheet === 'info')        closeInfoSheet();
+    else if (leaving?.sheet === 'suggestions')   closeSuggestionsSheet();
+    else if (leaving?.sheet === 'error-report') closeErrorReportSheet();
+    else if (leaving?.sheet === 'info')          closeInfoSheet();
     else if (leaving?.sheet === 'search')      closeSearch();
     else                                       _applyView(arriving.view ?? 'view-home');
     _currentState = arriving;
@@ -1065,8 +1172,11 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-home-feedback').addEventListener('click', openSuggestionsSheet);
   document.getElementById('about-overlay').addEventListener('click', closeAboutSheet);
   document.getElementById('suggestions-overlay').addEventListener('click', closeSuggestionsSheet);
+  document.getElementById('btn-report-error').addEventListener('click', openErrorReportSheet);
+  document.getElementById('error-report-overlay').addEventListener('click', closeErrorReportSheet);
   initAboutSheet();
   initSuggestionsSheet();
+  initErrorReportSheet();
   initInfoSheet();
 
   // Info sheet — delegación en tech-blocks (celda entera o botón)

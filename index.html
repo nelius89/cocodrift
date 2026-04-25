@@ -137,6 +137,9 @@
 
         <!-- Bloques técnicos -->
         <div class="tech-blocks" id="tech-blocks"></div>
+
+        <!-- Botón informar error -->
+        <button class="btn-report-error" id="btn-report-error">Informar error</button>
       </div><!-- /results-main-content -->
 
       <div id="results-seven-day" class="hidden results__seven-day-empty">
@@ -225,6 +228,24 @@
       </div>
       <div class="suggestions-success hidden" id="suggestions-success">
         <p class="suggestions-success__msg">Gracias. Lo hemos recibido.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error report overlay + sheet -->
+  <div class="error-report-overlay" id="error-report-overlay"></div>
+  <div class="error-report-sheet" id="error-report-sheet">
+    <div class="error-report-sheet__handle"></div>
+    <div class="error-report-sheet__content">
+      <h2 class="error-report-sheet__title">¿Ves algo que no cuadra?</h2>
+      <p class="error-report-sheet__desc">Si los datos no reflejan lo que estás viendo en el agua, cuéntanoslo. Nos ayuda a afinar la interpretación.</p>
+      <div id="error-report-form">
+        <textarea class="error-report-sheet__textarea" id="error-report-textarea" placeholder="Añade un comentario (opcional)" maxlength="500" rows="3"></textarea>
+        <div class="error-report-sheet__counter"><span id="error-report-count">0</span>/500</div>
+        <button class="error-report-sheet__send" id="error-report-send">Enviar reporte</button>
+      </div>
+      <div class="hidden" id="error-report-success">
+        <p class="error-report-sheet__success-msg">Reporte enviado. Gracias por ayudarnos a mejorar.</p>
       </div>
     </div>
   </div>

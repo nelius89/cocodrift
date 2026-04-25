@@ -1,0 +1,4 @@
+name = "coco-error-reports"
+main = "index.js"
+compatibility_date = "2024-01-01"
+account_id = "f48b8353d8242e3d6afb9d28f34830b8"
