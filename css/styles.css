@@ -435,12 +435,17 @@ ul { list-style: none; }
 }
 
 .results__spot-name {
-  font-size: 40px;
+  font-size: 26px;
   font-weight: 900;
   color: var(--white);
-  letter-spacing: -0.03em;
-  line-height: 1.05;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
   text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
 }
 
 .btn-favorite {
