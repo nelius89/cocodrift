@@ -366,7 +366,7 @@ function buildNarrativeBlocks(d, estado, warnings) {
   if (d.waveH > 1.5) {
     encounter = {
       title: 'El mar está muy revuelto',
-      desc:  'Olas grandes, cortas y desordenadas. Todo se mueve a la vez.',
+      desc:  'Olas grandes, cortas y desordenadas.',
     };
   } else if (d.waveH > 1.0 || (d.waveH > 0.6 && d.wavePer < 4)) {
     encounter = {
@@ -375,23 +375,23 @@ function buildNarrativeBlocks(d, estado, warnings) {
     };
   } else if (d.waveH > 0.6) {
     encounter = {
-      title: 'El mar tiene movimiento real',
-      desc:  'Olas medias y movimiento irregular.',
+      title: 'El mar está movido',
+      desc:  'Las olas se notan y no tienen un ritmo claro.',
     };
   } else if (d.waveH > 0.3 && d.wavePer < 4) {
     encounter = {
-      title: 'Olas pequeñas, pero desordenadas',
-      desc:  'El mar no tiene ritmo. Te va a mover más de lo que parece.',
+      title: 'Olas pequeñas pero constantes',
+      desc:  'Que te mantienen todo el rato en movimiento.',
     };
   } else if (d.waveH > 0.3) {
     encounter = {
       title: 'Algo de movimiento, pero suave',
-      desc:  'Pequeñas olas y ritmo regular. Nada que sorprenda.',
+      desc:  'Pequeñas olas con ritmo constante. No te van a descolocar.',
     };
   } else {
     encounter = {
       title: 'El mar está como una piscina',
-      desc:  'Sin olas y sin apenas movimiento. Todo se siente estable.',
+      desc:  'Sin olas y sin apenas movimiento. Se siente estable.',
     };
   }
 
@@ -400,12 +400,12 @@ function buildNarrativeBlocks(d, estado, warnings) {
   if (d.windKn > 20) {
     demand = {
       title: 'Remar se vuelve muy difícil',
-      desc:  'El viento te frena o te arrastra, y mantener el equilibrio cuesta mucho.',
+      desc:  'El viento puede frenarte o arrastrarte. Mantener el equilibrio cuesta mucho.',
     };
   } else if (d.windKn > 15) {
     demand = {
       title: 'Mantenerse de pie exige técnica',
-      desc:  'El viento empuja y el mar no ayuda. No puedes relajarte.',
+      desc:  'El viento empuja y el mar no ayuda. No se está mood relax.',
     };
   } else if (d.windKn > 10) {
     demand = {
@@ -427,16 +427,16 @@ function buildNarrativeBlocks(d, estado, warnings) {
   // Override: cuando el mar corto es lo que exige, no el viento
   if (d.wavePer < 4 && d.waveH > 0.3 && d.windKn <= 5) {
     demand = {
-      title: 'Remar no cuesta, pero mantenerse estable sí',
-      desc:  'El problema no es el viento — es el equilibrio con el mar corto.',
+      title: 'Remar no cuesta, pero no vas a estar estable',
+      desc:  'Aunque el viento sea suave, el mar te moverá constantemente.',
     };
   }
 
   // Override: ola media con viento suave — el equilibrio exige más que el esfuerzo de remar
   if (d.waveH > 0.6 && d.windKn <= 5) {
     demand = {
-      title: 'Remar no cuesta, pero mantenerse estable sí',
-      desc:  'El viento no es el problema. Las olas exigen equilibrio constante.',
+      title: 'Remar no cuesta, pero no vas a estar estable',
+      desc:  'Las olas te moverán constantemente y exigen equilibrio.',
     };
   }
 
@@ -445,8 +445,8 @@ function buildNarrativeBlocks(d, estado, warnings) {
   // Si no, el override de ola anterior ya ha puesto el mensaje correcto.
   if (variabilidad > 6 && d.windKn <= 5 && d.waveH <= 0.6) {
     demand = {
-      title: 'El viento base es suave, pero cambia de golpe',
-      desc:  'Las rachas pueden sorprenderte aunque la media parezca tranquila.',
+      title: 'El viento parece tranquilo, pero no lo es',
+      desc:  'Hay ratos de calma y otros en los que empuja de golpe.',
     };
   }
 
@@ -464,8 +464,8 @@ function buildNarrativeBlocks(d, estado, warnings) {
   if (terralWarningDemand && d.windKn <= 5 && d.waveH <= 0.6) {
     if (terralWarningDemand.nivel >= 2) {
       demand = {
-        title: 'Remar parece fácil, pero el viento te aleja de la orilla',
-        desc:  'El viento viene de tierra y te empuja hacia el mar. Si se pone más fuerte, volver va a costar más.',
+        title: 'Remar es fácil, pero el viento te aleja de la orilla',
+        desc:  'Viene de tierra y te empuja hacia el mar. Si se pone más fuerte, volver costará más.',
       };
     } else {
       demand = {

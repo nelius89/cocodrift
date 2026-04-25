@@ -56,13 +56,14 @@ Input: `waveH` (metros) + `wavePer` (segundos)
 
 | Condición | title | desc |
 |---|---|---|
-| waveH < 0.3m | El mar está como una piscina | Sin olas y sin apenas movimiento. Todo se siente estable. |
-| waveH 0.3–0.6m | Algo de movimiento, pero suave | Pequeñas olas y ritmo regular. Nada que sorprenda. |
-| waveH 0.6–1.0m | El mar tiene movimiento real | Olas medias y movimiento irregular. |
+| waveH ≤ 0.3m | El mar está como una piscina | Sin olas y sin apenas movimiento. Se siente estable. |
+| waveH 0.3–0.6m, wavePer ≥ 4s | Algo de movimiento, pero suave | Pequeñas olas con ritmo constante. No te van a descolocar. |
+| waveH 0.3–0.6m, wavePer < 4s | Olas pequeñas pero constantes | Que te mantienen todo el rato en movimiento. |
+| waveH 0.6–1.5m | El mar está movido | Las olas se notan y no tienen un ritmo claro. |
 | waveH > 1.0m ó (waveH > 0.6m y wavePer < 4s) | Mar movido y poco ordenado | Olas que no siguen un ritmo claro y viento incómodo. |
-| waveH > 1.5m | El mar está muy revuelto | Olas grandes, cortas y desordenadas. Todo se mueve a la vez. |
+| waveH > 1.5m | El mar está muy revuelto | Olas grandes, cortas y desordenadas. |
 
-Nota: el umbral de waveH > 1.5m tiene prioridad sobre el de > 1.0m.
+Nota: las condiciones se evalúan de mayor a menor gravedad (1.5m → 1.0m/cortas → 0.6m → 0.3m+cortas → 0.3m → piscina).
 
 ---
 
@@ -75,8 +76,8 @@ Input: `windKn` (nudos)
 | windKn < 5 | Remar está fácil y fluido | No hay resistencia ni esfuerzo extra. Puedes avanzar sin cansarte. |
 | windKn 5–10 | Se rema cómodo, algo de viento | Lo notas, pero no molesta ni condiciona. |
 | windKn 10–15 | Necesitarás mantener el equilibrio | Las rachas pueden descolocarte y remar ya exige esfuerzo. |
-| windKn 15–20 | Mantenerse de pie exige técnica | El viento empuja y el mar no ayuda. No puedes relajarte. |
-| windKn > 20 | Remar se vuelve muy difícil | El viento te frena o te arrastra, y mantener el equilibrio cuesta mucho. |
+| windKn 15–20 | Mantenerse de pie exige técnica | El viento empuja y el mar no ayuda. No se está mood relax. |
+| windKn > 20 | Remar se vuelve muy difícil | El viento puede frenarte o arrastrarte. Mantener el equilibrio cuesta mucho. |
 
 ---
 
@@ -99,7 +100,7 @@ Warnings críticos = categoría `alerta` o `cuidado` en el array de warnings.
 ## 5. Ejemplos completos
 
 ### Piscina — viento 4kn, ola 0.2m, periodo 8s
-- Encounter: "El mar está como una piscina" / "Sin olas y sin apenas movimiento. Todo se siente estable."
+- Encounter: "El mar está como una piscina" / "Sin olas y sin apenas movimiento. Se siente estable."
 - Demand: "Remar está fácil y fluido" / "No hay resistencia ni esfuerzo extra. Puedes avanzar sin cansarte."
 - Fit: "Es un día para cualquiera" / "Da igual el nivel. Es perfecto incluso si es tu primera vez."
 
@@ -115,13 +116,29 @@ Warnings críticos = categoría `alerta` o `cuidado` en el array de warnings.
 
 ### Exigente — viento 16kn, ola 1.1m, periodo 4s
 - Encounter: "Mar movido y poco ordenado" / "Olas que no siguen un ritmo claro y viento incómodo."
-- Demand: "Mantenerse de pie exige técnica" / "El viento empuja y el mar no ayuda. No puedes relajarte."
+- Demand: "Mantenerse de pie exige técnica" / "El viento empuja y el mar no ayuda. No se está mood relax."
 - Fit: "Solo para gente con experiencia" / "Si no tienes control, lo vas a pasar mal."
 
 ### No recomendable — viento 22kn, ola 1.6m, periodo 3s
-- Encounter: "El mar está muy revuelto" / "Olas grandes, cortas y desordenadas. Todo se mueve a la vez."
-- Demand: "Remar se vuelve muy difícil" / "El viento te frena o te arrastra, y mantener el equilibrio cuesta mucho."
+- Encounter: "El mar está muy revuelto" / "Olas grandes, cortas y desordenadas."
+- Demand: "Remar se vuelve muy difícil" / "El viento puede frenarte o arrastrarte. Mantener el equilibrio cuesta mucho."
 - Fit: "No es un día para salir" / "Las condiciones no son seguras, independientemente del nivel."
+
+---
+
+## 7. Overrides de Demand
+
+Cuando el factor dominante no es el viento base, se aplican overrides en este orden:
+
+| Condición | title | desc |
+|---|---|---|
+| wavePer < 4s && waveH > 0.3m && windKn ≤ 5 | Remar no cuesta, pero no vas a estar estable | Aunque el viento sea suave, el mar te moverá constantemente. |
+| waveH > 0.6m && windKn ≤ 5 | Remar no cuesta, pero no vas a estar estable | Las olas te moverán constantemente y exigen equilibrio. |
+| variabilidad > 6 && windKn ≤ 5 && waveH ≤ 0.6m | El viento parece tranquilo, pero no lo es | Hay ratos de calma y otros en los que empuja de golpe. |
+| terral ≥ 2 && windKn ≤ 5 && waveH ≤ 0.6m | Remar es fácil, pero el viento te aleja de la orilla | Viene de tierra y te empuja hacia el mar. Si se pone más fuerte, volver costará más. |
+| terral = 1 && windKn ≤ 5 && waveH ≤ 0.6m | El viento viene de tierra, hoy está suave | Te empuja un poco hacia el mar. No es un problema si no te alejas demasiado. |
+
+Los overrides se aplican en ese orden — el último en pasar sobreescribe el anterior.
 
 ---
 
