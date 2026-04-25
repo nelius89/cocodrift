@@ -1,6 +1,6 @@
 # Cocodrift — Estado del proyecto
 _Actualizar al inicio/cierre de cada sesión de trabajo._
-_Última actualización: abril 2026 — rama v1.1_
+_Última actualización: abril 2026 — rama v2.0_
 
 ---
 
@@ -25,149 +25,75 @@ Sin login. Sin historial. Funciona offline (Service Worker).
 |---|---|
 | `main` | Producción (Cloudflare auto-deploy) |
 | `dev` | Staging |
-| `ui-lab` | Experimentos anteriores |
-| `v1.1` | **Rama activa** — sistema diagnóstico v2 + nuevos bloques |
+| `ui-lab` | Experimentos visuales anteriores (archivada) |
+| `v1.1` | Sistema diagnóstico v2 — base de v2.0 |
+| `v2.0` | **Rama activa** — rediseño visual completo |
 
-**Regla:** nunca mergear `v1.1` → `dev`/`main` sin confirmación explícita.
+**Regla:** nunca mergear `v2.0` → `dev`/`main` sin confirmación explícita.
 
 ---
 
 ## Estado actual (abril 2026)
 
-### Lo que está implementado en v1.1
+### Lo que está implementado en v2.0
 
-- **Sistema de diagnóstico v2** — `js/score.js`
-  - Reglas directas por variable (sin scoring ponderado)
-  - 5 estados: piscina / muy-agradable / se-puede-salir / exigente / no-recomendable
-  - `diagnosticar()` como punto de entrada único
-  - `calcularVariabilidad()` — variable propia de Cocodrift
-  - `getWarnings()` — 4 tipos de avisos con nivel + categoría + copy
-  - Regla de acumulación (≥2 avisos nivel-3 → estado baja uno)
-  - `buildAlertaConsolidada()` — pastilla única para no-recomendable
-  - `getUserFit()` — función escrita (no conectada al DOM todavía)
+**Header / Hero (zona azul)**
+- Topbar: botón atrás (izquierda) + estrella favorito (derecha), misma línea
+- Nombre del spot centrado (18px/700), una línea con ellipsis
+- Ciudad centrada con icono pin
 
-- **app.js** — migrado a `diagnosticar()`, `ILLUS_MAP` actualizado
-  - `renderWarnings()` — renderiza pastilla consolidada o acordeón según estado
-  - `initWarningsToggle()` — acordeón "A saber antes de salir"
-  - Frase de cierre conectada al DOM (`diagnosis-closing`)
+**Navegación temporal**
+- 3 tabs fijos: Hoy · Mañana · 7 días (pill selector animado)
+- Lógica: `currentDay = 0/1`, `showSevenDay` flag para tab 7 días
+- Vista 7 días: pantalla vacía (placeholder)
 
-- **HTML/CSS (bloques v1.1)**
-  - `.diagnosis__closing` — frase de cierre atemporal
-  - `.alerta-consolidada` — pastilla negra para no-recomendable
-  - `.warnings-section` — acordeón "A saber antes de salir" con color coding por nivel
-  - Versión v1.1 visible en menú y about sheet
+**Franjas horarias**
+- 4 franjas: Amanecer (6–9h) · Día (9–18h) · Tarde (18–21h) · Noche (21–6h)
+- Visual: nombre de franja + icono weather real del API + temperatura en grados
+- **Sliding pill indicator**: indicator absoluto animado con `transform: translateX`, `cubic-bezier(0.25, 0.46, 0.45, 0.94)`, color transition en texto
 
-### Lo que NO está implementado todavía
+**Zona resultado (scrollable, fondo beige)**
+- Diagnosis: pre-label + ilustración por estado + título
+- 3 bloques narrativos con icono SVG + título bold + descripción
+- Tech blocks inline: Viento (dirección + compass + velocidad + rachas + terral + variabilidad) y Oleaje (altura + período + dirección + fondo + viento + tipo)
+- Info sheets por métrica (bottom sheet con rangos)
+- Popup "A saber" y Sugerencias como bottom sheets
 
-- **Rediseño visual completo** — el diseño actual (pantallazo de referencia) no refleja la spec de diseño. La estructura lógica está pero el CSS visual está pendiente. Ver sección de diseño abajo.
-- **`getUserFit()` sin conectar al DOM** — función lista en score.js, sin renderizado
-- **Token temporal** — pendiente de decisión de lógica completa (ver sección abajo)
+**Sistema de diagnóstico (`score.js`)** — sin cambios desde v1.1
+- 5 estados, reglas directas, `diagnosticar()`, `calcularVariabilidad()`, `buildNarrativeBlocks()`
+
+### Pendiente / no implementado
+
+- Vista de 7 días — placeholder vacío, lógica sin construir
+- Token temporal en el copy (ver decisiones)
+- `getUserFit()` — función en score.js sin conectar al DOM
 
 ---
 
-## Diseño visual pendiente — spec completa
-
-### Diseño actual (estado del pantallazo, lo que hay que cambiar)
-
-El diseño actual muestra:
-- Header azul full-width con nombre del spot grande (h1), ciudad + icono clima + temperatura, fecha/hora
-- Franja "Ver más tarde" — tira delgada azul claro
-- Bocadillo con borde azul, bg blanco, título bold azul + subtítulo gris azulado
-- Ilustración del cocodrilo
-- Bloques narrativos: texto bold azul centrado + descripción gris centrada (sin icono visible)
-- Pastilla negra terral: icono ! circular · título uppercase · descripción · consejo en bold — elemento separado, encima del acordeón
-- Acordeón "01 TEN EN CUENTA": cards azul-tinted con icono de viento + texto bold + desc
-- Acordeón "02 INFORMACIÓN DETALLADA" y "03 INFORMACIÓN DETALLADA" colapsados
-
-### Lo que debe cambiar en el rediseño visual
-
-1. **Terral pill + pastilla negra actual → sustituir**
-   - La pastilla negra grande con el terral debe desaparecer como elemento independiente
-   - El terral pasa a ser un item dentro del acordeón "A saber antes de salir"
-   - La terral-pill pequeña (badge arriba) también puede eliminarse — el acordeón la cubre
-   - Excepción: si terral nivel 3 (Alerta), puede quedar fuera del acordeón como pastilla prominente
-
-2. **Acordeón "01 TEN EN CUENTA" → sustituir por "A saber antes de salir"**
-   - Nuevo nombre del acordeón
-   - Items: label + bullet de color + copy (sin cards azules, sin iconos)
-   - Color coding: rojo para Alerta, ámbar para Cuidado, gris para A tener en cuenta
-   - El acordeón empieza cerrado
-   - Muestra el número de avisos en el header del acordeón
-
-3. **Frase de cierre** — aparece debajo de los bloques narrativos, antes del acordeón
-   - Texto pequeño, gris, itálica o regular
-   - Ej: "El mar no va a sorprenderte. El viento, a ratos sí."
-
-4. **Bloques narrativos** — revisar peso visual
-   - Actualmente el texto está centrado y es grande
-   - Spec: icono + título bold 15px + descripción 14px gris, alineado a la izquierda
-
-5. **Secciones técnicas** — renombrar
-   - "02 INFORMACIÓN DETALLADA" → "Ver por qué" (ya hay un botón, unificar)
-   - Eliminar duplicados / simplificar
-
-6. **Tipografía según spec** (de `sistema-diagnostico.md` sección 10):
-
-| Elemento | Tamaño | Peso | Color |
-|---|---|---|---|
-| Título bocadillo | 28–32px | bold | azul corporativo |
-| Subtítulo bocadillo | 15–16px | regular | gris medio |
-| Narrativa título | 15px | bold | negro |
-| Narrativa desc | 14px | regular | gris |
-| Frase de cierre | 14px | regular | gris medio |
-| Alerta copy | 14px | regular | oscuro |
-| Cuidado (acordeón) | 14px | regular | oscuro · bullet ámbar |
-| A tener en cuenta | 13px | regular | gris · bullet gris |
-
-### Orden de bloques en pantalla (definitivo)
+## Orden de bloques en pantalla (implementado)
 
 ```
-HEADER (fijo arriba)
-  ← Nombre del spot · ☰ menú
+ZONA AZUL (fija)
+  ← back                              ★ favorito
+  [Nombre del spot centrado]
+  [📍 Ciudad]
+  [Hoy]  [Mañana]  [7 días]
+  ─────────────────────────────
+  [Amanecer ☀ 18°] [Día ⛅ 22°] [Tarde 🌤 20°] [Noche 🌙 16°]
 
-TIME-NAV
-  días + slider de franja
+ZONA BEIGE (scroll)
+  ¿Está para salir?
+  [ilustración]
+  TÍTULO DEL ESTADO
 
-────────────────────────── (scroll)
+  [bloque narrativo 1: qué te vas a encontrar]
+  [bloque narrativo 2: qué te va a pedir]
+  [bloque narrativo 3: para quién encaja]
 
-BOCADILLO
-  Título (estado)
-  Subtítulo (¿es para mí?)
+  [tech block: Viento]
+  [tech block: Oleaje]
 
-ILUSTRACIÓN COCODRILO
-
-BLOQUE AMBIENTAL
-  icono clima · temperatura
-
-NARRATIVA VIENTO
-  icono · título bold · desc gris
-
-NARRATIVA MAR
-  icono · título bold · desc gris
-
-FRASE DE CIERRE
-  texto gris, atemporal
-
-────────────
-
-PASTILLA CONSOLIDADA (solo no-recomendable)
-  bg negro · texto explicativo del motivo
-
-O
-
-ACORDEÓN "A saber antes de salir" (si hay avisos no-narrativa)
-  [header: label · count · flecha]
-  [items: bullet color · label · copy]
-
-────────────
-
-"VER POR QUÉ" (botón toggle)
-
-BLOQUE TÉCNICO (colapsado por defecto)
-  4 métricas: viento · rachas · ola · período
-  3 párrafos por métrica + cierre
-
-────────────────────────── (fin scroll)
+  nota legal inferior
 ```
 
 ---
@@ -183,9 +109,6 @@ Hay que definir un sistema de referencia temporal dinámica:
 | Franja posterior, hoy | "esta tarde" / "esta noche" |
 | Día siguiente | "mañana" |
 | Días futuros | "el martes" / "el miércoles" |
-
-El token se inyecta en título y subtítulo del bocadillo donde tenga sentido.
-`getUserFit(estado, warnings, timeRef)` y `buildBlocks` recibirán `timeRef` cuando se implemente.
 
 **No implementar hasta decidir la lógica completa.**
 
@@ -228,6 +151,6 @@ El token se inyecta en título y subtítulo del bocadillo donde tenga sentido.
 
 1. Leer este archivo
 2. Leer `docs/sistema-diagnostico.md` si se va a trabajar en lógica o copy
-3. Rama activa: `v1.1`
-4. **El próximo trabajo es el rediseño visual** — ver sección "Diseño visual pendiente"
+3. Rama activa: `v2.0`
+4. **Próximos trabajos posibles:** vista 7 días, token temporal, refinado visual
 5. No tocar `score.js` ni el sistema de diagnóstico — está cerrado

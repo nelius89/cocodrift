@@ -64,5 +64,6 @@ El diseño actual respeta los principios 1, 2 y 4 bien. El principio 3 (personal
 - **Tipografía:** Geist Mono — técnica pero accesible, da carácter sin ser ruidosa
 - **Paleta base:** `#314fff` (azul) + `#f9f6ef` (beige) + `#0a0a0a` (negro)
 - **Ilustraciones:** PNG con fondo transparente, sin contenedor circular
-- **Métricas:** 2 slides — datos visuales (slide 1) + resumen de texto (slide 2)
-- **Terral:** Bottom sheet en lugar de expand inline — no rompe el layout principal
+- **Métricas:** Tech blocks inline (viento + oleaje) en zona scrollable — sin slides
+- **Terral:** Info sheet por métrica (bottom sheet) — no rompe el layout principal
+- **Animaciones:** `cubic-bezier(0.25, 0.46, 0.45, 0.94)` como curva estándar de transición

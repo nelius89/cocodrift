@@ -1,43 +1,40 @@
 # Features — Inventario por fase
 
-_Última actualización: 2026-04-17_
+_Última actualización: 2026-04-25_
 
 ---
 
-## V1 (actual — casi terminada)
+## V1 (base — implementada en rama v1.1)
 
-### Core
-- [x] Diagnóstico principal: estado del mar con título + descripción en lenguaje natural
-- [x] Ilustraciones por estado (Perfecto, Bueno; resto pendiente)
-- [x] Métricas detalladas: temperatura, viento, ola, rachas, período, dirección
-- [x] Resumen de texto (slide 2)
-- [x] Aviso de terral con bottom sheet explicativo
-- [x] Previsión 7 días con navegación por días
-- [x] Franjas horarias (7 franjas por día)
-- [x] 2 spots hardcoded: Pont del Petroli (Badalona) y Platja del Llevant (Barcelona)
-- [x] Añadir spots propios (búsqueda por geocoding)
-- [x] Máximo 10 spots (8 usuario + 2 hardcoded)
+### Core implementado
+- [x] Diagnóstico principal: 5 estados con título + ilustración
+- [x] Sistema de diagnóstico v2: reglas directas, `diagnosticar()`, `calcularVariabilidad()`
+- [x] 3 bloques narrativos (qué te encontrarás / qué te pedirá / para quién encaja)
+- [x] Tech blocks: viento (dirección, media, rachas, terral, variabilidad) + oleaje (altura, período, dirección, fondo, tipo)
+- [x] Info sheets por métrica (bottom sheet con rangos explicados)
+- [x] Aviso de terral con nivel + copy
+- [x] 4 franjas horarias: Amanecer / Día / Tarde / Noche
+- [x] Añadir spots propios (búsqueda por geocoding — Nominatim)
 - [x] Caché de API (60 min TTL)
-- [x] Diseño responsive mobile-first
-
-### Pendiente para cerrar V1
-- [ ] Ilustraciones para estados Aceptable, Complicado, No salir
-- [ ] Pantalla "Acerca de" con disclaimer y atribuciones
-- [ ] PWA: manifest.json + service worker
-- [ ] Cloudflare Web Analytics activado
-- [ ] Renombrar a Coco (title, metadatos, icono)
+- [x] PWA: manifest.json + service worker
+- [x] Cloudflare Web Analytics
+- [x] About sheet + Suggestions sheet
 
 ---
 
-## V2 (post-lanzamiento stores)
+## V2 (rama activa — v2.0)
 
-_Definir prioridades según feedback de usuarios_
+### Rediseño visual implementado
+- [x] Header/hero: nombre centrado, estrella favorito en topbar derecha
+- [x] Selector de día: 3 tabs fijos (Hoy / Mañana / 7 días) en lugar de dropdown
+- [x] Franjas: icono weather real del API + temperatura por franja
+- [x] Sliding pill indicator animado en selector de franjas
+- [x] Vista 7 días: placeholder vacío
 
-- [ ] Ilustraciones completas para todos los estados
-- [ ] Mejoras UX según feedback
-- [ ] Deportes: parámetros ajustados para surf (ola más relevante que viento)
-- [ ] Geolocalización opcional (sugerir spot más cercano)
-- [ ] Compartir condiciones (screenshot generado o link)
+### Pendiente en v2.0
+- [ ] Vista 7 días con contenido real
+- [ ] Token temporal en copy (ver estado-proyecto.md)
+- [ ] Ilustraciones para todos los estados (faltan algunas)
 
 ---
 
