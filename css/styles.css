@@ -603,6 +603,25 @@ ul { list-style: none; }
   width: 100%;
   padding: 8px 12px 14px;
   gap: 6px;
+  position: relative;
+}
+
+/* Pill deslizante — se mueve con transform */
+.results__franja-indicator {
+  position: absolute;
+  top: 8px;
+  left: 0;
+  height: calc(100% - 22px);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  border-radius: 14px;
+  pointer-events: none;
+  z-index: 0;
+  transition: transform 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              width   0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.results__franja-indicator.no-transition {
+  transition: none;
 }
 
 .results__franja-pill {
@@ -612,19 +631,17 @@ ul { list-style: none; }
   align-items: center;
   gap: 6px;
   padding: 10px 4px;
-  border: 1.5px solid transparent;
+  border: none;
   border-radius: 14px;
   background: transparent;
   cursor: pointer;
   color: rgba(255, 255, 255, 0.45);
-  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  transition: color 0.28s ease;
   font-family: var(--font);
+  position: relative;
+  z-index: 1;
 }
-.results__franja-pill.active {
-  color: var(--white);
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.3);
-}
+.results__franja-pill.active { color: var(--white); }
 .results__franja-pill:active { opacity: 0.6; }
 
 .results__franja-name {

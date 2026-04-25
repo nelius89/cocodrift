@@ -259,10 +259,30 @@ function renderDayTabs() {
   });
 }
 
+// Mueve el indicator al pill indicado (con o sin animación)
+function positionFranjaIndicator(index, animate) {
+  const container = document.getElementById('results-franjas-pills');
+  if (!container) return;
+  const indicator = container.querySelector('.results__franja-indicator');
+  const pills     = container.querySelectorAll('.results__franja-pill');
+  if (!indicator || !pills[index]) return;
+  const pill = pills[index];
+  if (!animate) indicator.classList.add('no-transition');
+  else          indicator.classList.remove('no-transition');
+  indicator.style.width     = pill.offsetWidth + 'px';
+  indicator.style.transform = `translateX(${pill.offsetLeft}px)`;
+}
+
 // Franjas — nombre + icono weather real + temperatura
 function renderFranjas() {
   const container = document.getElementById('results-franjas-pills');
   container.innerHTML = '';
+
+  // Indicator — se renderiza primero para quedar detrás de los pills (z-index)
+  const indicator = document.createElement('div');
+  indicator.className = 'results__franja-indicator no-transition';
+  container.appendChild(indicator);
+
   FRANJAS.forEach((f, i) => {
     let weatherIcon = '';
     let tempStr = '';
@@ -281,11 +301,18 @@ function renderFranjas() {
     pill.addEventListener('click', () => {
       if (showSevenDay) return;
       currentFranja = i;
-      renderFranjas();
+      // Animar indicator y transición de color
+      positionFranjaIndicator(i, true);
+      container.querySelectorAll('.results__franja-pill').forEach((p, idx) => {
+        p.classList.toggle('active', idx === i);
+      });
       renderResults(sliderIndex(currentDay, currentFranja));
     });
     container.appendChild(pill);
   });
+
+  // Posicionar indicator tras pintar el DOM (sin animación)
+  requestAnimationFrame(() => positionFranjaIndicator(currentFranja, false));
 }
 
 // ── Cargar datos y mostrar resultados ──
