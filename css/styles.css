@@ -677,8 +677,11 @@ ul { list-style: none; }
 .narrative-blocks {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0;
 }
+
+.narrative-block:nth-child(1) { margin-bottom: 48px; }
+.narrative-block:nth-child(2) { margin-bottom: 24px; }
 
 .narrative-block {
   display: flex;
