@@ -776,6 +776,7 @@ ul { list-style: none; }
 .tech-grid-row--3   { grid-template-columns: repeat(3, 1fr); }
 .tech-grid-row--2   { grid-template-columns: 1fr 1fr; }
 .tech-grid-row--dir { grid-template-columns: 1.7fr 1fr 1fr; }
+.tech-grid-row--dir-2 { grid-template-columns: 1.7fr 2fr; }
 
 .tech-cell {
   padding: 10px 12px 10px;

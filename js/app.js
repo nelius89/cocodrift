@@ -677,15 +677,7 @@ function renderTechBlocks(d, warnings) {
           <div class="tech-cell__sub">${d.gustKmh} km/h</div>
         </div>
       </div>
-      <div class="tech-grid-row tech-grid-row--2">
-        <div class="tech-cell tech-cell--${sVar}" data-info="wind-variability">
-          <div class="tech-cell__top">
-            <span class="tech-cell__label">Variabilidad</span>
-            ${stateIcon(sVar, 'wind-variability')}
-          </div>
-          <div class="tech-cell__value tech-cell__value--wind">${variabilidad.toFixed(1)} <em class="tech-cell__unit-inline">nudos</em></div>
-          <div class="tech-cell__sub">(rachas − media)</div>
-        </div>
+      <div class="tech-grid-row tech-grid-row--dir-2">
         ${terralLevel === 0
           ? `<div class="tech-cell tech-cell--ok" data-info="terral">
               <div class="tech-cell__top">
@@ -707,7 +699,15 @@ function renderTechBlocks(d, warnings) {
                   ${terralMetaIcon}
                 </button>
               </div>
-            </div>`
+            </div>`}
+        <div class="tech-cell tech-cell--${sVar}" data-info="wind-variability">
+          <div class="tech-cell__top">
+            <span class="tech-cell__label">Variabilidad</span>
+            ${stateIcon(sVar, 'wind-variability')}
+          </div>
+          <div class="tech-cell__value tech-cell__value--wind">${variabilidad.toFixed(1)} <em class="tech-cell__unit-inline">nudos</em></div>
+          <div class="tech-cell__sub">(rachas − media)</div>
+        </div>
         }
       </div>
     </div>
