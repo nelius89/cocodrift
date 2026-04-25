@@ -435,11 +435,11 @@ ul { list-style: none; }
 }
 
 .results__spot-name {
-  font-size: 26px;
-  font-weight: 900;
+  font-size: 18px;
+  font-weight: 700;
   color: var(--white);
-  letter-spacing: -0.02em;
-  line-height: 1.1;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
