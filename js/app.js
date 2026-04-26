@@ -310,12 +310,36 @@ function renderSpotList() {
 // ── Navegación temporal v2.0 ──
 
 // Day tabs: Hoy | Mañana | 7 días
-function renderDayTabs() {
+function positionDayIndicator(animate) {
+  const container = document.querySelector('.results__day-tabs');
+  if (!container) return;
+  const indicator = container.querySelector('.results__day-indicator');
+  const activeTab = container.querySelector('.results__day-tab--active');
+  if (!indicator || !activeTab) return;
+
+  if (!animate) {
+    indicator.classList.add('no-transition');
+    // forzar reflow antes de mover sin transición
+    indicator.getBoundingClientRect();
+  } else {
+    indicator.classList.remove('no-transition');
+  }
+
+  indicator.style.width     = activeTab.offsetWidth + 'px';
+  indicator.style.transform = `translateX(${activeTab.offsetLeft}px)`;
+}
+
+function renderDayTabs(animate = false) {
   document.querySelectorAll('.results__day-tab').forEach(tab => {
     const day = tab.dataset.day;
     const isActive = showSevenDay ? day === '7' : day === String(currentDay);
     tab.classList.toggle('results__day-tab--active', isActive);
   });
+  if (animate) {
+    positionDayIndicator(true);
+  } else {
+    requestAnimationFrame(() => positionDayIndicator(false));
+  }
 }
 
 // Mueve el indicator al pill indicado (con o sin animación)
@@ -1190,6 +1214,14 @@ function selectGeoResult(result) {
 
 // ── Event listeners ──
 document.addEventListener('DOMContentLoaded', () => {
+  // Inyectar indicator deslizante en day tabs
+  const dayTabsContainer = document.querySelector('.results__day-tabs');
+  if (dayTabsContainer) {
+    const dayIndicator = document.createElement('div');
+    dayIndicator.className = 'results__day-indicator no-transition';
+    dayTabsContainer.prepend(dayIndicator);
+  }
+
   renderSpotList();
   showView('view-home');
   initInstallButton();
@@ -1248,14 +1280,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const day = parseInt(tab.dataset.day);
       if (day === 7) {
         showSevenDay = true;
-        renderDayTabs();
+        renderDayTabs(true);
         renderFranjas();
         document.getElementById('results-main-content').classList.add('hidden');
         document.getElementById('results-seven-day').classList.remove('hidden');
       } else {
         showSevenDay = false;
         currentDay = day;
-        renderDayTabs();
+        renderDayTabs(true);
         renderFranjas();
         document.getElementById('results-main-content').classList.remove('hidden');
         document.getElementById('results-seven-day').classList.add('hidden');
