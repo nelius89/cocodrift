@@ -45,16 +45,48 @@ ul { list-style: none; }
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transition: opacity 0.25s ease, transform 0.25s ease;
-  opacity: 0;
   pointer-events: none;
-  transform: translateX(20px);
+  backface-visibility: hidden;
 }
 
 .view.active {
-  opacity: 1;
   pointer-events: auto;
-  transform: translateX(0);
+}
+
+/* ── Transición Home: scale-back al presentar results ── */
+.view--home.fx-dim {
+  transform: scale(0.94);
+  opacity: 0.7;
+  transition: transform 0.44s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity   0.44s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.view--home.fx-undim {
+  transform: scale(1);
+  opacity: 1;
+  transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity   0.38s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ── Transición Results: card que sube / baja ── */
+.view--results.fx-enter {
+  transform: translateY(0);
+  transition: transform 0.44s cubic-bezier(0.34, 1.12, 0.64, 1);
+}
+.view--results.fx-exit {
+  transform: translateY(100%);
+  transition: transform 0.30s cubic-bezier(0.4, 0, 1, 1);
+}
+
+/* ── Accesibilidad: sin movimiento ── */
+@media (prefers-reduced-motion: reduce) {
+  .view--home.fx-dim,
+  .view--home.fx-undim,
+  .view--results.fx-enter,
+  .view--results.fx-exit {
+    transition: opacity 0.15s ease;
+  }
+  .view--results.fx-enter  { transform: translateY(0); }
+  .view--results.fx-exit   { transform: translateY(100%); }
 }
 
 /* ─────────────────────────────────────────
@@ -314,6 +346,8 @@ ul { list-style: none; }
   color: var(--black);
   display: flex;
   flex-direction: column;
+  transform: translateY(100%);
+  will-change: transform;
 }
 
 /* ── Zona azul ── */

@@ -105,10 +105,55 @@ let _historyNavigation = false;
 let _currentState = null;
 
 // ── Vistas ──
+let _txTimer = null;
+
+function transitionViews(toId, direction) {
+  if (_txTimer) { clearTimeout(_txTimer); _txTimer = null; }
+
+  const homeEl    = document.getElementById('view-home');
+  const resultsEl = document.getElementById('view-results');
+
+  if (direction === 'forward') {
+    // Home retrocede; Results sube como card
+    homeEl.classList.remove('fx-undim');
+    homeEl.classList.add('fx-dim');
+
+    resultsEl.classList.remove('fx-exit');
+    resultsEl.classList.add('active');
+    // doble rAF: garantiza que el browser pinta translateY(100%) antes de animar
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      resultsEl.classList.add('fx-enter');
+    }));
+
+    // Ocultar home tras la animación (queda detrás de results)
+    _txTimer = setTimeout(() => {
+      homeEl.classList.remove('active');
+      _txTimer = null;
+    }, 460);
+
+  } else {
+    // Results baja; Home vuelve a primer plano
+    homeEl.classList.add('active');
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      homeEl.classList.remove('fx-dim');
+      homeEl.classList.add('fx-undim');
+    }));
+
+    resultsEl.classList.add('fx-exit');
+
+    _txTimer = setTimeout(() => {
+      resultsEl.classList.remove('active', 'fx-enter', 'fx-exit');
+      homeEl.classList.remove('fx-undim');
+      _txTimer = null;
+    }, 320);
+  }
+
+  document.body.dataset.view = toId;
+}
+
 function _applyView(id) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  document.body.dataset.view = id;
+  // Usado solo para el estado inicial y popstate
+  transitionViews(id, id === 'view-home' ? 'back' : 'forward');
 }
 
 function showView(id) {
@@ -120,7 +165,7 @@ function showView(id) {
     history.replaceState(newState, '');
   }
   _currentState = newState;
-  _applyView(id);
+  transitionViews(id, id === 'view-results' ? 'forward' : 'back');
 }
 
 // ── Abreviatura de ciudad ──
