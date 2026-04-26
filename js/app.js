@@ -368,22 +368,70 @@ function refreshWithFade(el, renderFn, inClass, outMs) {
   }, outMs);
 }
 
-// Slide direccional → render → slide in con stagger (cambio de franja)
+// Slide direccional → render → spring in + stagger opacity (cambio de franja)
 function refreshFranjaContent(oldIndex, newIndex) {
-  const el = document.getElementById('results-main-content');
-  const dir = newIndex > oldIndex ? 'next' : 'prev';
-  const outClass = `data-refreshing--${dir}`;
-  const inClass  = `data-refresh-in--${dir}`;
+  const el  = document.getElementById('results-main-content');
+  const dir = newIndex > oldIndex ? 1 : -1; // 1 = siguiente, -1 = anterior
 
-  el.classList.remove('data-refresh-in--next', 'data-refresh-in--prev');
-  el.classList.add(outClass);
+  // Reducir movimiento si el usuario lo prefiere
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    renderResults(sliderIndex(currentDay, newIndex));
+    return;
+  }
+
+  // ── Fase 1: salida (exit) ──────────────────────────────────────────────
+  el.style.transition = 'transform 0.14s cubic-bezier(0.4, 0, 1, 1), opacity 0.10s ease';
+  el.style.transform  = `translateX(${dir * -50}px)`;
+  el.style.opacity    = '0';
+  el.style.pointerEvents = 'none';
 
   setTimeout(() => {
+    // ── Fase 2: snap al lado contrario + render ────────────────────────
+    el.style.transition = 'none';
+    el.style.transform  = `translateX(${dir * 70}px)`;
+    el.style.opacity    = '1';
+
     renderResults(sliderIndex(currentDay, newIndex));
-    el.classList.remove(outClass);
-    el.classList.add(inClass);
-    setTimeout(() => el.classList.remove(inClass), 400);
-  }, 100);
+
+    // Pre-ocultar elementos para el stagger
+    const items = [
+      el.querySelector('.diagnosis'),
+      ...el.querySelectorAll('.narrative-block')
+    ].filter(Boolean);
+    items.forEach(item => {
+      item.style.transition = 'none';
+      item.style.opacity    = '0';
+    });
+
+    // Forzar reflow — garantiza que el browser aplica el estado inicial
+    el.getBoundingClientRect();
+
+    // ── Fase 3a: spring del contenedor ────────────────────────────────
+    el.style.transition    = 'transform 0.42s cubic-bezier(0.34, 1.12, 0.64, 1)';
+    el.style.transform     = 'translateX(0)';
+    el.style.pointerEvents = 'auto';
+
+    // ── Fase 3b: stagger de elementos (solo opacity) ───────────────────
+    items.forEach((item, i) => {
+      setTimeout(() => {
+        item.style.transition = 'opacity 0.22s ease';
+        item.style.opacity    = '1';
+        setTimeout(() => {
+          item.style.transition = '';
+          item.style.opacity    = '';
+        }, 240);
+      }, i * 40); // diagnosis 0ms · bloque1 40ms · bloque2 80ms · bloque3 120ms
+    });
+
+    // Limpiar contenedor tras el spring
+    setTimeout(() => {
+      el.style.transition    = '';
+      el.style.transform     = '';
+      el.style.opacity       = '';
+      el.style.pointerEvents = '';
+    }, 460);
+
+  }, 110); // overlap: exit 140ms, entrance arranca a 110ms
 }
 
 // Franjas — nombre + icono weather real + temperatura

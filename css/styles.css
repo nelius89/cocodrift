@@ -96,17 +96,8 @@ ul { list-style: none; }
     animation: resultFadeIn 0.20s ease both;
     animation-delay: 0s !important;
   }
-  .data-refreshing,
-  .data-refreshing--next,
-  .data-refreshing--prev { animation: none; opacity: 0; }
+  .data-refreshing { animation: none; opacity: 0; }
   .data-refresh-in--day { animation: resultFadeIn 0.12s ease forwards; }
-  .data-refresh-in--next .diagnosis,
-  .data-refresh-in--next .narrative-block,
-  .data-refresh-in--prev .diagnosis,
-  .data-refresh-in--prev .narrative-block {
-    animation: resultFadeIn 0.12s ease both;
-    animation-delay: 0s !important;
-  }
 }
 
 /* ─────────────────────────────────────────
@@ -130,67 +121,7 @@ ul { list-style: none; }
   animation: dataInDay 0.22s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-/* Cambio de franja — slide direccional */
-@keyframes slideOutLeft {
-  to { opacity: 0; transform: translateX(-16px); }
-}
-@keyframes slideOutRight {
-  to { opacity: 0; transform: translateX(16px); }
-}
-@keyframes slideInRight {
-  from { opacity: 0; transform: translateX(24px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-@keyframes slideInLeft {
-  from { opacity: 0; transform: translateX(-24px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-
-/* Salida según dirección */
-.data-refreshing--next {
-  animation: slideOutLeft  0.10s ease forwards;
-  pointer-events: none;
-}
-.data-refreshing--prev {
-  animation: slideOutRight 0.10s ease forwards;
-  pointer-events: none;
-}
-
-/* Entrada — siguiente franja (hacia adelante en el tiempo) */
-.data-refresh-in--next .diagnosis {
-  animation: slideInRight 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: 0ms;
-}
-.data-refresh-in--next .narrative-block:nth-child(1) {
-  animation: slideInRight 0.20s cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: 50ms;
-}
-.data-refresh-in--next .narrative-block:nth-child(2) {
-  animation: slideInRight 0.20s cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: 100ms;
-}
-.data-refresh-in--next .narrative-block:nth-child(3) {
-  animation: slideInRight 0.20s cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: 150ms;
-}
-
-/* Entrada — franja anterior (hacia atrás en el tiempo) */
-.data-refresh-in--prev .diagnosis {
-  animation: slideInLeft 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: 0ms;
-}
-.data-refresh-in--prev .narrative-block:nth-child(1) {
-  animation: slideInLeft 0.20s cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: 50ms;
-}
-.data-refresh-in--prev .narrative-block:nth-child(2) {
-  animation: slideInLeft 0.20s cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: 100ms;
-}
-.data-refresh-in--prev .narrative-block:nth-child(3) {
-  animation: slideInLeft 0.20s cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: 150ms;
-}
+/* Cambio de franja — gestionado con inline styles en JS (refreshFranjaContent) */
 
 /* ─────────────────────────────────────────
    ANIMACIONES DE ENTRADA — Results content
@@ -887,6 +818,7 @@ ul { list-style: none; }
 .results__body {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   padding: 20px 16px calc(40px + env(safe-area-inset-bottom, 0px));
