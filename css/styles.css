@@ -113,28 +113,28 @@ ul { list-style: none; }
 
 /* Hero: texto (nombre + ciudad) — fade sin movimiento */
 .view--results.fx-enter .results__hero {
-  animation: resultFadeIn 0.22s ease both;
-  animation-delay: 0.08s;
+  animation: resultFadeIn 0.26s ease both;
+  animation-delay: 0.10s;
 }
 
 /* Diagnosis (¿Está para salir? + ilustración + título) */
 .view--results.fx-enter .diagnosis {
-  animation: resultFadeUp 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: 0.20s;
+  animation: resultFadeUp 0.40s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 0.24s;
 }
 
-/* Narrative blocks — staggered */
+/* Narrative blocks — staggered, más tarde para dejar leer el titular */
 .view--results.fx-enter .narrative-block:nth-child(1) {
-  animation: resultFadeUp 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: 0.28s;
+  animation: resultFadeUp 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 0.50s;
 }
 .view--results.fx-enter .narrative-block:nth-child(2) {
-  animation: resultFadeUp 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: 0.34s;
+  animation: resultFadeUp 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 0.58s;
 }
 .view--results.fx-enter .narrative-block:nth-child(3) {
-  animation: resultFadeUp 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: 0.40s;
+  animation: resultFadeUp 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 0.66s;
 }
 
 /* ─────────────────────────────────────────
