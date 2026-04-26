@@ -388,6 +388,11 @@ function buildNarrativeBlocks(d, estado, warnings) {
       title: 'Algo de movimiento, pero suave',
       desc:  'Pequeñas olas con ritmo constante. Nada preocupante.',
     };
+  } else if (d.wavePer < 7) {
+    encounter = {
+      title: 'El mar está casi plano',
+      desc:  'Olas pequeñas en la orilla pueden descolocar al empezar, pero fuera se siente estable.',
+    };
   } else {
     encounter = {
       title: 'El mar está como una piscina',
