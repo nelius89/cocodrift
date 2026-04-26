@@ -25,6 +25,7 @@ html, body {
   overflow: hidden;
   font-family: var(--font);
   -webkit-font-smoothing: antialiased;
+  background: var(--blue);
 }
 
 button {
@@ -87,6 +88,53 @@ ul { list-style: none; }
   }
   .view--results.fx-enter  { transform: translateY(0); }
   .view--results.fx-exit   { transform: translateY(100%); }
+
+  /* Sin movimiento: solo fade */
+  .view--results.fx-enter .results__hero,
+  .view--results.fx-enter .diagnosis,
+  .view--results.fx-enter .narrative-block {
+    animation: resultFadeIn 0.20s ease both;
+    animation-delay: 0s !important;
+  }
+}
+
+/* ─────────────────────────────────────────
+   ANIMACIONES DE ENTRADA — Results content
+───────────────────────────────────────── */
+@keyframes resultFadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes resultFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Hero: texto (nombre + ciudad) — fade sin movimiento */
+.view--results.fx-enter .results__hero {
+  animation: resultFadeIn 0.22s ease both;
+  animation-delay: 0.08s;
+}
+
+/* Diagnosis (¿Está para salir? + ilustración + título) */
+.view--results.fx-enter .diagnosis {
+  animation: resultFadeUp 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 0.20s;
+}
+
+/* Narrative blocks — staggered */
+.view--results.fx-enter .narrative-block:nth-child(1) {
+  animation: resultFadeUp 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 0.28s;
+}
+.view--results.fx-enter .narrative-block:nth-child(2) {
+  animation: resultFadeUp 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 0.34s;
+}
+.view--results.fx-enter .narrative-block:nth-child(3) {
+  animation: resultFadeUp 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 0.40s;
 }
 
 /* ─────────────────────────────────────────
