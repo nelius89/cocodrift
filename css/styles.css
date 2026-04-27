@@ -868,6 +868,75 @@ ul { list-style: none; }
   padding: 0 32px;
 }
 
+/* ── Bocadillo ── */
+.bocadillo {
+  background: transparent;
+  border: 2px solid var(--blue);
+  border-radius: 18px;
+  padding: 22px 20px 20px;
+  position: relative;
+  margin-bottom: 24px;
+}
+
+.bocadillo::after {
+  content: '';
+  position: absolute;
+  bottom: -18px;
+  left: 52px;
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 18px solid var(--blue);
+}
+
+.bocadillo__title {
+  font-size: 32px;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: var(--blue);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+.bocadillo__divider {
+  width: 100%;
+  height: 1px;
+  background: var(--blue);
+  opacity: 0.2;
+  margin-bottom: 14px;
+}
+
+.bocadillo__text {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--blue);
+  line-height: 1.6;
+  text-align: center;
+}
+
+.bocadillo__line {
+  display: block;
+}
+
+.bocadillo__line + .bocadillo__line {
+  margin-top: 8px;
+}
+
+.bocadillo__line--fit {
+  font-weight: 700;
+  margin-top: 10px;
+  opacity: 0.7;
+}
+
+.diagnosis__croc {
+  width: 180px;
+  display: block;
+  margin: 0 auto 8px;
+}
+
 /* ── Narrative blocks ── */
 .narrative-blocks {
   display: flex;

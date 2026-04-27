@@ -396,8 +396,8 @@ function refreshFranjaContent(oldIndex, newIndex) {
 
     // Pre-ocultar elementos para el stagger
     const items = [
-      el.querySelector('.diagnosis'),
-      ...el.querySelectorAll('.narrative-block')
+      el.querySelector('.bocadillo'),
+      el.querySelector('.diagnosis__croc'),
     ].filter(Boolean);
     items.forEach(item => {
       item.style.transition = 'none';
@@ -528,21 +528,14 @@ function renderResults(sliderIdx) {
   // Ciudad (actualizar por si acaso)
   document.getElementById('ctx-city').textContent = currentSpot.city || '—';
 
-  // Título diagnóstico
+  // Título diagnóstico (bocadillo)
   document.getElementById('diagnosis-title').textContent = info.titulo;
 
-  // Ilustración según estado
-  document.getElementById('diagnosis-illus').innerHTML =
-    `<img src="${ESTADO_ILLUS[estado]}" alt="">`;
-
-  // Bloques narrativos
+  // Bloques narrativos — bocadillo muestra desc + desc + fit.title
   const nb = buildNarrativeBlocks(d, estado, warnings);
-  document.getElementById('nb-encounter-title').textContent = nb.encounter.title;
-  document.getElementById('nb-encounter-desc').textContent  = nb.encounter.desc;
-  document.getElementById('nb-demand-title').textContent    = nb.demand.title;
-  document.getElementById('nb-demand-desc').textContent     = nb.demand.desc;
-  document.getElementById('nb-fit-title').textContent       = nb.fit.title;
-  document.getElementById('nb-fit-desc').textContent        = nb.fit.desc;
+  document.getElementById('nb-encounter-desc').textContent = nb.encounter.desc;
+  document.getElementById('nb-demand-desc').textContent    = nb.demand.desc;
+  document.getElementById('nb-fit-title').textContent      = nb.fit.title;
 
   // Bloques técnicos
   renderTechBlocks(d, warnings);
