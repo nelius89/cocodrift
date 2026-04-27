@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cocodrift — Preview bocadillo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:  #314fff;
+      --beige: #f9f6ef;
+      --black: #0a0a0a;
+      --white: #ffffff;
+      --font:  'Geist Mono', monospace;
+    }
+
+    body {
+      background: #e8e4da;
+      font-family: var(--font);
+      padding: 40px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 48px;
+    }
+
+    h1 {
+      font-family: var(--font);
+      font-size: 11px;
+      font-weight: 600;
+      color: #999;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      align-self: flex-start;
+      max-width: 375px;
+      width: 100%;
+    }
+
+    .phone {
+      width: 100%;
+      max-width: 375px;
+      background: var(--beige);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+    }
+
+    .header {
+      background: var(--blue);
+      padding: 20px 20px 16px;
+    }
+
+    .header__beach {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--white);
+      text-align: center;
+      letter-spacing: -0.01em;
+      margin-bottom: 2px;
+    }
+
+    .header__location {
+      font-size: 11px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.65);
+      text-align: center;
+      margin-bottom: 14px;
+    }
+
+    .header__tabs {
+      display: flex;
+      background: rgba(255,255,255,0.12);
+      border-radius: 99px;
+      padding: 3px;
+      gap: 2px;
+      margin-bottom: 14px;
+    }
+
+    .tab {
+      flex: 1;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.5);
+      padding: 6px 0;
+      border-radius: 99px;
+      font-family: var(--font);
+    }
+
+    .tab--active {
+      background: var(--white);
+      color: var(--blue);
+    }
+
+    .header__times {
+      display: flex;
+      gap: 4px;
+    }
+
+    .time-slot {
+      flex: 1;
+      text-align: center;
+      padding: 7px 4px;
+      border-radius: 10px;
+    }
+
+    .time-slot--active {
+      background: rgba(255,255,255,0.15);
+    }
+
+    .time-slot__label {
+      font-size: 9px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.7);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 3px;
+    }
+
+    .time-slot__temp {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--white);
+    }
+
+    .body {
+      padding: 28px 20px 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ── Bocadillo — fondo transparente ── */
+    .bocadillo {
+      width: 100%;
+      background: transparent;
+      border: 2px solid var(--blue);
+      border-radius: 18px;
+      padding: 22px 20px 20px;
+      position: relative;
+      margin-bottom: 24px;
+    }
+
+    .bocadillo::after {
+      content: '';
+      position: absolute;
+      bottom: -18px;
+      left: 52px;
+      width: 0;
+      height: 0;
+      border-left: 10px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 18px solid var(--blue);
+    }
+
+    /* ── Título grande ── */
+    .bocadillo__title {
+      font-size: 30px;
+      font-weight: 700;
+      color: var(--blue);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+
+    .bocadillo__divider {
+      width: 100%;
+      height: 1px;
+      background: var(--blue);
+      opacity: 0.2;
+      margin-bottom: 14px;
+    }
+
+    .bocadillo__text {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--blue);
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    .bocadillo__line {
+      display: block;
+    }
+
+    .bocadillo__line + .bocadillo__line {
+      margin-top: 8px;
+    }
+
+    .bocadillo__line--fit {
+      font-weight: 700;
+      margin-top: 10px;
+      opacity: 0.6;
+    }
+
+    .croc {
+      font-size: 52px;
+      margin-top: 8px;
+    }
+
+    .state-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(49,79,255,0.5);
+      margin-bottom: 10px;
+      align-self: flex-start;
+      max-width: 375px;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Preview bocadillo — Cocodrift v2.1</h1>
+
+  <!-- 1: PISCINA -->
+  <div class="state-label">Estado 1 — piscina</div>
+  <div class="phone">
+    <div class="header">
+      <div class="header__beach">Platja del Pont del Petroli</div>
+      <div class="header__location">⊙ Badalona</div>
+      <div class="header__tabs">
+        <div class="tab tab--active">Hoy</div>
+        <div class="tab">Mañana</div>
+        <div class="tab">7 días</div>
+      </div>
+      <div class="header__times">
+        <div class="time-slot time-slot--active"><div class="time-slot__label">Amanecer</div><div class="time-slot__temp">16°</div></div>
+        <div class="time-slot"><div class="time-slot__label">Día</div><div class="time-slot__temp">21°</div></div>
+        <div class="time-slot"><div class="time-slot__label">Tarde</div><div class="time-slot__temp">20°</div></div>
+        <div class="time-slot"><div class="time-slot__label">Noche</div><div class="time-slot__temp">18°</div></div>
+      </div>
+    </div>
+    <div class="body">
+      <div class="bocadillo">
+        <div class="bocadillo__title">SE ESTÁ COMO<br>EN UNA PISCINA</div>
+        <div class="bocadillo__divider"></div>
+        <div class="bocadillo__text">
+          <span class="bocadillo__line">Sin olas ni movimiento. Plano de verdad.</span>
+          <span class="bocadillo__line">Sin resistencia. Se avanza tranquilamente.</span>
+          <span class="bocadillo__line bocadillo__line--fit">Fácil incluso si es tu primera vez.</span>
+        </div>
+      </div>
+      <div class="croc">🐊</div>
+    </div>
+  </div>
+
+  <!-- 2: MUY AGRADABLE -->
+  <div class="state-label">Estado 2 — muy agradable</div>
+  <div class="phone">
+    <div class="header">
+      <div class="header__beach">Platja del Pont del Petroli</div>
+      <div class="header__location">⊙ Badalona</div>
+      <div class="header__tabs">
+        <div class="tab tab--active">Hoy</div>
+        <div class="tab">Mañana</div>
+        <div class="tab">7 días</div>
+      </div>
+      <div class="header__times">
+        <div class="time-slot time-slot--active"><div class="time-slot__label">Amanecer</div><div class="time-slot__temp">16°</div></div>
+        <div class="time-slot"><div class="time-slot__label">Día</div><div class="time-slot__temp">21°</div></div>
+        <div class="time-slot"><div class="time-slot__label">Tarde</div><div class="time-slot__temp">20°</div></div>
+        <div class="time-slot"><div class="time-slot__label">Noche</div><div class="time-slot__temp">18°</div></div>
+      </div>
+    </div>
+    <div class="body">
+      <div class="bocadillo">
+        <div class="bocadillo__title">ESTÁ SUPER<br>AGRADABLE</div>
+        <div class="bocadillo__divider"></div>
+        <div class="bocadillo__text">
+          <span class="bocadillo__line">Olas pequeñas con ritmo regular. Nada que sorprenda.</span>
+          <span class="bocadillo__line">Hay algo de viento, pero no molesta ni condiciona.</span>
+          <span class="bocadillo__line bocadillo__line--fit">Apto para casi todos.</span>
+        </div>
+      </div>
+      <div class="croc">🐊</div>
+    </div>
+  </div>
+
+  <!-- 3: SE PUEDE SALIR -->
+  <div class="state-label">Estado 3 — se puede salir</div>
+  <div class="phone">
+    <div class="header">
+      <div class="header__beach">Platja del Pont del Petroli</div>
+      <div class="header__location">⊙ Badalona</div>
+      <div class="header__tabs">
+        <div class="tab tab--active">Hoy</div>
+        <div class="tab">Mañana</div>
+        <div class="tab">7 días</div>
+      </div>
+      <div class="header__times">
+        <div class="time-slot time-slot--active"><div class="time-slot__label">Amanecer</div><div class="time-slot__temp">16°</div></div>
+        <div class="time-slot"><div class="time-slot__label">Día</div><div class="time-slot__temp">21°</div></div>
+        <div class="time-slot"><div class="time-slot__label">Tarde</div><div class="time-slot__temp">20°</div></div>
+        <div class="time-slot"><div class="time-slot__label">Noche</div><div class="time-slot__temp">18°</div></div>
+      </div>
+    </div>
+    <div class="body">
+      <div class="bocadillo">
+        <div class="bocadillo__title">ESTÁ MOVIDITO<br>PERO MANEJABLE</div>
+        <div class="bocadillo__divider"></div>
+        <div class="bocadillo__text">
+          <span class="bocadillo__line">Las olas se notan. No siguen un ritmo claro.</span>
+          <span class="bocadillo__line">El viento no es constante y puede pillarte. Remar empieza a costar.</span>
+          <span class="bocadillo__line bocadillo__line--fit">Mejor si ya has salido alguna vez.</span>
+        </div>
+      </div>
+      <div class="croc">🐊</div>
+    </div>
+  </div>
+
+  <!-- 3b: SE PUEDE SALIR + TERRAL -->
+  <div class="state-label">Estado 3b — se puede salir + terral moderado</div>
+  <div class="phone">
+    <div class="header">
+      <div class="header__beach">Platja del Pont del Petroli</div>
+      <div class="header__location">⊙ Badalona</div>
+      <div class="header__tabs">
+        <div class="tab tab--active">Hoy</div>
+        <div class="tab">Mañana</div>
+        <div class="tab">7 días</div>
+      </div>
+      <div class="header__times">
+        <div class="time-slot time-slot--active"><div class="time-slot__label">Amanecer</div><div class="time-slot__temp">16°</div></div>
+        <div class="time-slot"><div class="time-slot__label">Día</div><div class="time-slot__temp">21°</div></div>
+        <div class="time-slot"><div class="time-slot__label">Tarde</div><div class="time-slot__temp">20°</div></div>
+        <div class="time-slot"><div class="time-slot__label">Noche</div><div class="time-slot__temp">18°</div></div>
+      </div>
+    </div>
+    <div class="body">
+      <div class="bocadillo">
+        <div class="bocadillo__title">ESTÁ MOVIDITO<br>PERO MANEJABLE</div>
+        <div class="bocadillo__divider"></div>
+        <div class="bocadillo__text">
+          <span class="bocadillo__line">Casi plano, pero hay movimiento en la orilla. Puede costar entrar.</span>
+          <span class="bocadillo__line">Viento de tierra: te empuja hacia el mar. Si sube, volver costará.</span>
+          <span class="bocadillo__line bocadillo__line--fit">Mejor si ya has salido alguna vez.</span>
+        </div>
+      </div>
+      <div class="croc">🐊</div>
+    </div>
+  </div>
+
+  <!-- 4: EXIGENTE -->
+  <div class="state-label">Estado 4 — exigente</div>
+  <div class="phone">
+    <div class="header">
+      <div class="header__beach">Platja del Pont del Petroli</div>
+      <div class="header__location">⊙ Badalona</div>
+      <div class="header__tabs">
+        <div class="tab tab--active">Hoy</div>
+        <div class="tab">Mañana</div>
+        <div class="tab">7 días</div>
+      </div>
+      <div class="header__times">
+        <div class="time-slot time-slot--active"><div class="time-slot__label">Amanecer</div><div class="time-slot__temp">16°</div></div>
+        <div class="time-slot"><div class="time-slot__label">Día</div><div class="time-slot__temp">21°</div></div>
+        <div class="time-slot"><div class="time-slot__label">Tarde</div><div class="time-slot__temp">20°</div></div>
+        <div class="time-slot"><div class="time-slot__label">Noche</div><div class="time-slot__temp">18°</div></div>
+      </div>
+    </div>
+    <div class="body">
+      <div class="bocadillo">
+        <div class="bocadillo__title">EL MAR ESTÁ<br>EXIGENTE</div>
+        <div class="bocadillo__divider"></div>
+        <div class="bocadillo__text">
+          <span class="bocadillo__line">Olas sin ritmo que no dan tregua. Hay que estar muy atento.</span>
+          <span class="bocadillo__line">El viento empuja fuerte. Mantener el equilibrio exige concentración.</span>
+          <span class="bocadillo__line bocadillo__line--fit">Solo para gente con experiencia.</span>
+        </div>
+      </div>
+      <div class="croc">🐊</div>
+    </div>
+  </div>
+
+  <!-- 5: NO RECOMENDABLE -->
+  <div class="state-label">Estado 5 — no recomendable</div>
+  <div class="phone">
+    <div class="header">
+      <div class="header__beach">Platja del Pont del Petroli</div>
+      <div class="header__location">⊙ Badalona</div>
+      <div class="header__tabs">
+        <div class="tab tab--active">Hoy</div>
+        <div class="tab">Mañana</div>
+        <div class="tab">7 días</div>
+      </div>
+      <div class="header__times">
+        <div class="time-slot time-slot--active"><div class="time-slot__label">Amanecer</div><div class="time-slot__temp">16°</div></div>
+        <div class="time-slot"><div class="time-slot__label">Día</div><div class="time-slot__temp">21°</div></div>
+        <div class="time-slot"><div class="time-slot__label">Tarde</div><div class="time-slot__temp">20°</div></div>
+        <div class="time-slot"><div class="time-slot__label">Noche</div><div class="time-slot__temp">18°</div></div>
+      </div>
+    </div>
+    <div class="body">
+      <div class="bocadillo">
+        <div class="bocadillo__title">HOY MEJOR<br>EN TIERRA</div>
+        <div class="bocadillo__divider"></div>
+        <div class="bocadillo__text">
+          <span class="bocadillo__line">Olas grandes, cortas y sin orden.</span>
+          <span class="bocadillo__line">El viento puede arrastrarte. Muy difícil mantenerse.</span>
+          <span class="bocadillo__line bocadillo__line--fit">No es seguro para nadie hoy.</span>
+        </div>
+      </div>
+      <div class="croc">🐊</div>
+    </div>
+  </div>
+
+</body>
+</html>
